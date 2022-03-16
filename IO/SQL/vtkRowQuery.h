@@ -48,7 +48,7 @@
  *
  * @sa
  * vtkRowQueryToTable
-*/
+ */
 
 #ifndef vtkRowQuery_h
 #define vtkRowQuery_h
@@ -127,7 +127,7 @@ public:
    */
   virtual const char* GetLastErrorText() = 0;
 
-  //@{
+  ///@{
   /**
    * Many databases do not preserve case in field names.  This can
    * cause GetFieldIndex to fail if you search for a field named
@@ -139,16 +139,16 @@ public:
   vtkSetMacro(CaseSensitiveFieldNames, bool);
   vtkGetMacro(CaseSensitiveFieldNames, bool);
   vtkBooleanMacro(CaseSensitiveFieldNames, bool);
-  //@}
+  ///@}
 
 protected:
   vtkRowQuery();
   ~vtkRowQuery() override;
   bool CaseSensitiveFieldNames;
+
 private:
-  vtkRowQuery(const vtkRowQuery &) = delete;
-  void operator=(const vtkRowQuery &) = delete;
+  vtkRowQuery(const vtkRowQuery&) = delete;
+  void operator=(const vtkRowQuery&) = delete;
 };
 
 #endif // vtkRowQuery_h
-

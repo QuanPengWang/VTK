@@ -15,12 +15,10 @@
 /**
  * @class   vtkXdmfReaderInternal
  *
-*/
+ */
 
 #ifndef vtkXdmfReaderInternal_h
 #define vtkXdmfReaderInternal_h
-#ifndef __VTK_WRAP__
-#ifndef VTK_WRAPPING_CXX
 
 // NAMING CONVENTION *********************************************************
 // * all member variables of the type XdmfXml* begin with XML eg. XMLNode
@@ -52,63 +50,61 @@
 //?
 #include VTKXDMF2_HEADER(XdmfSet.h)
 
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-#include <vtksys/SystemTools.hxx>
+#include <algorithm>
 #include <cassert>
 #include <functional>
-#include <algorithm>
+#include <map>
+#include <set>
 #include <sstream>
+#include <string>
+#include <vector>
+#include <vtksys/SystemTools.hxx>
 
 class vtkXdmfDomain;
 class VTKIOXDMF2_EXPORT vtkXdmfDocument
 {
 public:
   //---------------------------------------------------------------------------
-  //@{
+  ///@{
   /**
    * Parse an xmf file (or string). Both these methods use caching hence calling
    * these methods repeatedly with the same argument will NOT result in
    * re-parsing of the xmf.
    */
-  bool Parse(const char*xmffilename);
+  bool Parse(const char* xmffilename);
   bool ParseString(const char* xmfdata, size_t length);
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**
    * Returns the names for available domains.
    */
-  const std::vector<std::string>& GetDomains()
-    { return this->Domains; }
+  const std::vector<std::string>& GetDomains() { return this->Domains; }
 
   //---------------------------------------------------------------------------
-  //@{
+  ///@{
   /**
    * Set the active domain. This will result in processing of the domain xmf if
    * the selected domain is different from the active one.
    */
   bool SetActiveDomain(const char* domainname);
   bool SetActiveDomain(int index);
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**
    * Returns the active domain.
    */
-  vtkXdmfDomain* GetActiveDomain()
-    { return this->ActiveDomain; }
+  vtkXdmfDomain* GetActiveDomain() { return this->ActiveDomain; }
 
   //---------------------------------------------------------------------------
-  //@{
+  ///@{
   /**
    * Constructor/Destructor
    */
   vtkXdmfDocument();
   ~vtkXdmfDocument();
-  //@}
+  ///@}
 
 private:
   // Populates the list of domains.
@@ -139,10 +135,7 @@ public:
     }
   }
 
-  void AddArray(const char* name, bool status=true)
-  {
-    (*this)[name] = status;
-  }
+  void AddArray(const char* name, bool status = true) { (*this)[name] = status; }
 
   bool ArrayIsEnabled(const char* name)
   {
@@ -162,24 +155,17 @@ public:
     return (iter != this->end());
   }
 
-  int GetArraySetting(const char* name)
-  {
-    return this->ArrayIsEnabled(name)? 1 : 0;
-  }
+  int GetArraySetting(const char* name) { return this->ArrayIsEnabled(name) ? 1 : 0; }
 
-  void SetArrayStatus(const char* name, bool status)
-  {
-    this->AddArray(name, status);
-  }
+  void SetArrayStatus(const char* name, bool status) { this->AddArray(name, status); }
 
   const char* GetArrayName(int index)
   {
-    int cc=0;
-    for (vtkXdmfArraySelection::iterator iter = this->begin();
-      iter != this->end(); ++iter)
+    int cc = 0;
+    for (vtkXdmfArraySelection::iterator iter = this->begin(); iter != this->end(); ++iter)
     {
 
-      if (cc==index)
+      if (cc == index)
       {
         return iter->first.c_str();
       }
@@ -188,10 +174,7 @@ public:
     return nullptr;
   }
 
-  int GetNumberOfArrays()
-  {
-    return static_cast<int>(this->size());
-  }
+  int GetNumberOfArrays() { return static_cast<int>(this->size()); }
 };
 
 //***************************************************************************
@@ -208,8 +191,7 @@ private:
   // these are node indices used when building the SIL.
   vtkIdType SILBlocksRoot;
   std::map<std::string, vtkIdType> GridCenteredAttrbuteRoots;
-  std::map<vtkIdType,
-    std::map<XdmfInt64, vtkIdType> > GridCenteredAttrbuteValues;
+  std::map<vtkIdType, std::map<XdmfInt64, vtkIdType>> GridCenteredAttrbuteValues;
 
   vtkSILBuilder* SILBuilder;
   vtkMutableDirectedGraph* SIL;
@@ -218,7 +200,7 @@ private:
   vtkXdmfArraySelection* Grids;
   vtkXdmfArraySelection* Sets;
   std::map<XdmfFloat64, int> TimeSteps; //< Only discrete timesteps are currently
-                                 //  supported.
+                                        //  supported.
   std::map<int, XdmfFloat64> TimeStepsRev;
 
 public:
@@ -232,12 +214,10 @@ public:
    * After instantiating, check that the domain is valid. If this returns false,
    * it means that the specified domain could not be located.
    */
-  bool IsValid()
-    { return (this->XMLDomain != 0); }
+  bool IsValid() { return (this->XMLDomain != 0); }
 
   //---------------------------------------------------------------------------
-  vtkGraph* GetSIL()
-    { return this->SIL; }
+  vtkGraph* GetSIL() { return this->SIL; }
 
   //---------------------------------------------------------------------------
   /**
@@ -264,10 +244,8 @@ public:
   /**
    * Returns the timesteps.
    */
-  const std::map<XdmfFloat64, int>& GetTimeSteps()
-    { return this->TimeSteps; }
-  const std::map<int,XdmfFloat64>& GetTimeStepsRev()
-    { return this->TimeStepsRev; }
+  const std::map<XdmfFloat64, int>& GetTimeSteps() { return this->TimeSteps; }
+  const std::map<int, XdmfFloat64>& GetTimeStepsRev() { return this->TimeStepsRev; }
 
   //---------------------------------------------------------------------------
   /**
@@ -276,7 +254,7 @@ public:
   int GetIndexForTime(double time);
 
   //---------------------------------------------------------------------------
-  //@{
+  ///@{
   /**
    * Returns the time value at the given index.
    */
@@ -285,7 +263,7 @@ public:
     std::map<int, XdmfFloat64>::iterator iter = this->TimeStepsRev.find(index);
     return (iter != this->TimeStepsRev.end()) ? iter->second : 0.0;
   }
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**
@@ -327,14 +305,10 @@ public:
   // Returns -1 is the xmfGrid is not a uniform i.e. is a collection or a tree.
   static int GetDataDimensionality(xdmf2::XdmfGrid* xmfGrid);
 
-  vtkXdmfArraySelection* GetPointArraySelection()
-    { return this->PointArrays; }
-  vtkXdmfArraySelection* GetCellArraySelection()
-    { return this->CellArrays; }
-  vtkXdmfArraySelection* GetGridSelection()
-    { return this->Grids; }
-  vtkXdmfArraySelection* GetSetsSelection()
-    { return this->Sets; }
+  vtkXdmfArraySelection* GetPointArraySelection() { return this->PointArrays; }
+  vtkXdmfArraySelection* GetCellArraySelection() { return this->CellArrays; }
+  vtkXdmfArraySelection* GetGridSelection() { return this->Grids; }
+  vtkXdmfArraySelection* GetSetsSelection() { return this->Sets; }
 
 private:
   /**
@@ -358,17 +332,14 @@ private:
   // Used by CollectMetaData().
   void CollectLeafMetaData(xdmf2::XdmfGrid* xmfGrid, vtkIdType silParent);
 
-  //@{
+  ///@{
   /**
    * Use this to add an association with the grid attribute with the node for
    * the grid in the SIL if applicable. Returns true if the attribute was added.
    */
-  bool UpdateGridAttributeInSIL(
-    xdmf2::XdmfAttribute* xmfAttribute, vtkIdType gridSILId);
+  bool UpdateGridAttributeInSIL(xdmf2::XdmfAttribute* xmfAttribute, vtkIdType gridSILId);
+  ///@}
 };
-  //@}
 
-#endif
-#endif
 #endif
 // VTK-HeaderTest-Exclude: vtkXdmfReaderInternal.h

@@ -49,7 +49,7 @@ VTXvtkVTI::VTXvtkVTI(const std::string& schema, adios2::IO& io, adios2::Engine& 
   InitTimes();
 }
 
-VTXvtkVTI::~VTXvtkVTI() {}
+VTXvtkVTI::~VTXvtkVTI() = default;
 
 // PRIVATE
 void VTXvtkVTI::DoFill(vtkMultiBlockDataSet* multiBlock, const size_t step)
@@ -77,7 +77,7 @@ void VTXvtkVTI::ReadPiece(const size_t step, const size_t pieceID)
     for (auto& dataArrayPair : dataSet)
     {
       const std::string& variableName = dataArrayPair.first;
-      if (this->TIMENames.count(variableName) == 1)
+      if (VTXvtkVTI::TIMENames.count(variableName) == 1)
       {
         continue;
       }
@@ -94,7 +94,7 @@ void VTXvtkVTI::ReadPiece(const size_t step, const size_t pieceID)
     for (auto& dataArrayPair : dataSet)
     {
       const std::string& variableName = dataArrayPair.first;
-      if (this->TIMENames.count(variableName) == 1)
+      if (VTXvtkVTI::TIMENames.count(variableName) == 1)
       {
         continue;
       }
@@ -112,7 +112,7 @@ void VTXvtkVTI::Init()
     const std::string nodeName = DataSetType(type);
     const pugi::xml_node dataSetNode = helper::XMLNode(
       nodeName, pieceNode, true, "when reading " + nodeName + " node in ImageData", false);
-    types::DataSet dataSet = helper::XMLInitDataSet(dataSetNode, this->TIMENames);
+    types::DataSet dataSet = helper::XMLInitDataSet(dataSetNode, VTXvtkVTI::TIMENames);
 
     for (auto& dataArrayPair : dataSet)
     {
@@ -156,7 +156,7 @@ void VTXvtkVTI::Init()
     const pugi::xml_attribute wholeExtentXML = vtx::helper::XMLAttribute(
       "WholeExtent", extentNode, true, "when reading WholeExtent in ImageData", true);
 
-    this->WholeExtent = vtx::helper::StringToVector<size_t>(wholeExtentXML.value());
+    this->WholeExtent = vtx::helper::StringToVector<std::size_t>(wholeExtentXML.value());
     if (this->WholeExtent.size() != 6)
     {
       throw std::runtime_error("ERROR: incorrect WholeExtent attribute, must have 6 elements, "

@@ -49,6 +49,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkTesting.h"
 
 #include <adios2.h>
 
@@ -99,12 +100,14 @@ void WriteBPFile3DVars(const std::string& fileName, const adios2::Dims& shape,
   const std::string extent = "0 " + std::to_string(shape[0]) + " " + "0 " +
     std::to_string(shape[1]) + " " + "0 " + std::to_string(shape[2]);
 
-    const std::string imageSchema = R"( <?xml version="1.0"?>
+  const std::string imageSchema = R"( <?xml version="1.0"?>
       <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian">
-        <ImageData WholeExtent=")" + extent +
-                                    R"(" Origin="0 0 0" Spacing="1 1 1">
-          <Piece Extent=")" + extent +
-                                    R"(">
+        <ImageData WholeExtent=")" +
+    extent +
+    R"(" Origin="0 0 0" Spacing="1 1 1">
+          <Piece Extent=")" +
+    extent +
+    R"(">
             <CellData>
               <DataArray Name="T" />
               <DataArray Name="TIME">
@@ -115,15 +118,15 @@ void WriteBPFile3DVars(const std::string& fileName, const adios2::Dims& shape,
         </ImageData>
       </VTKFile>)";
 
-    // using adios2 C++ high-level API
-    std::vector<double> T(totalElements);
-    std::iota(T.begin(), T.end(), static_cast<double>(rank * totalElements));
+  // using adios2 C++ high-level API
+  std::vector<double> T(totalElements);
+  std::iota(T.begin(), T.end(), static_cast<double>(rank * totalElements));
 
-    adios2::fstream fw(fileName, adios2::fstream::out, MPIGetComm());
-    fw.write_attribute("vtk.xml", imageSchema);
-    fw.write("time", 0);
-    fw.write("T", T.data(), shape, start, count);
-    fw.close();
+  adios2::fstream fw(fileName, adios2::fstream::out, MPIGetComm());
+  fw.write_attribute("vtk.xml", imageSchema);
+  fw.write("time", 0);
+  fw.write("T", T.data(), shape, start, count);
+  fw.close();
 }
 
 } // end empty namespace
@@ -137,7 +140,9 @@ int TestIOADIOS2VTX_VTI3DRendering(int argc, char* argv[])
   const int rank = MPIGetRank();
   const int size = MPIGetSize();
 
-  const std::string fileName = "heat3D_render.bp";
+  vtkNew<vtkTesting> testing;
+  const std::string rootDirectory(testing->GetTempDirectory());
+  const std::string fileName = rootDirectory + "/heat3D_render.bp";
   const adios2::Dims count{ 4, 4, 8 };
   const adios2::Dims start{ static_cast<size_t>(rank) * count[0], 0, 0 };
   const adios2::Dims shape{ static_cast<size_t>(size) * count[0], count[1], count[2] };
@@ -153,19 +158,6 @@ int TestIOADIOS2VTX_VTI3DRendering(int argc, char* argv[])
   vtkMultiPieceDataSet* mp = vtkMultiPieceDataSet::SafeDownCast(multiBlock->GetBlock(0));
   vtkImageData* imageData = vtkImageData::SafeDownCast(mp->GetPiece(rank));
 
-  if (false)
-  {
-    double* data =
-      reinterpret_cast<double*>(imageData->GetCellData()->GetArray("T")->GetVoidPointer(0));
-
-    for (size_t i = 0; i < 128; ++i)
-    {
-      if (data[i] != static_cast<double>(i))
-      {
-        throw std::invalid_argument("ERROR: invalid source data for rendering\n");
-      }
-    }
-  }
   // set color table
   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
   lookupTable->SetNumberOfTableValues(10);

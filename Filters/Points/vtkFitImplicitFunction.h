@@ -47,7 +47,7 @@
  *
  * @sa
  * vtkPointCloudFilter vtkExtractPoints vtkImplicitFunction
-*/
+ */
 
 #ifndef vtkFitImplicitFunction_h
 #define vtkFitImplicitFunction_h
@@ -58,38 +58,37 @@
 class vtkImplicitFunction;
 class vtkPointSet;
 
-
 class VTKFILTERSPOINTS_EXPORT vtkFitImplicitFunction : public vtkPointCloudFilter
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instantiating, obtaining type information, and
    * printing information.
    */
-  static vtkFitImplicitFunction *New();
-  vtkTypeMacro(vtkFitImplicitFunction,vtkPointCloudFilter);
+  static vtkFitImplicitFunction* New();
+  vtkTypeMacro(vtkFitImplicitFunction, vtkPointCloudFilter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the implicit function defining a surface on which points
    * are to be extracted.
    */
   virtual void SetImplicitFunction(vtkImplicitFunction*);
-  vtkGetObjectMacro(ImplicitFunction,vtkImplicitFunction);
-  //@}
+  vtkGetObjectMacro(ImplicitFunction, vtkImplicitFunction);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify a threshold value which defines a fuzzy extraction surface.
    * Since in this filter the implicit surface is defined as f(x,y,z)=0;
    * the extracted points are (-Threshold <= f(x,y,z) < Threshold).
    */
-  vtkSetClampMacro(Threshold,double,0.0,VTK_FLOAT_MAX);
-  vtkGetMacro(Threshold,double);
-  //@}
+  vtkSetClampMacro(Threshold, double, 0.0, VTK_FLOAT_MAX);
+  vtkGetMacro(Threshold, double);
+  ///@}
 
   /**
    * Return the MTime taking into account changes to the implicit function.
@@ -100,17 +99,16 @@ protected:
   vtkFitImplicitFunction();
   ~vtkFitImplicitFunction() override;
 
-  vtkImplicitFunction *ImplicitFunction;
+  vtkImplicitFunction* ImplicitFunction;
   double Threshold;
 
   // All derived classes must implement this method. Note that a side effect of
   // the class is to populate the PointMap. Zero is returned if there is a failure.
-  int FilterPoints(vtkPointSet *input) override;
+  int FilterPoints(vtkPointSet* input) override;
 
 private:
   vtkFitImplicitFunction(const vtkFitImplicitFunction&) = delete;
   void operator=(const vtkFitImplicitFunction&) = delete;
-
 };
 
 #endif

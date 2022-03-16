@@ -41,13 +41,13 @@
  *
  * @sa
  * vtkApproximatingSubdivisionFilter
-*/
+ */
 
 #ifndef vtkLoopSubdivisionFilter_h
 #define vtkLoopSubdivisionFilter_h
 
-#include "vtkFiltersModelingModule.h" // For export macro
 #include "vtkApproximatingSubdivisionFilter.h"
+#include "vtkFiltersModelingModule.h" // For export macro
 
 class vtkPolyData;
 class vtkIntArray;
@@ -57,27 +57,26 @@ class vtkIdList;
 class VTKFILTERSMODELING_EXPORT vtkLoopSubdivisionFilter : public vtkApproximatingSubdivisionFilter
 {
 public:
-  //@{
+  ///@{
   /**
    * Construct object with NumberOfSubdivisions set to 1.
    */
-  static vtkLoopSubdivisionFilter *New();
-  vtkTypeMacro(vtkLoopSubdivisionFilter,vtkApproximatingSubdivisionFilter);
-  //@}
+  static vtkLoopSubdivisionFilter* New();
+  vtkTypeMacro(vtkLoopSubdivisionFilter, vtkApproximatingSubdivisionFilter);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+  ///@}
 
 protected:
-  vtkLoopSubdivisionFilter () {}
-  ~vtkLoopSubdivisionFilter () override {}
+  vtkLoopSubdivisionFilter() = default;
+  ~vtkLoopSubdivisionFilter() override = default;
 
-  int GenerateSubdivisionPoints (vtkPolyData *inputDS, vtkIntArray *edgeData,
-                                 vtkPoints *outputPts,
-                                 vtkPointData *outputPD) override;
-  int  GenerateEvenStencil (vtkIdType p1, vtkPolyData *polys,
-                            vtkIdList *stencilIds, double *weights);
-  void GenerateOddStencil (vtkIdType p1, vtkIdType p2, vtkPolyData *polys,
-                           vtkIdList *stencilIds, double *weights);
+  int GenerateSubdivisionPoints(vtkPolyData* inputDS, vtkIntArray* edgeData, vtkPoints* outputPts,
+    vtkPointData* outputPD) override;
+  int GenerateEvenStencil(vtkIdType p1, vtkPolyData* polys, vtkIdList* stencilIds, double* weights);
+  void GenerateOddStencil(
+    vtkIdType p1, vtkIdType p2, vtkPolyData* polys, vtkIdList* stencilIds, double* weights);
 
-  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkLoopSubdivisionFilter(const vtkLoopSubdivisionFilter&) = delete;
@@ -85,4 +84,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkLoopSubdivisionFilter.h

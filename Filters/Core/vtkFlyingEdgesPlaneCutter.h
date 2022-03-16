@@ -19,7 +19,7 @@
  *
  * vtkFlyingEdgesPlaneCutter is a specialization of the FlyingEdges algorithm
  * to cut a volume with a single plane. It is designed for performance and
- * an exploratory, fast workflow.
+ * an exploratory, fast workflow. The filter handles oriented volumes.
  *
  * This algorithm is not only fast because it uses flying edges, but also
  * because it plays some "tricks" during processing. For example, rather
@@ -44,7 +44,7 @@
  *
  * @sa
  * vtkFlyingEdges2D vtkFlyingEdges3D
-*/
+ */
 
 #ifndef vtkFlyingEdgesPlaneCutter_h
 #define vtkFlyingEdgesPlaneCutter_h
@@ -58,73 +58,71 @@ class vtkPlane;
 class VTKFILTERSCORE_EXPORT vtkFlyingEdgesPlaneCutter : public vtkPolyDataAlgorithm
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard construction and print methods.
    */
-  static vtkFlyingEdgesPlaneCutter *New();
-  vtkTypeMacro(vtkFlyingEdgesPlaneCutter,vtkPolyDataAlgorithm);
+  static vtkFlyingEdgesPlaneCutter* New();
+  vtkTypeMacro(vtkFlyingEdgesPlaneCutter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * The modified time depends on the delegated cut plane.
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Specify the plane (an implicit function) to perform the cutting. The
    * definition of the plane (its origin and normal) is controlled via this
    * instance of vtkPlane.
    */
   virtual void SetPlane(vtkPlane*);
-  vtkGetObjectMacro(Plane,vtkPlane);
-  //@}
+  vtkGetObjectMacro(Plane, vtkPlane);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the computation of normals. The normal generated is simply the
    * cut plane normal. By default this is disabled.
    */
-  vtkSetMacro(ComputeNormals,vtkTypeBool);
-  vtkGetMacro(ComputeNormals,vtkTypeBool);
-  vtkBooleanMacro(ComputeNormals,vtkTypeBool);
-  //@}
+  vtkSetMacro(ComputeNormals, vtkTypeBool);
+  vtkGetMacro(ComputeNormals, vtkTypeBool);
+  vtkBooleanMacro(ComputeNormals, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicate whether to interpolate other attribute data besides the input
    * scalars (which are required). That is, as the isosurface is generated,
    * interpolate all other point attribute data across intersected edges.
    */
-  vtkSetMacro(InterpolateAttributes,vtkTypeBool);
-  vtkGetMacro(InterpolateAttributes,vtkTypeBool);
-  vtkBooleanMacro(InterpolateAttributes,vtkTypeBool);
-  //@}
+  vtkSetMacro(InterpolateAttributes, vtkTypeBool);
+  vtkGetMacro(InterpolateAttributes, vtkTypeBool);
+  vtkBooleanMacro(InterpolateAttributes, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get which component of the scalar array to contour on; defaults to 0.
    */
   vtkSetMacro(ArrayComponent, int);
   vtkGetMacro(ArrayComponent, int);
-  //@}
+  ///@}
 
 protected:
   vtkFlyingEdgesPlaneCutter();
   ~vtkFlyingEdgesPlaneCutter() override;
 
-  vtkPlane *Plane;
+  vtkPlane* Plane;
   vtkTypeBool ComputeNormals;
   vtkTypeBool InterpolateAttributes;
   int ArrayComponent;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                  vtkInformationVector *) override;
-  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkFlyingEdgesPlaneCutter(const vtkFlyingEdgesPlaneCutter&) = delete;

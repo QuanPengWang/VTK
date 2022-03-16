@@ -11,18 +11,17 @@
 
 #include "ncdispatch.h"
 
-
 extern int NC3_initialize(void);
 extern int NC3_finalize(void);
 
 #ifdef USE_NETCDF4
 #include "nc4internal.h"
-#include "hdf5internal.h"
 extern int NC4_initialize(void);
 extern int NC4_finalize(void);
 #endif
 
 #ifdef USE_HDF5
+#include "hdf5internal.h"
 extern int NC_HDF5_initialize(void);
 extern int NC_HDF5_finalize(void);
 #endif
@@ -51,9 +50,6 @@ extern int NC_HDF4_finalize(void);
 #include <io.h>
 #include <fcntl.h>
 #endif
-
-int NC_argc = 1;
-char* NC_argv[] = {"nc_initialize",NULL};
 
 int NC_initialized = 0;
 int NC_finalized = 1;
@@ -98,6 +94,9 @@ nc_initialize()
 #endif
 #ifdef USE_HDF4
     if((stat = NC_HDF4_initialize())) goto done;
+#endif
+#ifdef ENABLE_NCZARR
+    if((stat = NCZ_initialize())) goto done;
 #endif
 
 done:
@@ -145,6 +144,10 @@ nc_finalize(void)
 
 #ifdef USE_HDF5
     if((stat = NC_HDF5_finalize())) return stat;
+#endif
+
+#ifdef ENABLE_NCZARR
+    if((stat = NCZ_finalize())) return stat;
 #endif
 
     if((stat = NC3_finalize())) return stat;

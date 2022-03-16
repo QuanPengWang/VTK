@@ -33,41 +33,41 @@
  *
  * @sa
  * vtkButtonWidget
-*/
+ */
 
 #ifndef vtkButtonRepresentation_h
 #define vtkButtonRepresentation_h
 
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
 #include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkWidgetRepresentation.h"
-
 
 class VTKINTERACTIONWIDGETS_EXPORT vtkButtonRepresentation : public vtkWidgetRepresentation
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for the class.
    */
-  vtkTypeMacro(vtkButtonRepresentation,vtkWidgetRepresentation);
+  vtkTypeMacro(vtkButtonRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Retrieve the current button state.
    */
-  vtkSetClampMacro(NumberOfStates,int,1,VTK_INT_MAX);
-  //@}
+  vtkSetClampMacro(NumberOfStates, int, 1, VTK_INT_MAX);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Retrieve the current button state.
    */
-  vtkGetMacro(State,int);
-  //@}
+  vtkGetMacro(State, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Manipulate the state. Note that the NextState() and PreviousState() methods
    * use modulo traversal. The "state" integral value will be clamped within
@@ -77,15 +77,19 @@ public:
   virtual void SetState(int state);
   virtual void NextState();
   virtual void PreviousState();
-  //@}
+  ///@}
 
-  enum _InteractionState
+  enum InteractionStateType
   {
-    Outside=0,
+    Outside = 0,
     Inside
   };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef InteractionStateType _InteractionState;
+#endif
 
-  //@{
+  ///@{
   /**
    * These methods control the appearance of the button as it is being
    * interacted with. Subclasses will behave differently depending on their
@@ -94,15 +98,24 @@ public:
    * Otherwise, the HighlightNormal is used. The Highlight() method will throw
    * a vtkCommand::HighlightEvent.
    */
-  enum _HighlightState {HighlightNormal,HighlightHovering,HighlightSelecting};
+  enum HighlightStateType
+  {
+    HighlightNormal,
+    HighlightHovering,
+    HighlightSelecting
+  };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef HighlightStateType _HighlightState;
+#endif
   void Highlight(int) override;
-  vtkGetMacro(HighlightState,int);
-  //@}
+  vtkGetMacro(HighlightState, int);
+  ///@}
 
   /**
    * Satisfy some of vtkProp's API.
    */
-  void ShallowCopy(vtkProp *prop) override;
+  void ShallowCopy(vtkProp* prop) override;
 
 protected:
   vtkButtonRepresentation();

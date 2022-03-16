@@ -33,7 +33,7 @@
  *
  * @sa
  * vtkSQLDatabase vtkRowQuery
-*/
+ */
 
 #ifndef vtkRowQueryToTable_h
 #define vtkRowQueryToTable_h
@@ -50,13 +50,13 @@ public:
   vtkTypeMacro(vtkRowQueryToTable, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The query to execute.
    */
   void SetQuery(vtkRowQuery* query);
   vtkGetObjectMacro(Query, vtkRowQuery);
-  //@}
+  ///@}
 
   /**
    * Update the modified time based on the query.
@@ -69,10 +69,7 @@ protected:
 
   vtkRowQuery* Query;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkRowQueryToTable(const vtkRowQueryToTable&) = delete;
@@ -80,4 +77,3 @@ private:
 };
 
 #endif
-

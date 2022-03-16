@@ -17,13 +17,13 @@
  * @brief   links vtkLights to OSPRay
  *
  * Translates vtkLight state into OSPRay rendering calls
-*/
+ */
 
 #ifndef vtkOSPRayLightNode_h
 #define vtkOSPRayLightNode_h
 
-#include "vtkRenderingRayTracingModule.h" // For export macro
 #include "vtkLightNode.h"
+#include "vtkRenderingRayTracingModule.h" // For export macro
 
 #include "RTWrapper/RTWrapper.h" // for handle types
 
@@ -34,8 +34,7 @@ class vtkInformationIntegerKey;
 class vtkLight;
 class vtkOSPRayRendererNode;
 
-class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayLightNode :
-  public vtkLightNode
+class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayLightNode : public vtkLightNode
 {
 public:
   static vtkOSPRayLightNode* New();
@@ -45,18 +44,18 @@ public:
   /**
    * Make ospray calls to render me.
    */
-  virtual void Render(bool prepass) override;
+  void Render(bool prepass) override;
 
-  //@{
+  ///@{
   /**
    * A global multiplier to all ospray lights.
    * default is 1.0
    */
   static void SetLightScale(double s);
   static double GetLightScale();
-  //@}
+  ///@}
 
-  //state beyond rendering core...
+  // state beyond rendering core...
 
   /**
    * When present on light, the light acts as an ambient source.
@@ -65,13 +64,13 @@ public:
    */
   static vtkInformationIntegerKey* IS_AMBIENT();
 
-  //@{
+  ///@{
   /**
    * Convenience method to set/get IS_AMBIENT on a vtkLight.
    */
-  static void SetIsAmbient(int, vtkLight *);
-  static int GetIsAmbient(vtkLight *);
-  //@}
+  static void SetIsAmbient(int, vtkLight*);
+  static int GetIsAmbient(vtkLight*);
+  ///@}
 
   /**
    * The radius setting, when > 0.0, produces soft shadows in the
@@ -79,24 +78,24 @@ public:
    */
   static vtkInformationDoubleKey* RADIUS();
 
-  //@{
+  ///@{
   /**
    * Convenience method to set/get RADIUS on a vtkLight.
    */
-  static void SetRadius(double, vtkLight *);
-  static double GetRadius(vtkLight *);
-  //@}
+  static void SetRadius(double, vtkLight*);
+  static double GetRadius(vtkLight*);
+  ///@}
 
 protected:
   vtkOSPRayLightNode();
-  ~vtkOSPRayLightNode();
+  ~vtkOSPRayLightNode() override;
 
 private:
   vtkOSPRayLightNode(const vtkOSPRayLightNode&) = delete;
   void operator=(const vtkOSPRayLightNode&) = delete;
 
   static double LightScale;
-  void *OLight;
+  void* OLight;
 };
 
 #endif

@@ -23,15 +23,12 @@
  *
  *
  * Implements a vtkSQLDatabase using an underlying Qt QSQLDatabase.
-*/
+ */
 
 #ifndef vtkQtSQLDatabase_h
 #define vtkQtSQLDatabase_h
 
-// Check for Qt SQL module before defining this class.
-#include <qglobal.h> // Needed to check if SQL is available
-#if (QT_EDITION & QT_MODULE_SQL)
-
+#include "vtkDeprecation.h"           // For deprecation macros
 #include "vtkGUISupportQtSQLModule.h" // For export macro
 #include "vtkSQLDatabase.h"
 
@@ -77,7 +74,7 @@ public:
   /**
    * Get the list of fields for a particular table
    */
-  vtkStringArray* GetRecord(const char *table) override;
+  vtkStringArray* GetRecord(const char* table) override;
 
   /**
    * Returns a list of columns for a particular table.
@@ -108,63 +105,68 @@ public:
    */
   const char* GetLastErrorText() override;
 
-  //@{
+  ///@{
   /**
    * String representing Qt database type (e.g. "mysql").
    */
-  const char* GetDatabaseType() override
-  {
-    return this->DatabaseType;
-  }
+  const char* GetDatabaseType() override { return this->DatabaseType; }
   vtkSetStringMacro(DatabaseType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The database server host name.
    */
   vtkSetStringMacro(HostName);
   vtkGetStringMacro(HostName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The user name for connecting to the database server.
    */
   vtkSetStringMacro(UserName);
   vtkGetStringMacro(UserName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The name of the database to connect to.
    */
   vtkSetStringMacro(DatabaseName);
   vtkGetStringMacro(DatabaseName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Additional options for the database.
    */
   vtkSetStringMacro(ConnectOptions);
   vtkGetStringMacro(ConnectOptions);
-  //@}
+  ///@}
 
-  //@{
+  // VTK_DEPRECATED_IN_9_1_0: Remove header test exclusion when this is removed.
+  ///@{
+  VTK_DEPRECATED_IN_9_1_0("Renamed to DbPort to avoid Windows macro collisions")
+  void SetPort(int port) { this->SetDbPort(port); }
+  VTK_DEPRECATED_IN_9_1_0("Renamed to DbPort to avoid Windows macro collisions")
+  int GetPort() { return this->GetDbPort(); }
+  ///@}
+
+  ///@{
   /**
    * The port used for connecting to the database.
    */
-  vtkSetClampMacro(Port, int, 0, 65535);
-  vtkGetMacro(Port, int);
-  //@}
+  vtkSetClampMacro(DbPort, int, 0, 65535);
+  vtkGetMacro(DbPort, int);
+  ///@}
 
   /**
    * Create a the proper subclass given a URL.
    * The URL format for SQL databases is a true URL of the form:
    * 'protocol://'[[username[':'password]'@']hostname[':'port]]'/'[dbname] .
    */
-  static vtkSQLDatabase* CreateFromURL( const char* URL );
+  static vtkSQLDatabase* CreateFromURL(const char* URL);
 
   /**
    * Get the URL of the database.
@@ -173,13 +175,13 @@ public:
 
 protected:
   vtkQtSQLDatabase();
-  ~vtkQtSQLDatabase();
+  ~vtkQtSQLDatabase() override;
 
   char* DatabaseType;
   char* HostName;
   char* UserName;
   char* DatabaseName;
-  int Port;
+  int DbPort;
   char* ConnectOptions;
 
   QSqlDatabase QtDatabase;
@@ -192,24 +194,23 @@ protected:
    * Look at CreateFromURL() for details about the URL format.
    */
   bool ParseURL(const char* url) override;
-private:
 
+private:
   // Storing the tables in the database, this array
   // is accessible through GetTables() method
-  vtkStringArray *myTables;
+  vtkStringArray* myTables;
 
   // Storing the correct record list from any one
   // of the tables in the database, this array is
   // accessible through GetRecord(const char *table)
-  vtkStringArray *currentRecord;
+  vtkStringArray* currentRecord;
 
   // Used to assign unique identifiers for database instances
   static int id;
 
-  vtkQtSQLDatabase(const vtkQtSQLDatabase &) = delete;
-  void operator=(const vtkQtSQLDatabase &) = delete;
+  vtkQtSQLDatabase(const vtkQtSQLDatabase&) = delete;
+  void operator=(const vtkQtSQLDatabase&) = delete;
 };
 
-#endif // (QT_EDITION & QT_MODULE_SQL)
 #endif // vtkQtSQLDatabase_h
 // VTK-HeaderTest-Exclude: vtkQtSQLDatabase.h

@@ -14,6 +14,13 @@ set(classes
   vtkAttributesErrorMetric
   vtkBSPCuts
   vtkBSPIntersections
+  vtkBezierCurve
+  vtkBezierHexahedron
+  vtkBezierInterpolation
+  vtkBezierQuadrilateral
+  vtkBezierTetra
+  vtkBezierTriangle
+  vtkBezierWedge
   vtkBiQuadraticQuad
   vtkBiQuadraticQuadraticHexahedron
   vtkBiQuadraticQuadraticWedge
@@ -24,17 +31,24 @@ set(classes
   vtkCell
   vtkCell3D
   vtkCellArray
+  vtkCellArrayIterator
   vtkCellData
   vtkCellIterator
   vtkCellLinks
   vtkCellLocator
+  vtkCellLocatorStrategy
   vtkCellTypes
+  vtkClosestNPointsStrategy
+  vtkClosestPointStrategy
   vtkCompositeDataIterator
   vtkCompositeDataSet
   vtkCone
   vtkConvexPointSet
+  vtkCoordinateFrame
   vtkCubicLine
   vtkCylinder
+  vtkDataAssembly
+  vtkDataAssemblyUtilities
   vtkDataObject
   vtkDataObjectCollection
   vtkDataObjectTree
@@ -54,6 +68,7 @@ set(classes
   vtkExplicitStructuredGrid
   vtkExtractStructuredGridHelper
   vtkFieldData
+  vtkFindCellStrategy
   vtkGenericAdaptorCell
   vtkGenericAttribute
   vtkGenericAttributeCollection
@@ -73,12 +88,16 @@ set(classes
   vtkHexahedron
   vtkHierarchicalBoxDataIterator
   vtkHierarchicalBoxDataSet
+  vtkHigherOrderCurve
+  vtkHigherOrderHexahedron
+  vtkHigherOrderInterpolation
+  vtkHigherOrderQuadrilateral
+  vtkHigherOrderTetra
+  vtkHigherOrderTriangle
+  vtkHigherOrderWedge
   vtkHyperTree
+  vtkHyperTreeCursor
   vtkHyperTreeGrid
-  vtkHyperTreeGridEntry
-  vtkHyperTreeGridGeometryEntry
-  vtkHyperTreeGridGeometryLevelEntry
-  vtkHyperTreeGridLevelEntry
   vtkHyperTreeGridNonOrientedCursor
   vtkHyperTreeGridNonOrientedGeometryCursor
   vtkHyperTreeGridNonOrientedMooreSuperCursor
@@ -183,6 +202,7 @@ set(classes
   vtkSortFieldData
   vtkSphere
   vtkSpheres
+  vtkSphericalPointIterator
   vtkSpline
   vtkStaticCellLinks
   vtkStaticCellLocator
@@ -201,6 +221,7 @@ set(classes
   vtkTreeDFSIterator
   vtkTreeIterator
   vtkTriQuadraticHexahedron
+  vtkTriQuadraticPyramid
   vtkTriangle
   vtkTriangleStrip
   vtkUndirectedGraph
@@ -229,24 +250,44 @@ set(template_classes
   vtkMappedUnstructuredGrid
   vtkMappedUnstructuredGridCellIterator
   vtkPeriodicDataArray
-  vtkStaticCellLinksTemplate)
+  vtkStaticCellLinksTemplate
+  vtkStaticEdgeLocatorTemplate)
+
+set(nowrap_classes
+  vtkHyperTreeGridEntry
+  vtkHyperTreeGridGeometryEntry
+  vtkHyperTreeGridGeometryLevelEntry
+  vtkHyperTreeGridLevelEntry)
 
 set(headers
   vtkCellType.h
   vtkColor.h
-  vtkCompositeDataSetRange.h
-  vtkDataArrayDispatcher.h
-  vtkDataObjectTreeRange.h
-  vtkDispatcher.h
-  vtkDispatcher_Private.h
-  vtkDoubleDispatcher.h
+  vtkDataAssemblyVisitor.h
+  vtkDataObjectTreeInternals.h
+  vtkHyperTreeGridScales.h
   vtkHyperTreeGridTools.h
   vtkIntersectionCounter.h
   vtkRect.h
   vtkVector.h
   vtkVectorOperators.h)
 
+set(nowrap_headers
+  vtkCompositeDataSetNodeReference.h
+  vtkCompositeDataSetRange.h
+  vtkDataObjectTreeRange.h
+  vtkPolyDataInternals.h)
+
+set(templates
+  vtkCompositeDataSet.txx)
+
+set(private_templates
+  vtkImageIterator.txx)
+
 vtk_module_add_module(VTK::CommonDataModel
   CLASSES           ${classes}
+  NOWRAP_CLASSES    ${nowrap_classes}
+  TEMPLATES         ${templates}
   TEMPLATE_CLASSES  ${template_classes}
-  HEADERS           ${headers})
+  HEADERS           ${headers}
+  NOWRAP_HEADERS    ${nowrap_headers}
+  PRIVATE_TEMPLATES ${private_templates})

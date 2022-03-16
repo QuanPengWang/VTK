@@ -44,13 +44,15 @@
  *
  * @par Thanks:
  * Developed by Timothy M. Shead (tshead@sandia.gov) at Sandia National Laboratories.
-*/
+ */
 
 #ifndef vtkTableToSparseArray_h
 #define vtkTableToSparseArray_h
 
-#include "vtkInfovisCoreModule.h" // For export macro
 #include "vtkArrayDataAlgorithm.h"
+#include "vtkInfovisCoreModule.h" // For export macro
+
+class vtkArrayExtents;
 
 class VTKINFOVISCORE_EXPORT vtkTableToSparseArray : public vtkArrayDataAlgorithm
 {
@@ -59,30 +61,30 @@ public:
   vtkTypeMacro(vtkTableToSparseArray, vtkArrayDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify the set of input table columns that will be mapped to coordinates
    * in the output sparse array.
    */
   void ClearCoordinateColumns();
   void AddCoordinateColumn(const char* name);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the input table column that will be mapped to values in the output array.
    */
   void SetValueColumn(const char* name);
   const char* GetValueColumn();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Explicitly specify the extents of the output array.
    */
   void ClearOutputExtents();
   void SetOutputExtents(const vtkArrayExtents& extents);
-  //@}
+  ///@}
 
 protected:
   vtkTableToSparseArray();
@@ -90,10 +92,7 @@ protected:
 
   int FillInputPortInformation(int, vtkInformation*) override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkTableToSparseArray(const vtkTableToSparseArray&) = delete;
@@ -101,8 +100,6 @@ private:
 
   class implementation;
   implementation* const Implementation;
-
 };
 
 #endif
-

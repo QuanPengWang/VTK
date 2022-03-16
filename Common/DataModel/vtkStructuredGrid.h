@@ -37,7 +37,7 @@
  * or "turn-off" points and cells in the dataset. This is done by setting
  * vtkDataSetAttributes::HIDDENPOINT or vtkDataSetAttributes::HIDDENCELL
  * in the ghost array for each point / cell that needs to be blanked.
-*/
+ */
 
 #ifndef vtkStructuredGrid_h
 #define vtkStructuredGrid_h
@@ -57,81 +57,81 @@ class vtkVertex;
 class VTKCOMMONDATAMODEL_EXPORT vtkStructuredGrid : public vtkPointSet
 {
 public:
-  static vtkStructuredGrid *New();
+  static vtkStructuredGrid* New();
+  static vtkStructuredGrid* ExtendedNew();
 
-  vtkTypeMacro(vtkStructuredGrid,vtkPointSet);
+  vtkTypeMacro(vtkStructuredGrid, vtkPointSet);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return what type of dataset this is.
    */
-  int GetDataObjectType() override {return VTK_STRUCTURED_GRID;}
+  int GetDataObjectType() override { return VTK_STRUCTURED_GRID; }
 
   /**
    * Copy the geometric and topological structure of an input poly data object.
    */
-  void CopyStructure(vtkDataSet *ds) override;
+  void CopyStructure(vtkDataSet* ds) override;
 
-  //@{
+  ///@{
   /**
    * Standard vtkDataSet API methods. See vtkDataSet for more information.
    */
-  vtkIdType GetNumberOfPoints() override
-    {return vtkPointSet::GetNumberOfPoints();}
-  double *GetPoint(vtkIdType ptId) VTK_SIZEHINT(3) override
-    {return this->vtkPointSet::GetPoint(ptId);}
-  void GetPoint(vtkIdType ptId, double p[3]) override
-    {this->vtkPointSet::GetPoint(ptId,p);}
-  vtkCell *GetCell(vtkIdType cellId) override;
-  vtkCell *GetCell(int i, int j, int k) override;
-  void GetCell(vtkIdType cellId, vtkGenericCell *cell) override;
+  vtkIdType GetNumberOfPoints() override { return vtkPointSet::GetNumberOfPoints(); }
+  double* GetPoint(vtkIdType ptId) VTK_SIZEHINT(3) override
+  {
+    return this->vtkPointSet::GetPoint(ptId);
+  }
+  void GetPoint(vtkIdType ptId, double p[3]) override { this->vtkPointSet::GetPoint(ptId, p); }
+  vtkCell* GetCell(vtkIdType cellId) override;
+  vtkCell* GetCell(int i, int j, int k) override;
+  void GetCell(vtkIdType cellId, vtkGenericCell* cell) override;
   void GetCellBounds(vtkIdType cellId, double bounds[6]) override;
   int GetCellType(vtkIdType cellId) override;
+  vtkIdType GetCellSize(vtkIdType cellId) override;
   vtkIdType GetNumberOfCells() override;
-  void GetCellPoints(vtkIdType cellId, vtkIdList *ptIds) override;
-  void GetPointCells(vtkIdType ptId, vtkIdList *cellIds) override
+  void GetCellPoints(vtkIdType cellId, vtkIdList* ptIds) override;
+  void GetPointCells(vtkIdType ptId, vtkIdList* cellIds) override
   {
-      vtkStructuredData::GetPointCells(ptId,cellIds,this->GetDimensions());
+    vtkStructuredData::GetPointCells(ptId, cellIds, this->GetDimensions());
   }
   void Initialize() override;
-  int GetMaxCellSize() override {return 8;}; //hexahedron is the largest
-  void GetCellNeighbors(vtkIdType cellId, vtkIdList *ptIds,
-                        vtkIdList *cellIds) override;
-  void GetCellNeighbors(vtkIdType cellId, vtkIdList *ptIds,
-                        vtkIdList *cellIds, int *seedLoc);
-  //@}
+  int GetMaxCellSize() override { return 8; } // hexahedron is the largest
+  void GetCellNeighbors(vtkIdType cellId, vtkIdList* ptIds, vtkIdList* cellIds) override;
+  void GetCellNeighbors(vtkIdType cellId, vtkIdList* ptIds, vtkIdList* cellIds, int* seedLoc);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * following methods are specific to structured grid
    */
   void SetDimensions(int i, int j, int k);
   void SetDimensions(const int dim[3]);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get dimensions of this structured points dataset.
    */
-  virtual int *GetDimensions () VTK_SIZEHINT(3);
-  virtual void GetDimensions (int dim[3]);
-  //@}
+  virtual int* GetDimensions() VTK_SIZEHINT(3);
+  virtual void GetDimensions(int dim[3]);
+  ///@}
 
   /**
    * Return the dimensionality of the data.
    */
   int GetDataDimension();
 
-  //@{
+  ///@{
   /**
    * Different ways to set the extent of the data array.  The extent
    * should be set before the "Scalars" are set or allocated.
    * The Extent is stored in the order (X, Y, Z).
    */
   void SetExtent(int extent[6]);
-  void SetExtent(int x1, int x2, int y1, int y2, int z1, int z2);
+  void SetExtent(int xMin, int xMax, int yMin, int yMax, int zMin, int zMax);
   vtkGetVector6Macro(Extent, int);
-  //@}
+  ///@}
 
   /**
    * Return the actual size of the data in kibibytes (1024 bytes). This number
@@ -143,20 +143,20 @@ public:
    */
   unsigned long GetActualMemorySize() override;
 
-  //@{
+  ///@{
   /**
    * Shallow and Deep copy.
    */
-  void ShallowCopy(vtkDataObject *src) override;
-  void DeepCopy(vtkDataObject *src) override;
-  //@}
+  void ShallowCopy(vtkDataObject* src) override;
+  void DeepCopy(vtkDataObject* src) override;
+  ///@}
 
   /**
    * The extent type is a 3D extent
    */
   int GetExtentType() override { return VTK_3D_EXTENT; }
 
-  //@{
+  ///@{
   /**
    * Methods for supporting blanking of cells. Blanking turns on or off
    * points in the structured grid, and hence the cells connected to them.
@@ -165,9 +165,9 @@ public:
    */
   void BlankPoint(vtkIdType ptId);
   void UnBlankPoint(vtkIdType ptId);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods for supporting blanking of cells. Blanking turns on or off
    * cells in the structured grid, and hence the points connected to them.
@@ -176,7 +176,7 @@ public:
    */
   void BlankCell(vtkIdType ptId);
   void UnBlankCell(vtkIdType ptId);
-  //@}
+  ///@}
 
   /**
    * Return non-zero value if specified point is visible.
@@ -209,7 +209,7 @@ public:
    * of "1" such that computing the total number of cells can be achieved by
    * simply by cellDims[0]*cellDims[1]*cellDims[2].
    */
-  void GetCellDims( int cellDims[3] );
+  void GetCellDims(int cellDims[3]);
 
   /**
    * Reallocates and copies to set the Extent to the UpdateExtent.
@@ -218,13 +218,13 @@ public:
    */
   void Crop(const int* updateExtent) override;
 
-  //@{
+  ///@{
   /**
    * Retrieve an instance of this class from an information object.
    */
   static vtkStructuredGrid* GetData(vtkInformation* info);
-  static vtkStructuredGrid* GetData(vtkInformationVector* v, int i=0);
-  //@}
+  static vtkStructuredGrid* GetData(vtkInformationVector* v, int i = 0);
+  ///@}
 
   /**
    * Get a point in the grid. If adjustForExtent is true, (i,j,k) is
@@ -242,11 +242,11 @@ protected:
   ~vtkStructuredGrid() override;
 
   // for the GetCell method
-  vtkVertex *Vertex;
-  vtkLine *Line;
-  vtkQuad *Quad;
-  vtkHexahedron *Hexahedron;
-  vtkEmptyCell *EmptyCell;
+  vtkVertex* Vertex;
+  vtkLine* Line;
+  vtkQuad* Quad;
+  vtkHexahedron* Hexahedron;
+  vtkEmptyCell* EmptyCell;
 
   int Dimensions[3];
   int DataDescription;
@@ -264,27 +264,26 @@ private:
    * For legacy compatibility. Do not use.
    */
   void GetCellNeighbors(vtkIdType cellId, vtkIdList& ptIds, vtkIdList& cellIds)
-    {this->GetCellNeighbors(cellId, &ptIds, &cellIds);}
+  {
+    this->GetCellNeighbors(cellId, &ptIds, &cellIds);
+  }
 
   // Internal method used by DeepCopy and ShallowCopy.
-  void InternalStructuredGridCopy(vtkStructuredGrid *src);
-
-  static unsigned char MASKED_CELL_VALUE;
+  void InternalStructuredGridCopy(vtkStructuredGrid* src);
 
 private:
   vtkStructuredGrid(const vtkStructuredGrid&) = delete;
   void operator=(const vtkStructuredGrid&) = delete;
 };
 
-
 inline vtkIdType vtkStructuredGrid::GetNumberOfCells()
 {
-  vtkIdType nCells=1;
+  vtkIdType nCells = 1;
   int dims[3];
   int i;
 
   this->GetDimensions(dims);
-  for (i=0; i<3; i++)
+  for (i = 0; i < 3; i++)
   {
     if (dims[i] <= 0)
     {
@@ -292,7 +291,7 @@ inline vtkIdType vtkStructuredGrid::GetNumberOfCells()
     }
     if (dims[i] > 1)
     {
-      nCells *= (dims[i]-1);
+      nCells *= (dims[i] - 1);
     }
   }
 
@@ -305,9 +304,3 @@ inline int vtkStructuredGrid::GetDataDimension()
 }
 
 #endif
-
-
-
-
-
-

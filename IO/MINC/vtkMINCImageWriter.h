@@ -63,7 +63,7 @@ POSSIBILITY OF SUCH DAMAGES.
  * @par Thanks:
  * Thanks to David Gobbi for writing this class and Atamai Inc. for
  * contributing it to VTK.
-*/
+ */
 
 #ifndef vtkMINCImageWriter_h
 #define vtkMINCImageWriter_h
@@ -82,27 +82,25 @@ class vtkMINCImageAttributes;
 class VTKIOMINC_EXPORT vtkMINCImageWriter : public vtkImageWriter
 {
 public:
-  vtkTypeMacro(vtkMINCImageWriter,vtkImageWriter);
+  vtkTypeMacro(vtkMINCImageWriter, vtkImageWriter);
 
-  static vtkMINCImageWriter *New();
+  static vtkMINCImageWriter* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get the extension for this file format.
    */
-  virtual const char* GetFileExtensions() {
-    return ".mnc"; }
+  virtual const char* GetFileExtensions() { return ".mnc"; }
 
   /**
    * Get the name of this file format.
    */
-  virtual const char* GetDescriptiveName() {
-    return "MINC"; }
+  virtual const char* GetDescriptiveName() { return "MINC"; }
 
   /**
    * Set the file name.
    */
-  void SetFileName(const char *name) override;
+  void SetFileName(VTK_FILEPATH const char* name) override;
 
   /**
    * Write the data.  This will attempt to stream the data
@@ -112,7 +110,7 @@ public:
    */
   void Write() override;
 
-  //@{
+  ///@{
   /**
    * Set a matrix that describes the orientation of the data.  The
    * three columns of this matrix should give the unit-vector
@@ -124,11 +122,11 @@ public:
    * a direction cosines vector whose dot product with the canonical
    * unit vector for that dimension is negative.
    */
-  virtual void SetDirectionCosines(vtkMatrix4x4 *matrix);
+  virtual void SetDirectionCosines(vtkMatrix4x4* matrix);
   vtkGetObjectMacro(DirectionCosines, vtkMatrix4x4);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the slope and intercept for rescaling the intensities.  The
    * default values are zero, which indicates to the reader that no
@@ -138,19 +136,18 @@ public:
   vtkGetMacro(RescaleSlope, double);
   vtkSetMacro(RescaleIntercept, double);
   vtkGetMacro(RescaleIntercept, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the image attributes, which contain patient information and
    * other useful metadata.
    */
-  virtual void SetImageAttributes(vtkMINCImageAttributes *attributes);
-  virtual vtkMINCImageAttributes *GetImageAttributes() {
-    return this->ImageAttributes; };
-  //@}
+  virtual void SetImageAttributes(vtkMINCImageAttributes* attributes);
+  virtual vtkMINCImageAttributes* GetImageAttributes() { return this->ImageAttributes; }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set whether to validate that all variable attributes that
    * have been set are ones that are listed in the MINC standard.
@@ -158,16 +155,16 @@ public:
   vtkSetMacro(StrictValidation, vtkTypeBool);
   vtkBooleanMacro(StrictValidation, vtkTypeBool);
   vtkGetMacro(StrictValidation, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set a string value to append to the history of the file.  This
    * string should describe, briefly, how the file was processed.
    */
   vtkSetStringMacro(HistoryAddition);
   vtkGetStringMacro(HistoryAddition);
-  //@}
+  ///@}
 
 protected:
   vtkMINCImageWriter();
@@ -177,7 +174,7 @@ protected:
   int MINCImageTypeSigned;
   int MINCImageMinMaxDims;
 
-  vtkMatrix4x4 *DirectionCosines;
+  vtkMatrix4x4* DirectionCosines;
   double RescaleSlope;
   double RescaleIntercept;
   vtkTypeBool StrictValidation;
@@ -190,9 +187,9 @@ protected:
 
   int ComputeValidRangeFromScalarRange;
 
-  vtkStringArray *FileDimensionNames;
+  vtkStringArray* FileDimensionNames;
 
-  vtkMINCImageAttributes *ImageAttributes;
+  vtkMINCImageAttributes* ImageAttributes;
 
   int Permutation[3];
   int Flip[3];
@@ -200,44 +197,34 @@ protected:
   int MismatchedInputs;
   int MINCFileId;
 
-  char *HistoryAddition;
+  char* HistoryAddition;
 
-  virtual int OpenNetCDFFile(const char *filename, int& ncid);
+  virtual int OpenNetCDFFile(const char* filename, int& ncid);
   virtual int CloseNetCDFFile(int ncid);
 
-  virtual int IndexFromDimensionName(const char *dimName);
-  virtual void ComputePermutationFromOrientation(int permutation[3],
-                                                 int flip[3]);
-  virtual int CreateMINCDimensions(vtkImageData *input, int timeStep,
-                                   int *dimids);
-  virtual int CreateMINCVariables(vtkImageData *input, int timeStep,
-                                  int *dimids);
-  virtual int WriteMINCFileAttributes(vtkImageData *input, int timeStep);
-  virtual int WriteMINCData(vtkImageData *input,
-                            int frameNumber,
-                            int wholeExt[6],
-                            int upExt[6]);
-  virtual void FindRescale(double &rescaleSlope, double &rescaleIntercept);
+  virtual int IndexFromDimensionName(const char* dimName);
+  virtual void ComputePermutationFromOrientation(int permutation[3], int flip[3]);
+  virtual int CreateMINCDimensions(vtkImageData* input, int timeStep, int* dimids);
+  virtual int CreateMINCVariables(vtkImageData* input, int timeStep, int* dimids);
+  virtual int WriteMINCFileAttributes(vtkImageData* input, int timeStep);
+  virtual int WriteMINCData(vtkImageData* input, int frameNumber, int wholeExt[6], int upExt[6]);
+  virtual void FindRescale(double& rescaleSlope, double& rescaleIntercept);
   virtual void FindMINCValidRange(double range[2]);
 
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  int RequestInformation(vtkInformation *request,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector) override;
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
-  int RequestUpdateExtent(vtkInformation *request,
-                                  vtkInformationVector **inputVector,
-                                  vtkInformationVector *outputVector) override;
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
-  int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkMINCImageWriter(const vtkMINCImageWriter&) = delete;
   void operator=(const vtkMINCImageWriter&) = delete;
-
 };
 
 #endif

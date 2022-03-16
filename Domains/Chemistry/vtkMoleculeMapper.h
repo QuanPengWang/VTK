@@ -47,13 +47,13 @@ public:
   vtkTypeMacro(vtkMoleculeMapper, vtkMapper);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the input vtkMolecule.
    */
   void SetInputData(vtkMolecule* in);
   vtkMolecule* GetInput();
-  //@}
+  ///@}
 
   /**
    * Set ivars to default ball-and-stick settings. This is equivalent
@@ -110,25 +110,25 @@ public:
    */
   void UseFastSettings();
 
-  //@{
+  ///@{
   /**
    * Get/Set whether or not to render atoms. Default: On.
    */
   vtkGetMacro(RenderAtoms, bool);
   vtkSetMacro(RenderAtoms, bool);
   vtkBooleanMacro(RenderAtoms, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether or not to render bonds. Default: On.
    */
   vtkGetMacro(RenderBonds, bool);
   vtkSetMacro(RenderBonds, bool);
   vtkBooleanMacro(RenderBonds, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether or not to render the unit cell lattice, if present.
    * Default: On.
@@ -136,7 +136,7 @@ public:
   vtkGetMacro(RenderLattice, bool);
   vtkSetMacro(RenderLattice, bool);
   vtkBooleanMacro(RenderLattice, bool);
-  //@}
+  ///@}
 
   enum
   {
@@ -146,7 +146,7 @@ public:
     CustomArrayRadius
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the type of radius used to generate the atoms. Default:
    * VDWRadius. If CustomArrayRadius is used, the VertexData array named
@@ -155,25 +155,13 @@ public:
   vtkGetMacro(AtomicRadiusType, int);
   vtkSetMacro(AtomicRadiusType, int);
   const char* GetAtomicRadiusTypeAsString();
-  void SetAtomicRadiusTypeToCovalentRadius()
-  {
-    this->SetAtomicRadiusType(CovalentRadius);
-  }
-  void SetAtomicRadiusTypeToVDWRadius()
-  {
-    this->SetAtomicRadiusType(VDWRadius);
-  }
-  void SetAtomicRadiusTypeToUnitRadius()
-  {
-    this->SetAtomicRadiusType(UnitRadius);
-  }
-  void SetAtomicRadiusTypeToCustomArrayRadius()
-  {
-    this->SetAtomicRadiusType(CustomArrayRadius);
-  }
-  //@}
+  void SetAtomicRadiusTypeToCovalentRadius() { this->SetAtomicRadiusType(CovalentRadius); }
+  void SetAtomicRadiusTypeToVDWRadius() { this->SetAtomicRadiusType(VDWRadius); }
+  void SetAtomicRadiusTypeToUnitRadius() { this->SetAtomicRadiusType(UnitRadius); }
+  void SetAtomicRadiusTypeToCustomArrayRadius() { this->SetAtomicRadiusType(CustomArrayRadius); }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the uniform scaling factor applied to the atoms.
    * This is ignored when AtomicRadiusType == CustomArrayRadius.
@@ -181,9 +169,9 @@ public:
    */
   vtkGetMacro(AtomicRadiusScaleFactor, float);
   vtkSetMacro(AtomicRadiusScaleFactor, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether multicylinders will be used to represent multiple
    * bonds. Default: On.
@@ -191,7 +179,7 @@ public:
   vtkGetMacro(UseMultiCylindersForBonds, bool);
   vtkSetMacro(UseMultiCylindersForBonds, bool);
   vtkBooleanMacro(UseMultiCylindersForBonds, bool);
-  //@}
+  ///@}
 
   enum
   {
@@ -199,7 +187,7 @@ public:
     DiscreteByAtom
   };
 
-  //@{
+  ///@{
   /**
    * Get/Set the method by which bonds are colored.
 
@@ -212,18 +200,12 @@ public:
    */
   vtkGetMacro(BondColorMode, int);
   vtkSetClampMacro(BondColorMode, int, SingleColor, DiscreteByAtom);
-  void SetBondColorModeToSingleColor()
-  {
-    this->SetBondColorMode(SingleColor);
-  }
-  void SetBondColorModeToDiscreteByAtom()
-  {
-    this->SetBondColorMode(DiscreteByAtom);
-  }
+  void SetBondColorModeToSingleColor() { this->SetBondColorMode(SingleColor); }
+  void SetBondColorModeToDiscreteByAtom() { this->SetBondColorMode(DiscreteByAtom); }
   const char* GetBondColorModeAsString();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the method by which atoms are colored.
    *
@@ -234,46 +216,45 @@ public:
    * internal lookup table.
    */
   vtkGetMacro(AtomColorMode, int);
-  vtkSetClampMacro(
-    AtomColorMode, int, SingleColor, DiscreteByAtom);
-  //@}
+  vtkSetClampMacro(AtomColorMode, int, SingleColor, DiscreteByAtom);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the atoms as an rgb tuple.
    * Default: {150, 150, 150} (grey)
    */
   vtkGetVector3Macro(AtomColor, unsigned char);
   vtkSetVector3Macro(AtomColor, unsigned char);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the bonds as an rgb tuple.
    * Default: {50, 50, 50} (dark grey)
    */
   vtkGetVector3Macro(BondColor, unsigned char);
   vtkSetVector3Macro(BondColor, unsigned char);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the radius of the bond cylinders. Default: 0.075
    */
   vtkGetMacro(BondRadius, float);
   vtkSetMacro(BondRadius, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the color of the bonds as an rgb tuple.
    * Default: {255, 255, 255} (white)
    */
   vtkGetVector3Macro(LatticeColor, unsigned char);
   vtkSetVector3Macro(LatticeColor, unsigned char);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Extract the ids atoms and/or bonds rendered by this molecule from a
    * vtkSelection object. The vtkIdTypeArray
@@ -288,9 +269,9 @@ public:
   {
     this->GetSelectedAtomsAndBonds(selection, nullptr, bondIds);
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Reimplemented from base class
    */
@@ -300,16 +281,16 @@ public:
   void GetBounds(double bounds[6]) override { vtkAbstractMapper3D::GetBounds(bounds); }
   int FillInputPortInformation(int port, vtkInformation* info) override;
   bool GetSupportsSelection() override { return true; }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the atomic radius array name. Default: "radii"
    * It is only used when AtomicRadiusType is set to CustomArrayRadius.
    */
   vtkGetStringMacro(AtomicRadiusArrayName);
   vtkSetStringMacro(AtomicRadiusArrayName);
-  //@}
+  ///@}
 
   /**
    * Helper method to set ScalarMode on both AtomGlyphMapper and BondGlyphMapper.
@@ -317,11 +298,16 @@ public:
    */
   virtual void SetMapScalars(bool map);
 
+  /**
+   * Accessor to internal structure. This is exposed to make it available for ray tracers.
+   */
+  vtkPeriodicTable* GetPeriodicTable() { return this->PeriodicTable; }
+
 protected:
   vtkMoleculeMapper();
   ~vtkMoleculeMapper() override;
 
-  //@{
+  ///@{
   /**
    * Customize atom rendering
    */
@@ -331,9 +317,9 @@ protected:
   char* AtomicRadiusArrayName;
   int AtomColorMode;
   unsigned char AtomColor[3];
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Customize bond rendering
    */
@@ -342,7 +328,7 @@ protected:
   bool UseMultiCylindersForBonds;
   float BondRadius;
   unsigned char BondColor[3];
-  //@}
+  ///@}
 
   bool RenderLattice;
 
@@ -351,7 +337,7 @@ protected:
    */
   void GlyphRender(vtkRenderer* ren, vtkActor* act);
 
-  //@{
+  ///@{
   /**
    * Cached variables and update methods
    */
@@ -363,15 +349,15 @@ protected:
   virtual void UpdateGlyphPolyData();
   virtual void UpdateAtomGlyphPolyData();
   virtual void UpdateBondGlyphPolyData();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Internal mappers
    */
   vtkNew<vtkGlyph3DMapper> AtomGlyphMapper;
   vtkNew<vtkGlyph3DMapper> BondGlyphMapper;
-  //@}
+  ///@}
 
   unsigned char LatticeColor[3];
   vtkNew<vtkPolyData> LatticePolyData;

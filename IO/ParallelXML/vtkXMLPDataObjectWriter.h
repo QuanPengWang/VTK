@@ -23,7 +23,7 @@
  *
  * @sa
  * vtkXMLDataObjectWriter
-*/
+ */
 
 #ifndef vtkXMLPDataObjectWriter_h
 #define vtkXMLPDataObjectWriter_h
@@ -40,15 +40,15 @@ public:
   vtkTypeMacro(vtkXMLPDataObjectWriter, vtkXMLWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of pieces that are being written in parallel.
    */
   vtkSetMacro(NumberOfPieces, int);
   vtkGetMacro(NumberOfPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the range of pieces assigned to this writer.
    */
@@ -56,25 +56,25 @@ public:
   vtkGetMacro(StartPiece, int);
   vtkSetMacro(EndPiece, int);
   vtkGetMacro(EndPiece, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the ghost level used for this writer's piece.
    */
   vtkSetMacro(GhostLevel, int);
   vtkGetMacro(GhostLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether to use a subdirectory to store the pieces
    */
   vtkSetMacro(UseSubdirectory, bool);
   vtkGetMacro(UseSubdirectory, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set whether the writer should write the summary file that
    * refers to all of the pieces' individual files.
@@ -84,9 +84,9 @@ public:
   virtual void SetWriteSummaryFile(int flag);
   vtkGetMacro(WriteSummaryFile, int);
   vtkBooleanMacro(WriteSummaryFile, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controller used to communicate data type of blocks.
    * By default, the global controller is used. If you want another
@@ -94,13 +94,13 @@ public:
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Overridden to handle passing the CONTINUE_EXECUTING() flags to the
    * executive.
    */
-  int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
+  vtkTypeBool ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
 protected:
@@ -108,8 +108,8 @@ protected:
   ~vtkXMLPDataObjectWriter() override;
 
   /**
-  * Override writing method from superclass.
-  */
+   * Override writing method from superclass.
+   */
   int WriteInternal() override;
 
   /**
@@ -141,10 +141,10 @@ protected:
     vtkInformationVector* outputVector);
 
   /**
-  * Collect information between ranks before writing the summary file.
-  * This method is called on all ranks while summary file is only written on 1
-  * rank (rank 0).
-  */
+   * Collect information between ranks before writing the summary file.
+   * This method is called on all ranks while summary file is only written on 1
+   * rank (rank 0).
+   */
   virtual void PrepareSummaryFile();
 
   /**
@@ -152,17 +152,17 @@ protected:
    */
   virtual void WritePPieceAttributes(int index);
 
-  //@{
+  ///@{
   /**
    * Methods for creating a filename for each piece in the dataset
    */
   char* CreatePieceFileName(int index, const char* path = nullptr);
   void SplitFileName();
-  //@}
+  ///@}
 
   /**
-  * Callback registered with the InternalProgressObserver.
-  */
+   * Callback registered with the InternalProgressObserver.
+   */
   static void ProgressCallbackFunction(vtkObject*, unsigned long, void*, void*);
 
   /**
@@ -177,8 +177,8 @@ protected:
   vtkGetMacro(CurrentPiece, int);
 
   /**
-  * Progress callback from internal writer.
-  */
+   * Progress callback from internal writer.
+   */
   virtual void ProgressCallback(vtkAlgorithm* w);
 
   /**
@@ -187,8 +187,8 @@ protected:
   void DeleteFiles();
 
   /**
-  * The observer to report progress from the internal writer.
-  */
+   * The observer to report progress from the internal writer.
+   */
   vtkCallbackCommand* InternalProgressObserver;
 
   vtkMultiProcessController* Controller;
@@ -206,8 +206,8 @@ protected:
   char* PieceFileNameExtension;
 
   /**
-  * Flags used to keep track of which pieces were written out.
-  */
+   * Flags used to keep track of which pieces were written out.
+   */
   unsigned char* PieceWrittenFlags;
 
   /**
@@ -220,14 +220,14 @@ private:
   void operator=(const vtkXMLPDataObjectWriter&) = delete;
 
   /**
-  * Indicates the piece currently being written.
-  */
+   * Indicates the piece currently being written.
+   */
   int CurrentPiece;
 
   /**
-  * Set in WriteInternal() to request continued execution from the executive to
-  * write more pieces.
-  */
+   * Set in WriteInternal() to request continued execution from the executive to
+   * write more pieces.
+   */
   bool ContinuingExecution;
 };
 

@@ -36,12 +36,11 @@
 #include "vtkCommonCoreModule.h" // For export macro
 #include "vtkOutputWindow.h"
 
-
 class VTKCOMMONCORE_EXPORT vtkWin32OutputWindow : public vtkOutputWindow
 {
 public:
-// Methods from vtkObject
-  vtkTypeMacro(vtkWin32OutputWindow,vtkOutputWindow);
+  // Methods from vtkObject
+  vtkTypeMacro(vtkWin32OutputWindow, vtkOutputWindow);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -54,31 +53,22 @@ public:
    */
   void DisplayText(const char*) override;
 
-  //@{
   /**
-   * Set or get whether the vtkWin32OutputWindow should also send its output
-   * to stderr / cerr.
-   *
-   * @deprecated in VTK 8.3. Please use `vtkOutputWindow::SetDisplayMode` instead.
+   * Returns the window title.
    */
-  VTK_LEGACY(void SetSendToStdErr(bool));
-  VTK_LEGACY(bool GetSendToStdErr());
-  VTK_LEGACY(void SendToStdErrOn());
-  VTK_LEGACY(void SendToStdErrOff());
-  //@}
+  virtual const char* GetWindowTitle() { return "vtkOutputWindow"; }
 
 protected:
   vtkWin32OutputWindow();
   ~vtkWin32OutputWindow() override;
 
-  void PromptText(const char* text);
-  static void AddText(const char*);
-  static int Initialize();
+  virtual void PromptText(const char* text);
+  virtual void AddText(const char*);
+  virtual int Initialize();
 
 private:
   vtkWin32OutputWindow(const vtkWin32OutputWindow&) = delete;
   void operator=(const vtkWin32OutputWindow&) = delete;
 };
-
 
 #endif

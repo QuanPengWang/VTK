@@ -12,17 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkMutexLock.h"
 #include "vtkObjectFactory.h"
 
 #ifdef VTK_USE_WIN32_THREADS
-# include "vtkWindows.h"
+#include "vtkWindows.h"
 #endif
 
 vtkStandardNewMacro(vtkMutexLock);
 
 // New for the SimpleMutex
-vtkSimpleMutexLock *vtkSimpleMutexLock::New()
+vtkSimpleMutexLock* vtkSimpleMutexLock::New()
 {
   return new vtkSimpleMutexLock;
 }
@@ -31,7 +34,7 @@ vtkSimpleMutexLock *vtkSimpleMutexLock::New()
 vtkSimpleMutexLock::vtkSimpleMutexLock()
 {
 #ifdef VTK_USE_WIN32_THREADS
-  this->MutexLock = CreateMutex( nullptr, FALSE, nullptr );
+  this->MutexLock = CreateMutex(nullptr, FALSE, nullptr);
 #endif
 
 #ifdef VTK_USE_PTHREADS
@@ -39,7 +42,6 @@ vtkSimpleMutexLock::vtkSimpleMutexLock()
 #endif
 }
 
-// Destruct the vtkMutexVariable
 vtkSimpleMutexLock::~vtkSimpleMutexLock()
 {
 #ifdef VTK_USE_WIN32_THREADS
@@ -47,7 +49,7 @@ vtkSimpleMutexLock::~vtkSimpleMutexLock()
 #endif
 
 #ifdef VTK_USE_PTHREADS
-  pthread_mutex_destroy( &this->MutexLock);
+  pthread_mutex_destroy(&this->MutexLock);
 #endif
 }
 
@@ -55,11 +57,11 @@ vtkSimpleMutexLock::~vtkSimpleMutexLock()
 void vtkSimpleMutexLock::Lock()
 {
 #ifdef VTK_USE_WIN32_THREADS
-  WaitForSingleObject( this->MutexLock, INFINITE );
+  WaitForSingleObject(this->MutexLock, INFINITE);
 #endif
 
 #ifdef VTK_USE_PTHREADS
-  pthread_mutex_lock( &this->MutexLock);
+  pthread_mutex_lock(&this->MutexLock);
 #endif
 }
 
@@ -67,11 +69,11 @@ void vtkSimpleMutexLock::Lock()
 void vtkSimpleMutexLock::Unlock()
 {
 #ifdef VTK_USE_WIN32_THREADS
-  ReleaseMutex( this->MutexLock );
+  ReleaseMutex(this->MutexLock);
 #endif
 
 #ifdef VTK_USE_PTHREADS
-  pthread_mutex_unlock( &this->MutexLock);
+  pthread_mutex_unlock(&this->MutexLock);
 #endif
 }
 
@@ -79,4 +81,3 @@ void vtkMutexLock::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

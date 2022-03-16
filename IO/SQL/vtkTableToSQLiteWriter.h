@@ -18,7 +18,7 @@
  *
  * vtkTableToSQLiteWriter reads a vtkTable and inserts it into an SQLite
  * database.
-*/
+ */
 
 #ifndef vtkTableToSQLiteWriter_h
 #define vtkTableToSQLiteWriter_h
@@ -31,24 +31,24 @@ class vtkSQLiteDatabase;
 class VTKIOSQL_EXPORT vtkTableToSQLiteWriter : public vtkTableToDatabaseWriter
 {
 public:
-  static vtkTableToSQLiteWriter *New();
-  vtkTypeMacro(vtkTableToSQLiteWriter,vtkTableToDatabaseWriter);
+  static vtkTableToSQLiteWriter* New();
+  vtkTypeMacro(vtkTableToSQLiteWriter, vtkTableToDatabaseWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get the input to this writer.
    */
   vtkTable* GetInput();
   vtkTable* GetInput(int port);
-  //@}
+  ///@}
 
 protected:
-   vtkTableToSQLiteWriter();
+  vtkTableToSQLiteWriter();
   ~vtkTableToSQLiteWriter() override;
   void WriteData() override;
 
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkTableToSQLiteWriter(const vtkTableToSQLiteWriter&) = delete;

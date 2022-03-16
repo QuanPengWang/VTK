@@ -27,16 +27,18 @@
  *
  * @sa
  * vtkRenderPass vtkDefaultPass
-*/
+ */
 
 #ifndef vtkOpenGLFXAAPass_h
 #define vtkOpenGLFXAAPass_h
 
 #include "vtkImageProcessingPass.h"
 
-#include "vtkNew.h" // For vtkNew
-#include "vtkOpenGLFXAAFilter.h" // For vtkOpenGLFXAAFilter
+#include "vtkNew.h"                    // For vtkNew
+#include "vtkOpenGLFXAAFilter.h"       // For vtkOpenGLFXAAFilter
 #include "vtkRenderingOpenGL2Module.h" // For export macro
+
+class vtkFXAAOptions;
 
 class VTKRENDERINGOPENGL2_EXPORT vtkOpenGLFXAAPass : public vtkImageProcessingPass
 {
@@ -50,14 +52,19 @@ public:
    */
   void Render(const vtkRenderState* s) override;
 
+  vtkGetObjectMacro(FXAAOptions, vtkFXAAOptions);
+  virtual void SetFXAAOptions(vtkFXAAOptions*);
+
 protected:
   vtkOpenGLFXAAPass() = default;
-  ~vtkOpenGLFXAAPass() override = default;
+  ~vtkOpenGLFXAAPass() override;
 
   /**
    * Graphics resources.
    */
   vtkNew<vtkOpenGLFXAAFilter> FXAAFilter;
+
+  vtkFXAAOptions* FXAAOptions = nullptr;
 
 private:
   vtkOpenGLFXAAPass(const vtkOpenGLFXAAPass&) = delete;

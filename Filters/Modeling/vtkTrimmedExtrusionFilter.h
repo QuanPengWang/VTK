@@ -59,7 +59,7 @@
  *
  * @sa
  * vtkLinearExtrusionFilter vtkRotationalExtrusionFilter
-*/
+ */
 
 #ifndef vtkTrimmedExtrusionFilter_h
 #define vtkTrimmedExtrusionFilter_h
@@ -72,59 +72,59 @@ class vtkAbstractCellLocator;
 class VTKFILTERSMODELING_EXPORT vtkTrimmedExtrusionFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkTrimmedExtrusionFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkTrimmedExtrusionFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Create object with extrusion direction (0,0,1) and capping on.
    */
-  static vtkTrimmedExtrusionFilter *New();
+  static vtkTrimmedExtrusionFilter* New();
 
-  //@{
+  ///@{
   /**
    * Set/Get the extrusion direction.
    */
-  vtkSetVector3Macro(ExtrusionDirection,double);
-  vtkGetVectorMacro(ExtrusionDirection,double,3);
-  //@}
+  vtkSetVector3Macro(ExtrusionDirection, double);
+  vtkGetVectorMacro(ExtrusionDirection, double, 3);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the surface which trims the surface.  Note that the method
    * SetTrimSurfaceData does not connect the pipeline. The algorithm will
    * work on the input data as it is without updating the producer of the
    * data.  The method SetTrimSurfaceConnection connects the pipeline.
    */
-  void SetTrimSurfaceData(vtkPolyData *pd);
+  void SetTrimSurfaceData(vtkPolyData* pd);
   void SetTrimSurfaceConnection(vtkAlgorithmOutput* algOutput);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Return a pointer to the enclosing surface.
    */
-  vtkPolyData *GetTrimSurface();
-  vtkPolyData *GetTrimSurface(vtkInformationVector *sourceInfo);
-  //@}
+  vtkPolyData* GetTrimSurface();
+  vtkPolyData* GetTrimSurface(vtkInformationVector* sourceInfo);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the capping of the extruded skirt.
    */
-  vtkSetMacro(Capping,int);
-  vtkGetMacro(Capping,int);
-  vtkBooleanMacro(Capping,int);
-  //@}
+  vtkSetMacro(Capping, int);
+  vtkGetMacro(Capping, int);
+  vtkBooleanMacro(Capping, int);
+  ///@}
 
   // How to extrude data. Either determine boundary edges and sweep them; or
   // sweep all edges.
   enum ExtrusionStrategy
   {
-    BOUNDARY_EDGES=0,
-    ALL_EDGES=1
+    BOUNDARY_EDGES = 0,
+    ALL_EDGES = 1
   };
 
-  //@{
+  ///@{
   /**
    * Specify a strategy for extrusion. If the strategy is set to
    * "BOUNDARY_EDGES" then the boundary edges of the input polygons and
@@ -134,24 +134,22 @@ public:
    * polygons exist in the input and so boundary calculation can be avoided.)
    * By default boundary edges are extruded.
    */
-  vtkSetMacro(ExtrusionStrategy,int);
-  vtkGetMacro(ExtrusionStrategy,int);
-  void SetExtrusionStrategyToBoundaryEdges()
-    { this->SetExtrusionStrategy(BOUNDARY_EDGES); }
-  void SetExtrusionStrategyToAllEdges()
-    { this->SetExtrusionStrategy(ALL_EDGES); }
-  //@}
+  vtkSetMacro(ExtrusionStrategy, int);
+  vtkGetMacro(ExtrusionStrategy, int);
+  void SetExtrusionStrategyToBoundaryEdges() { this->SetExtrusionStrategy(BOUNDARY_EDGES); }
+  void SetExtrusionStrategyToAllEdges() { this->SetExtrusionStrategy(ALL_EDGES); }
+  ///@}
 
   // How to cap data.
   enum CappingStrategy
   {
-    INTERSECTION=0,
-    MINIMUM_DISTANCE=1,
-    MAXIMUM_DISTANCE=2,
-    AVERAGE_DISTANCE=3,
+    INTERSECTION = 0,
+    MINIMUM_DISTANCE = 1,
+    MAXIMUM_DISTANCE = 2,
+    AVERAGE_DISTANCE = 3,
   };
 
-  //@{
+  ///@{
   /**
    * Specify a strategy for capping. By default the points of the cap
    * polygons are located where the extrusion intersects the capping surface.
@@ -173,26 +171,22 @@ public:
    * produce more points than expected because the output primitives may
    * have to be "split apart" to satisy the capping constraint.
    */
-  vtkSetMacro(CappingStrategy,int);
-  vtkGetMacro(CappingStrategy,int);
-  void SetCappingStrategyToIntersection()
-    { this->SetCappingStrategy(INTERSECTION); }
-  void SetCappingStrategyToMinimumDistance()
-    { this->SetCappingStrategy(MINIMUM_DISTANCE); }
-  void SetCappingStrategyToMaximumDistance()
-    { this->SetCappingStrategy(MAXIMUM_DISTANCE); }
-  void SetCappingStrategyToAverageDistance()
-    { this->SetCappingStrategy(AVERAGE_DISTANCE); }
-  //@}
+  vtkSetMacro(CappingStrategy, int);
+  vtkGetMacro(CappingStrategy, int);
+  void SetCappingStrategyToIntersection() { this->SetCappingStrategy(INTERSECTION); }
+  void SetCappingStrategyToMinimumDistance() { this->SetCappingStrategy(MINIMUM_DISTANCE); }
+  void SetCappingStrategyToMaximumDistance() { this->SetCappingStrategy(MAXIMUM_DISTANCE); }
+  void SetCappingStrategyToAverageDistance() { this->SetCappingStrategy(AVERAGE_DISTANCE); }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify a cell locator. By default a vtkStaticCellLocator is
    * used. The locator performs efficient searches to intersect cells.
    */
-  void SetLocator(vtkAbstractCellLocator *locator);
-  vtkGetObjectMacro(Locator,vtkAbstractCellLocator);
-  //@}
+  void SetLocator(vtkAbstractCellLocator* locator);
+  vtkGetObjectMacro(Locator, vtkAbstractCellLocator);
+  ///@}
 
 protected:
   vtkTrimmedExtrusionFilter();
@@ -202,19 +196,18 @@ protected:
   double ExtrusionDirection[3];
   int ExtrusionStrategy;
   int CappingStrategy;
-  vtkAbstractCellLocator *Locator;
+  vtkAbstractCellLocator* Locator;
 
-  void AdjustPoints(vtkPolyData *mesh, vtkIdType numPts, vtkIdType numCells,
-                    unsigned char *hots, vtkPoints *newPts);
+  void AdjustPoints(vtkPolyData* mesh, vtkIdType numPts, vtkIdType numCells, unsigned char* hots,
+    vtkPoints* newPts);
 
-  void ExtrudeEdges(vtkPolyData *input, vtkPolyData *output,
-                    vtkIdType numPts, vtkIdType numCells);
+  void ExtrudeEdges(vtkPolyData* input, vtkPolyData* output, vtkIdType numPts, vtkIdType numCells);
 
-  vtkIdType GetNeighborCount(vtkPolyData *mesh, vtkIdType inCellId,
-                             vtkIdType p1, vtkIdType p2, vtkIdList *cellIds);
+  vtkIdType GetNeighborCount(
+    vtkPolyData* mesh, vtkIdType inCellId, vtkIdType p1, vtkIdType p2, vtkIdList* cellIds);
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  int FillInputPortInformation(int, vtkInformation *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int, vtkInformation*) override;
 
 private:
   vtkTrimmedExtrusionFilter(const vtkTrimmedExtrusionFilter&) = delete;

@@ -30,58 +30,57 @@
  * field (identified by FieldId, with setFieldId()) and an input Reeb graph
  * computed on that mesh (port 1).
  * The outputs is vtkReebGraph object describing either a join or split tree.
-*/
+ */
 
 #ifndef vtkReebGraphToJoinSplitTreeFilter_h
 #define vtkReebGraphToJoinSplitTreeFilter_h
 
+#include "vtkDirectedGraphAlgorithm.h"
 #include "vtkFiltersReebGraphModule.h" // For export macro
-#include  "vtkDirectedGraphAlgorithm.h"
 
 class vtkReebGraph;
 
-class VTKFILTERSREEBGRAPH_EXPORT vtkReebGraphToJoinSplitTreeFilter :
-  public vtkDirectedGraphAlgorithm
+class VTKFILTERSREEBGRAPH_EXPORT vtkReebGraphToJoinSplitTreeFilter
+  : public vtkDirectedGraphAlgorithm
 {
 public:
   static vtkReebGraphToJoinSplitTreeFilter* New();
-  vtkTypeMacro(vtkReebGraphToJoinSplitTreeFilter,
-    vtkDirectedGraphAlgorithm);
+  vtkTypeMacro(vtkReebGraphToJoinSplitTreeFilter, vtkDirectedGraphAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify if you want to get a join or a split tree.
    * Default value: false (join tree)
    */
   vtkSetMacro(IsSplitTree, bool);
   vtkGetMacro(IsSplitTree, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scalar field Id
    * Default value: 0;
    */
   vtkSetMacro(FieldId, vtkIdType);
   vtkGetMacro(FieldId, vtkIdType);
-  //@}
+  ///@}
 
   vtkReebGraph* GetOutput();
 
 protected:
   vtkReebGraphToJoinSplitTreeFilter();
-  ~vtkReebGraphToJoinSplitTreeFilter();
+  ~vtkReebGraphToJoinSplitTreeFilter() override;
 
   bool IsSplitTree;
 
   vtkIdType FieldId;
 
-  int FillInputPortInformation(int portNumber, vtkInformation *) override;
-  int FillOutputPortInformation(int, vtkInformation *) override;
+  int FillInputPortInformation(int portNumber, vtkInformation*) override;
+  int FillOutputPortInformation(int, vtkInformation*) override;
 
-  int RequestData(vtkInformation *request,
-    vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkReebGraphToJoinSplitTreeFilter(const vtkReebGraphToJoinSplitTreeFilter&) = delete;

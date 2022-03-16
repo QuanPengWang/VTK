@@ -39,13 +39,13 @@
  * normally interpreted as the interactive selection of an application.
  * As a convenience, this selection is sent to output port 2 so that it
  * can be connected to pipelines requiring a vtkSelection.
-*/
+ */
 
 #ifndef vtkAnnotationLink_h
 #define vtkAnnotationLink_h
 
-#include "vtkFiltersGeneralModule.h" // For export macro
 #include "vtkAnnotationLayersAlgorithm.h"
+#include "vtkFiltersGeneralModule.h" // For export macro
 
 class vtkCommand;
 class vtkDataObjectCollection;
@@ -57,27 +57,27 @@ class vtkTable;
 class VTKFILTERSGENERAL_EXPORT vtkAnnotationLink : public vtkAnnotationLayersAlgorithm
 {
 public:
-  static vtkAnnotationLink *New();
+  static vtkAnnotationLink* New();
   vtkTypeMacro(vtkAnnotationLink, vtkAnnotationLayersAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The annotations to be shared.
    */
   vtkGetObjectMacro(AnnotationLayers, vtkAnnotationLayers);
   virtual void SetAnnotationLayers(vtkAnnotationLayers* layers);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set or get the current selection in the annotation layers.
    */
   virtual void SetCurrentSelection(vtkSelection* sel);
   virtual vtkSelection* GetCurrentSelection();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The domain mappings.
    */
@@ -86,7 +86,7 @@ public:
   void RemoveAllDomainMaps();
   int GetNumberOfDomainMaps();
   vtkTable* GetDomainMap(int i);
-  //@}
+  ///@}
 
   /**
    * Get the mtime of this object.
@@ -100,8 +100,7 @@ protected:
   /**
    * Called to process modified events from its vtkAnnotationLayers.
    */
-  virtual void ProcessEvents(vtkObject* caller, unsigned long eventId,
-    void* callData);
+  virtual void ProcessEvents(vtkObject* caller, unsigned long eventId, void* callData);
 
   /**
    * Set up input ports.
@@ -117,17 +116,13 @@ protected:
    * Copy the data to the output objects.
    */
   void ShallowCopyToOutput(
-    vtkAnnotationLayers* input,
-    vtkAnnotationLayers* output,
-    vtkSelection* sel);
+    vtkAnnotationLayers* input, vtkAnnotationLayers* output, vtkSelection* sel);
 
   /**
    * Shallow copy the internal selection to the output.
    */
-  int RequestData(
-    vtkInformation *info,
-    vtkInformationVector **inVector,
-    vtkInformationVector *outVector) override;
+  int RequestData(vtkInformation* info, vtkInformationVector** inVector,
+    vtkInformationVector* outVector) override;
 
   /**
    * The shared selection.
@@ -139,7 +134,6 @@ protected:
    */
   vtkDataObjectCollection* DomainMaps;
 
-
 private:
   vtkAnnotationLink(const vtkAnnotationLink&) = delete;
   void operator=(const vtkAnnotationLink&) = delete;
@@ -147,7 +141,6 @@ private:
   class Command;
   friend class Command;
   Command* Observer;
-
 };
 
 #endif

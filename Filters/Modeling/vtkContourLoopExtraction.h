@@ -64,7 +64,8 @@
  * @sa
  * vtkCookieCutter vtkFlyingEdges2D vtkMarchingSquares vtkFeatureEdges
  * vtkConnectivityFilter vtkPolyDataConnectivityFilter
- * vtkDiscreteFlyingEdges2D vtkStripper
+ * vtkDiscreteFlyingEdges2D vtkStripper vtkImprintFilter
+ * vtkCleanPolyData vtkStaticCleanPolyData
  */
 
 #ifndef vtkContourLoopExtraction_h
@@ -84,80 +85,88 @@
 class VTKFILTERSMODELING_EXPORT vtkContourLoopExtraction : public vtkPolyDataAlgorithm
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods to instantiate, print and provide type information.
    */
-  static vtkContourLoopExtraction *New();
-  vtkTypeMacro(vtkContourLoopExtraction,vtkPolyDataAlgorithm);
+  static vtkContourLoopExtraction* New();
+  vtkTypeMacro(vtkContourLoopExtraction, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify whether to close loops or not. All non-closed loops can be
    * rejected; boundary loops (end points lie on vertical or horizontal
    * porions of the boundary) can be closed (default); or all loops can be
    * forced closed by connecting first and last points.
    */
-  vtkSetClampMacro(LoopClosure,int,VTK_LOOP_CLOSURE_OFF,VTK_LOOP_CLOSURE_ALL);
-  vtkGetMacro(LoopClosure,int);
-  void SetLoopClosureToOff()
-    {this->SetLoopClosure(VTK_LOOP_CLOSURE_OFF);};
-  void SetLoopClosureToBoundary()
-    {this->SetLoopClosure(VTK_LOOP_CLOSURE_BOUNDARY);};
-  void SetLoopClosureToAll()
-    {this->SetLoopClosure(VTK_LOOP_CLOSURE_ALL);};
-  const char *GetLoopClosureAsString();
-  //@}
+  vtkSetClampMacro(LoopClosure, int, VTK_LOOP_CLOSURE_OFF, VTK_LOOP_CLOSURE_ALL);
+  vtkGetMacro(LoopClosure, int);
+  void SetLoopClosureToOff() { this->SetLoopClosure(VTK_LOOP_CLOSURE_OFF); }
+  void SetLoopClosureToBoundary() { this->SetLoopClosure(VTK_LOOP_CLOSURE_BOUNDARY); }
+  void SetLoopClosureToAll() { this->SetLoopClosure(VTK_LOOP_CLOSURE_ALL); }
+  const char* GetLoopClosureAsString();
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the extraction of loops based on scalar thresholding.  Loops
    * with scalar values in a specified range can be extracted. If no scalars
    * are available from the input than this data member is ignored.
    */
-  vtkSetMacro(ScalarThresholding,bool);
-  vtkGetMacro(ScalarThresholding,bool);
-  vtkBooleanMacro(ScalarThresholding,bool);
-  //@}
+  vtkSetMacro(ScalarThresholding, bool);
+  vtkGetMacro(ScalarThresholding, bool);
+  vtkBooleanMacro(ScalarThresholding, bool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scalar range to use to extract loop based on scalar
    * thresholding.  If any scalar, point data, in the loop falls into the
    * scalar range given, then the loop is extracted.
    */
-  vtkSetVector2Macro(ScalarRange,double);
-  vtkGetVector2Macro(ScalarRange,double);
-  //@}
+  vtkSetVector2Macro(ScalarRange, double);
+  vtkGetVector2Macro(ScalarRange, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the normal vector used to orient the algorithm (controlling turns
    * around the loop). By default the normal points in the +z direction.
    */
-  vtkSetVector3Macro(Normal,double);
-  vtkGetVector3Macro(Normal,double);
-  //@}
+  vtkSetVector3Macro(Normal, double);
+  vtkGetVector3Macro(Normal, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the form of the output. Polygons can be output (default);
    * polylines can be output (the first and last point is repeated); or both
    * can be output.
    */
-  vtkSetClampMacro(OutputMode,int,VTK_OUTPUT_POLYGONS,VTK_OUTPUT_BOTH);
-  vtkGetMacro(OutputMode,int);
-  void SetOutputModeToPolygons()
-    {this->SetOutputMode(VTK_OUTPUT_POLYGONS);};
-  void SetOutputModeToPolylines()
-    {this->SetOutputMode(VTK_OUTPUT_POLYLINES);};
-  void SetOutputModeToBoth()
-    {this->SetOutputMode(VTK_OUTPUT_BOTH);};
-  const char *GetOutputModeAsString();
-  //@}
+  vtkSetClampMacro(OutputMode, int, VTK_OUTPUT_POLYGONS, VTK_OUTPUT_BOTH);
+  vtkGetMacro(OutputMode, int);
+  void SetOutputModeToPolygons() { this->SetOutputMode(VTK_OUTPUT_POLYGONS); }
+  void SetOutputModeToPolylines() { this->SetOutputMode(VTK_OUTPUT_POLYLINES); }
+  void SetOutputModeToBoth() { this->SetOutputMode(VTK_OUTPUT_BOTH); }
+  const char* GetOutputModeAsString();
+  ///@}
 
+  ///@{
+  /**
+   * Indicate whether to clean the output points. Cleaning means discarding
+   * any points that are unused by the output polylines or polygons. This
+   * results in a potential renumbering of the points. By default, cleaning
+   * points is on. (This feature is useful because some filters output
+   * points in addition to those used to represent output lines and
+   * polylines, and this method is faster than using
+   * vtkCleanPolyData/vtkStaticCleanPolyData).
+   */
+  vtkSetMacro(CleanPoints, bool);
+  vtkGetMacro(CleanPoints, bool);
+  vtkBooleanMacro(CleanPoints, bool);
+  ///@}
 
 protected:
   vtkContourLoopExtraction();
@@ -168,14 +177,13 @@ protected:
   double ScalarRange[2];
   double Normal[3];
   int OutputMode;
+  bool CleanPoints;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                  vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkContourLoopExtraction(const vtkContourLoopExtraction&) = delete;
   void operator=(const vtkContourLoopExtraction&) = delete;
 };
-
 
 #endif

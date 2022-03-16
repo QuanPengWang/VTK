@@ -40,7 +40,7 @@
  *
  * @sa
  * vtkAbstractCellLinks vtkCellLinks vtkStaticCellLinks
-*/
+ */
 
 #ifndef vtkStaticCellLinksTemplate_h
 #define vtkStaticCellLinksTemplate_h
@@ -57,13 +57,13 @@ template <typename TIds>
 class vtkStaticCellLinksTemplate
 {
 public:
-  //@{
+  ///@{
   /**
    * Instantiate and destructor methods.
    */
   vtkStaticCellLinksTemplate();
   ~vtkStaticCellLinksTemplate();
-  //@}
+  ///@}
 
   /**
    * Make sure any previously created links are cleaned up.
@@ -74,70 +74,71 @@ public:
    * Build the link list array for a general dataset. Slower than the
    * specialized methods that follow.
    */
-  void BuildLinks(vtkDataSet *ds);
+  void BuildLinks(vtkDataSet* ds);
 
   /**
    * Build the link list array for vtkPolyData.
    */
-  void BuildLinks(vtkPolyData *pd);
+  void BuildLinks(vtkPolyData* pd);
 
   /**
    * Build the link list array for vtkUnstructuredGrid.
    */
-  void BuildLinks(vtkUnstructuredGrid *ugrid);
+  void BuildLinks(vtkUnstructuredGrid* ugrid);
 
   /**
    * Build the link list array for vtkExplicitStructuredGrid.
    */
-  void BuildLinks(vtkExplicitStructuredGrid *esgrid);
+  void BuildLinks(vtkExplicitStructuredGrid* esgrid);
 
   /**
    * Specialized methods for building links from cell array.
    */
-  void SerialBuildLinks(const vtkIdType numPts, const vtkIdType numCells,
-                        vtkCellArray *cellArray);
-  void ThreadedBuildLinks(const vtkIdType numPts, const vtkIdType numCells,
-                          vtkCellArray *cellArray, vtkIdType *locs);
+  void SerialBuildLinks(const vtkIdType numPts, const vtkIdType numCells, vtkCellArray* cellArray);
+  void ThreadedBuildLinks(
+    const vtkIdType numPts, const vtkIdType numCells, vtkCellArray* cellArray);
 
-  //@{
+  ///@{
   /**
    * Get the number of cells using the point specified by ptId.
    */
-  TIds GetNumberOfCells(vtkIdType ptId)
-  {
-    return (this->Offsets[ptId+1] - this->Offsets[ptId]);
-  }
-  vtkIdType GetNcells(vtkIdType ptId)
-  {
-    return (this->Offsets[ptId+1] - this->Offsets[ptId]);
-  }
-  //@}
+  TIds GetNumberOfCells(vtkIdType ptId) { return (this->Offsets[ptId + 1] - this->Offsets[ptId]); }
+  vtkIdType GetNcells(vtkIdType ptId) { return (this->Offsets[ptId + 1] - this->Offsets[ptId]); }
+  ///@}
+
+  /**
+   * Indicate whether the point ids provided defines at least one cell, or a
+   * portion of a cell.
+   */
+  bool MatchesCell(vtkIdType npts, const vtkIdType* pts);
 
   /**
    * Return a list of cell ids using the point specified by ptId.
    */
-  TIds *GetCells(vtkIdType ptId)
-  {
-    return (this->Links + this->Offsets[ptId]);
-  }
+  TIds* GetCells(vtkIdType ptId) { return (this->Links + this->Offsets[ptId]); }
 
-  //@{
+  /**
+   * Given point ids that define a cell, find the cells that contains all of
+   * these point ids. The set of linked cells is returned in cells.
+   */
+  void GetCells(vtkIdType npts, const vtkIdType* pts, vtkIdList* cells);
+
+  ///@{
   /**
    * Support vtkAbstractCellLinks API.
    */
   unsigned long GetActualMemorySize();
-  void DeepCopy(vtkAbstractCellLinks *src);
-  //@}
+  void DeepCopy(vtkAbstractCellLinks* src);
+  void SelectCells(vtkIdType minMaxDegree[2], unsigned char* cellSelection);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Control whether to thread or serial process.
    */
-  void SetSequentialProcessing(vtkTypeBool seq)
-  {this->SequentialProcessing = seq;}
-  vtkTypeBool GetSequentialProcessing()
-  {return this->SequentialProcessing;}
-  //@}
+  void SetSequentialProcessing(vtkTypeBool seq) { this->SequentialProcessing = seq; }
+  vtkTypeBool GetSequentialProcessing() { return this->SequentialProcessing; }
+  ///@}
 
 protected:
   // The various templated data members
@@ -146,17 +147,16 @@ protected:
   TIds NumCells;
 
   // These point to the core data structures
-  TIds *Links; //contiguous runs of cell ids
-  TIds *Offsets; //offsets for each point into the links array
+  TIds* Links;   // contiguous runs of cell ids
+  TIds* Offsets; // offsets for each point into the links array
 
   // Support for execution
-  int  Type;
+  int Type;
   vtkTypeBool SequentialProcessing;
 
 private:
   vtkStaticCellLinksTemplate(const vtkStaticCellLinksTemplate&) = delete;
   void operator=(const vtkStaticCellLinksTemplate&) = delete;
-
 };
 
 #include "vtkStaticCellLinksTemplate.txx"

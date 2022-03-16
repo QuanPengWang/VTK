@@ -16,52 +16,55 @@
 // .SECTION Description
 // Load a SEP file, check the grid and render it.
 
-#include "vtkActor.h"
-#include "vtkCamera.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkImageData.h"
-#include "vtkImageMapToColors.h"
-#include "vtkLookupTable.h"
-#include "vtkNew.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkSEPReader.h"
-#include "vtkTestUtilities.h"
+#include <vtkActor.h>
+#include <vtkCamera.h>
+#include <vtkDataSetSurfaceFilter.h>
+#include <vtkImageData.h>
+#include <vtkImageMapToColors.h>
+#include <vtkLookupTable.h>
+#include <vtkNew.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+#include <vtkSEPReader.h>
+#include <vtkTestUtilities.h>
 
-int TestSEPReader(int argc, char *argv[])
+int TestSEPReader(int argc, char* argv[])
 {
-  char* filename =
-      vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/small.H");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/small.H");
+  const std::string filename = fname;
+  delete[] fname;
 
   vtkNew<vtkSEPReader> SEPReader;
 
   // Check the image can be read
-  if (!SEPReader->CanReadFile(filename))
+  if (!SEPReader->CanReadFile(filename.c_str()))
   {
     std::cerr << "CanReadFile failed for " << filename << "\n";
-    delete filename;
     return EXIT_FAILURE;
   }
 
   // Read the input image
-  SEPReader->SetFileName(filename);
-  delete filename;
+  SEPReader->SetFileName(filename.c_str());
+  SEPReader->SetFixedDimension1("DEPTH");
+  SEPReader->SetFixedDimensionValue1(0);
   SEPReader->Update();
 
   // Check the image properties
-  int* extents = SEPReader->GetDataExtent();
-  if (extents[0] != 0 || extents[1] != 4 || extents[2] != 0 ||
-      extents[3] != 4 || extents[4] != 0 || extents[5] != 3)
+  auto extents = SEPReader->ComputeExtent();
+  if (extents[0] != 0 || extents[1] != 4 || extents[2] != 0 || extents[3] != 4 || extents[4] != 0 ||
+    extents[5] != 3)
   {
     std::cerr << "Unexpected data extents!" << std::endl;
+    std::cerr << extents[0] << " " << extents[1] << " " << extents[2] << " " << extents[3] << " "
+              << extents[4] << " " << extents[5] << std::endl;
     return EXIT_FAILURE;
   }
 
-  double *origin = SEPReader->GetDataOrigin();
+  double* origin = SEPReader->GetDataOrigin();
   if (origin[0] != 0. || origin[1] != 0. || origin[2] != 0.)
   {
     std::cerr << "Unexpected data origin!" << std::endl;
@@ -97,7 +100,7 @@ int TestSEPReader(int argc, char *argv[])
   vtkNew<vtkPolyDataMapper> mapper;
   mapper->SetInputConnection(surface->GetOutputPort());
   mapper->ScalarVisibilityOn();
-  mapper->SelectColorArray("scalars");
+  mapper->SelectColorArray("ImageScalars");
   mapper->SetColorModeToMapScalars();
 
   vtkNew<vtkActor> actor;
@@ -109,8 +112,8 @@ int TestSEPReader(int argc, char *argv[])
   ren->AddActor(actor);
   ren->ResetCamera();
   double z1 = ren->GetActiveCamera()->GetPosition()[2];
-  ren->GetActiveCamera()->SetPosition(0.25 * z1, 0.25 * z1, 0.5*z1);
-  ren->GetActiveCamera()->SetFocalPoint(0., 0. ,0. );
+  ren->GetActiveCamera()->SetPosition(0.25 * z1, 0.25 * z1, 0.5 * z1);
+  ren->GetActiveCamera()->SetFocalPoint(0., 0., 0.);
   ren->ResetCamera();
 
   vtkNew<vtkRenderWindow> renWin;

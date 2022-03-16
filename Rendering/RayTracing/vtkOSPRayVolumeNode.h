@@ -17,7 +17,7 @@
  * @brief   links vtkVolume and vtkMapper to OSPRay
  *
  * Translates vtkVolume/Mapper state into OSPRay rendering calls
-*/
+ */
 
 #ifndef vtkOSPRayVolumeNode_h
 #define vtkOSPRayVolumeNode_h
@@ -34,8 +34,7 @@ class vtkInformationStringKey;
 class vtkPiecewiseFunction;
 class vtkPolyData;
 
-class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayVolumeNode :
-  public vtkVolumeNode
+class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayVolumeNode : public vtkVolumeNode
 {
 public:
   static vtkOSPRayVolumeNode* New();
@@ -46,11 +45,11 @@ public:
    * Overridden to take into account my renderables time, including
    * mapper and data into mapper inclusive of composite input
    */
-  virtual vtkMTimeType GetMTime() override;
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkOSPRayVolumeNode();
-  ~vtkOSPRayVolumeNode();
+  ~vtkOSPRayVolumeNode() override;
 
 private:
   vtkOSPRayVolumeNode(const vtkOSPRayVolumeNode&) = delete;

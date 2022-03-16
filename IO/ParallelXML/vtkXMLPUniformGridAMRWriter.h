@@ -24,7 +24,7 @@
  * vtkXMLUniformGridAMRWriter to communicate information about data blocks
  * to the root node so that the root node can write the XML file describing the
  * structure correctly.
-*/
+ */
 
 #ifndef vtkXMLPUniformGridAMRWriter_h
 #define vtkXMLPUniformGridAMRWriter_h
@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkXMLPUniformGridAMRWriter, vtkXMLUniformGridAMRWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Controller used to communicate data type of blocks.
    * By default, the global controller is used. If you want another
@@ -51,7 +51,7 @@ public:
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Set whether this instance will write the meta-file. WriteMetaFile
@@ -70,10 +70,10 @@ protected:
   void FillDataTypes(vtkCompositeDataSet*) override;
 
   vtkMultiProcessController* Controller;
+
 private:
   vtkXMLPUniformGridAMRWriter(const vtkXMLPUniformGridAMRWriter&) = delete;
   void operator=(const vtkXMLPUniformGridAMRWriter&) = delete;
-
 };
 
 #endif

@@ -16,7 +16,7 @@
  * @class   vtkObjectIdMap
  * @brief   class used to assign Id to any VTK object and be able
  * to retrieve it base on its id.
-*/
+ */
 
 #ifndef vtkObjectIdMap_h
 #define vtkObjectIdMap_h
@@ -56,9 +56,18 @@ public:
   vtkObject* GetActiveObject(const char* objectType);
 
   /**
-   * Remove any internal reference count due to internal Id/Object mapping
+   * Given an object, remove any internal reference count due to
+   * internal Id/Object mapping.
+   * Returns true if the item existed in the map and was deleted.
    */
-  void FreeObject(vtkObject* obj);
+  bool FreeObject(vtkObject* obj);
+
+  /**
+   * Given an id, remove any internal reference count due to
+   * internal Id/Object mapping.
+   * Returns true if the id existed in the map and was deleted.
+   */
+  bool FreeObjectById(vtkTypeUInt32 id);
 
 protected:
   vtkObjectIdMap();
@@ -70,7 +79,6 @@ private:
 
   struct vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

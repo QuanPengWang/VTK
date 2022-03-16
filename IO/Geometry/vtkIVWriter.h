@@ -21,7 +21,7 @@
  *
  * @sa
  * vtkPolyDataWriter
-*/
+ */
 
 #ifndef vtkIVWriter_h
 #define vtkIVWriter_h
@@ -34,43 +34,37 @@ class vtkPolyData;
 class VTKIOGEOMETRY_EXPORT vtkIVWriter : public vtkWriter
 {
 public:
-  static vtkIVWriter *New();
-  vtkTypeMacro(vtkIVWriter,vtkWriter);
+  static vtkIVWriter* New();
+  vtkTypeMacro(vtkIVWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get the input to this writer.
    */
   vtkPolyData* GetInput();
   vtkPolyData* GetInput(int port);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify file name of vtk polygon data file to write.
    */
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
-  //@}
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
 
 protected:
-  vtkIVWriter()
-  {
-    this->FileName = nullptr;
-  }
+  vtkIVWriter() { this->FileName = nullptr; }
 
-  ~vtkIVWriter() override
-  {
-    delete[] this->FileName;
-  }
+  ~vtkIVWriter() override { delete[] this->FileName; }
 
   void WriteData() override;
-  void WritePolyData(vtkPolyData *polyData, FILE *fp);
+  void WritePolyData(vtkPolyData* polyData, FILE* fp);
 
-  char *FileName;
+  char* FileName;
 
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkIVWriter(const vtkIVWriter&) = delete;
@@ -78,4 +72,3 @@ private:
 };
 
 #endif
-

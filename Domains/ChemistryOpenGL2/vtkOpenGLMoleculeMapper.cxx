@@ -24,15 +24,24 @@
 #include "vtkPeriodicTable.h"
 #include "vtkTrivialProducer.h"
 
-//-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkOpenGLMoleculeMapper)
+//------------------------------------------------------------------------------
+vtkStandardNewMacro(vtkOpenGLMoleculeMapper);
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void vtkOpenGLMoleculeMapper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "FastAtomMapper:\n";
+  this->FastAtomMapper->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "FastBondMapper:\n";
+  this->FastBondMapper->PrintSelf(os, indent.GetNextIndent());
+}
+
+//------------------------------------------------------------------------------
 vtkOpenGLMoleculeMapper::vtkOpenGLMoleculeMapper()
 {
   // Setup glyph mappers
-  this->FastAtomMapper->SetScalarRange
-    (0, this->PeriodicTable->GetNumberOfElements());
+  this->FastAtomMapper->SetScalarRange(0, this->PeriodicTable->GetNumberOfElements());
   this->FastAtomMapper->SetColorModeToMapScalars();
   this->FastAtomMapper->SetScalarModeToUsePointFieldData();
 
@@ -44,25 +53,21 @@ vtkOpenGLMoleculeMapper::vtkOpenGLMoleculeMapper()
 
   this->FastAtomMapper->AddObserver(vtkCommand::StartEvent, cb);
   this->FastAtomMapper->AddObserver(vtkCommand::EndEvent, cb);
-  this->FastAtomMapper->AddObserver(vtkCommand::ProgressEvent,
-                                     cb);
+  this->FastAtomMapper->AddObserver(vtkCommand::ProgressEvent, cb);
 
   this->FastBondMapper->AddObserver(vtkCommand::StartEvent, cb);
   this->FastBondMapper->AddObserver(vtkCommand::EndEvent, cb);
-  this->FastBondMapper->AddObserver(vtkCommand::ProgressEvent,
-                                     cb);
+  this->FastBondMapper->AddObserver(vtkCommand::ProgressEvent, cb);
 
   // Connect the trivial producers to forward the glyph polydata
-  this->FastAtomMapper->SetInputConnection
-    (this->AtomGlyphPointOutput->GetOutputPort());
-  this->FastBondMapper->SetInputConnection
-    (this->BondGlyphPointOutput->GetOutputPort());
+  this->FastAtomMapper->SetInputConnection(this->AtomGlyphPointOutput->GetOutputPort());
+  this->FastBondMapper->SetInputConnection(this->BondGlyphPointOutput->GetOutputPort());
 }
 
 vtkOpenGLMoleculeMapper::~vtkOpenGLMoleculeMapper() = default;
 
-//----------------------------------------------------------------------------
-void vtkOpenGLMoleculeMapper::Render(vtkRenderer *ren, vtkActor *act )
+//------------------------------------------------------------------------------
+void vtkOpenGLMoleculeMapper::Render(vtkRenderer* ren, vtkActor* act)
 {
   // Update cached polydata if needed
   this->UpdateGlyphPolyData();
@@ -85,9 +90,7 @@ void vtkOpenGLMoleculeMapper::Render(vtkRenderer *ren, vtkActor *act )
 }
 
 void vtkOpenGLMoleculeMapper::ProcessSelectorPixelBuffers(
-  vtkHardwareSelector *sel,
-  std::vector<unsigned int> &pixeloffsets,
-  vtkProp *prop)
+  vtkHardwareSelector* sel, std::vector<unsigned int>& pixeloffsets, vtkProp* prop)
 {
   // forward to helper
   if (this->RenderAtoms)
@@ -106,15 +109,15 @@ void vtkOpenGLMoleculeMapper::ProcessSelectorPixelBuffers(
   }
 }
 
-//----------------------------------------------------------------------------
-void vtkOpenGLMoleculeMapper::ReleaseGraphicsResources(vtkWindow *w)
+//------------------------------------------------------------------------------
+void vtkOpenGLMoleculeMapper::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->FastAtomMapper->ReleaseGraphicsResources(w);
   this->FastBondMapper->ReleaseGraphicsResources(w);
   this->Superclass::ReleaseGraphicsResources(w);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Generate scale and position information for each atom sphere
 void vtkOpenGLMoleculeMapper::UpdateAtomGlyphPolyData()
 {
@@ -127,7 +130,7 @@ void vtkOpenGLMoleculeMapper::UpdateAtomGlyphPolyData()
   this->FastAtomMapper->SelectColorArray(this->AtomGlyphMapper->GetArrayId());
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Generate position, scale, and orientation vectors for each bond cylinder
 void vtkOpenGLMoleculeMapper::UpdateBondGlyphPolyData()
 {
@@ -143,7 +146,7 @@ void vtkOpenGLMoleculeMapper::UpdateBondGlyphPolyData()
   this->FastBondMapper->SetSelectionIdArray("Selection Ids");
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkOpenGLMoleculeMapper::SetMapScalars(bool map)
 {
   this->Superclass::SetMapScalars(map);

@@ -20,7 +20,7 @@
  *
  *
  *
-*/
+ */
 
 #ifndef vtkPlotStacked_h
 #define vtkPlotStacked_h
@@ -42,34 +42,26 @@ class VTKCHARTSCORE_EXPORT vtkPlotStacked : public vtkPlot
 {
 public:
   vtkTypeMacro(vtkPlotStacked, vtkPlot);
-  void PrintSelf(ostream &os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Creates a Stacked Plot Object
    */
-  static vtkPlotStacked *New();
+  static vtkPlotStacked* New();
 
-  //@{
+  ///@{
   /**
    * Set the plot color
    */
-  void SetColor(unsigned char r, unsigned char g, unsigned char b,
-                        unsigned char a) override;
-  void SetColor(double r,  double g, double b) override;
+  void SetColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) override;
+  void SetColor(double r, double g, double b) override;
   void GetColor(double rgb[3]) override;
-  //@}
-
-  /**
-   * Perform any updates to the item that may be necessary before rendering.
-   * The scene should take care of calling this on all items before their
-   * Paint function is invoked.
-   */
-  void Update() override;
+  ///@}
 
   /**
    * Paint event for the Stacked plot, called whenever the chart needs to be drawn
    */
-  bool Paint(vtkContext2D *painter) override;
+  bool Paint(vtkContext2D* painter) override;
 
   /**
    * Paint legend event for the Stacked plot, called whenever the legend needs the
@@ -77,8 +69,7 @@ public:
    * corner of the rect (elements 0 and 1) and with width x height (elements 2
    * and 3). The plot can choose how to fill the space supplied.
    */
-  bool PaintLegend(vtkContext2D *painter, const vtkRectf& rect,
-                           int legendIndex) override;
+  bool PaintLegend(vtkContext2D* painter, const vtkRectf& rect, int legendIndex) override;
 
   /**
    * Get the bounds for this mapper as (Xmin,Xmax,Ymin,Ymax).
@@ -94,54 +85,62 @@ public:
   /**
    * When used to set additional arrays, stacked bars are created.
    */
-  void SetInputArray(int index, const vtkStdString &name) override;
+  void SetInputArray(int index, const vtkStdString& name) override;
 
   /**
    * Set the color series to use if this becomes a stacked bar plot.
    */
-  void SetColorSeries(vtkColorSeries *colorSeries);
+  void SetColorSeries(vtkColorSeries* colorSeries);
 
   /**
    * Get the color series used if when this is a stacked bar plot.
    */
-  vtkColorSeries *GetColorSeries();
+  vtkColorSeries* GetColorSeries();
 
   /**
    * Get the plot labels.
    */
-  vtkStringArray *GetLabels() override;
+  vtkStringArray* GetLabels() override;
 
   /**
    * Function to query a plot for the nearest point to the specified coordinate.
    * Returns the index of the data series with which the point is associated or
    * -1.
    */
-  vtkIdType GetNearestPoint(const vtkVector2f& point,
-                                    const vtkVector2f& tolerance,
-                                    vtkVector2f* location) override;
+  vtkIdType GetNearestPoint(const vtkVector2f& point, const vtkVector2f& tolerance,
+    vtkVector2f* location, vtkIdType* segmentId) override;
+  using vtkPlot::GetNearestPoint;
 
   /**
    * Select all points in the specified rectangle.
    */
   bool SelectPoints(const vtkVector2f& min, const vtkVector2f& max) override;
 
+  /**
+   * Update the internal cache. Returns true if cache was successfully updated. Default does
+   * nothing.
+   * This method is called by Update() when either the plot's data has changed or
+   * CacheRequiresUpdate() returns true. It is not necessary to call this method explicitly.
+   */
+  bool UpdateCache() override;
+
 protected:
   vtkPlotStacked();
   ~vtkPlotStacked() override;
 
   /**
-   * Update the table cache.
+   * Test if the internal cache requires an update.
    */
-  bool UpdateTableCache(vtkTable *table);
+  virtual bool CacheRequiresUpdate() override;
 
   // Descript:
   // For stacked plots the Extent data must be greater than (or equal to) the
-  // base data. Insure that this is true
+  // base data. Ensure that this is true
   void FixExtent();
 
   /**
    * Handle calculating the log of the x or y series if necessary. Should be
-   * called by UpdateTableCache once the data has been updated in Points.
+   * called by UpdateCache once the data has been updated in Points.
    */
   void CalculateLogSeries();
 
@@ -157,11 +156,6 @@ protected:
    */
   vtkIdTypeArray* ExtentBadPoints;
 
-  /**
-   * The point cache is marked dirty until it has been initialized.
-   */
-  vtkTimeStamp BuildTime;
-
   bool LogX, LogY;
 
   /**
@@ -170,11 +164,10 @@ protected:
   vtkSmartPointer<vtkColorSeries> ColorSeries;
 
 private:
-  vtkPlotStacked(const vtkPlotStacked &) = delete;
-  void operator=(const vtkPlotStacked &) = delete;
+  vtkPlotStacked(const vtkPlotStacked&) = delete;
+  void operator=(const vtkPlotStacked&) = delete;
 
-  vtkPlotStackedPrivate *Private;
-
+  vtkPlotStackedPrivate* Private;
 };
 
-#endif //vtkPlotStacked_h
+#endif // vtkPlotStacked_h

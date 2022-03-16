@@ -25,7 +25,14 @@
 
 vtkStandardNewMacro(vtkPointSetToMoleculeFilter);
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void vtkPointSetToMoleculeFilter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "ConvertLinesIntoBonds: " << this->ConvertLinesIntoBonds << endl;
+}
+
+//------------------------------------------------------------------------------
 vtkPointSetToMoleculeFilter::vtkPointSetToMoleculeFilter()
   : ConvertLinesIntoBonds(true)
 {
@@ -36,18 +43,17 @@ vtkPointSetToMoleculeFilter::vtkPointSetToMoleculeFilter()
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, vtkDataSetAttributes::SCALARS);
 }
 
-//----------------------------------------------------------------------------
-int vtkPointSetToMoleculeFilter::FillInputPortInformation(int vtkNotUsed(port),
-  vtkInformation* info)
+//------------------------------------------------------------------------------
+int vtkPointSetToMoleculeFilter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPointSet");
   return 1;
 }
 
-//----------------------------------------------------------------------------
-int vtkPointSetToMoleculeFilter::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+//------------------------------------------------------------------------------
+int vtkPointSetToMoleculeFilter::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkPointSet* input = vtkPointSet::SafeDownCast(vtkDataObject::GetData(inputVector[0]));
   vtkMolecule* output = vtkMolecule::SafeDownCast(vtkDataObject::GetData(outputVector));

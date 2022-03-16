@@ -28,14 +28,16 @@
  * takes longer to compress and encode than that pushed in at N+1-th location or
  * if it was pushed in before the N-th location was even taken up for encoding
  * by the a thread in the thread pool.
-*/
+ */
 
 #ifndef vtkDataEncoder_h
 #define vtkDataEncoder_h
 
+#include "vtkDeprecation.h" // needed for exports
 #include "vtkObject.h"
+#include "vtkSmartPointer.h"  // needed for vtkSmartPointer
 #include "vtkWebCoreModule.h" // needed for exports
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include <memory>             // for std::unique_ptr
 
 class vtkUnsignedCharArray;
 class vtkImageData;
@@ -47,12 +49,14 @@ public:
   vtkTypeMacro(vtkDataEncoder, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
-   * Define the number of worker threads to use.
+   * Define the number of worker threads to use. Default is 3.
    * Initialize() needs to be called after changing the thread count.
    */
   void SetMaxThreads(vtkTypeUInt32);
   vtkGetMacro(MaxThreads, vtkTypeUInt32);
+  ///@}
 
   /**
    * Re-initializes the encoder. This will abort any on going encoding threads
@@ -69,7 +73,16 @@ public:
    * vtkObject::UnRegister() on it when it's done.
    * encoding can be set to 0 to skip encoding.
    */
-  void PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data, int quality, int encoding = 1);
+  VTK_DEPRECATED_IN_9_1_0("replaced by Push")
+  void PushAndTakeReference(vtkTypeUInt32 key, vtkImageData*& data, int quality, int encoding = 1);
+
+  /**
+   * Push an image into the encoder. The data is considered unchanging and thus
+   * should not be modified once pushed. Reference count changes are now thread safe
+   * and hence callers should ensure they release the reference held, if
+   * appropriate.
+   */
+  void Push(vtkTypeUInt32 key, vtkImageData* data, int quality, int encoding = 1);
 
   /**
    * Get access to the most-recent fully encoded result corresponding to the
@@ -78,7 +91,7 @@ public:
    * returns false, it means that there's some image either being processed on
    * pending processing.
    */
-  bool GetLatestOutput(vtkTypeUInt32 key,vtkSmartPointer<vtkUnsignedCharArray>& data);
+  bool GetLatestOutput(vtkTypeUInt32 key, vtkSmartPointer<vtkUnsignedCharArray>& data);
 
   /**
    * Flushes the encoding pipe and blocks till the most recently pushed image
@@ -91,12 +104,12 @@ public:
   /**
    * Take an image data and synchronously convert it to a base-64 encoded png.
    */
-  const char* EncodeAsBase64Png(vtkImageData* img, int compressionLevel=5);
+  const char* EncodeAsBase64Png(vtkImageData* img, int compressionLevel = 5);
 
   /**
    * Take an image data and synchronously convert it to a base-64 encoded jpg.
    */
-  const char* EncodeAsBase64Jpg(vtkImageData* img, int quality=50);
+  const char* EncodeAsBase64Jpg(vtkImageData* img, int quality = 50);
 
   /**
    * This method will wait for any running thread to terminate.
@@ -114,8 +127,7 @@ private:
   void operator=(const vtkDataEncoder&) = delete;
 
   class vtkInternals;
-  vtkInternals* Internals;
-
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

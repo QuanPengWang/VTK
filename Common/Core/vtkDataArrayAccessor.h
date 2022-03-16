@@ -17,6 +17,10 @@
  * @class   vtkDataArrayAccessor
  * @brief   Efficient templated access to vtkDataArray.
  *
+ * @warning vtkDataArrayAccessor has been replaced by the much easier to use
+ * range facilities vtk::DataArrayTupleRange and vtk::DataArrayValueRange,
+ * defined in vtkDataArrayRange.h. This accessor class shouldn't need to be
+ * used directly.
  *
  * vtkDataArrayAccessor provides access to data stored in a vtkDataArray. It
  * is intended to be used in conjunction with vtkArrayDispatcher.
@@ -87,16 +91,14 @@
  * function template.
  *
  * .SEE ALSO
- * vtkArrayDispatch
-*/
+ * vtkArrayDispatch vtk::DataArrayValueRange vtk::DataArrayTupleRange
+ */
 
 #include "vtkDataArray.h"
 #include "vtkGenericDataArray.h"
 
 #ifndef vtkDataArrayAccessor_h
 #define vtkDataArrayAccessor_h
-
-#ifndef __VTK_WRAP__
 
 // Generic form for all (non-bit) vtkDataArray subclasses.
 template <typename ArrayT>
@@ -105,9 +107,12 @@ struct vtkDataArrayAccessor
   typedef ArrayT ArrayType;
   typedef typename ArrayType::ValueType APIType;
 
-  ArrayType *Array;
+  ArrayType* Array;
 
-  vtkDataArrayAccessor(ArrayType *array) : Array(array) {}
+  vtkDataArrayAccessor(ArrayType* array)
+    : Array(array)
+  {
+  }
 
   VTK_ALWAYS_INLINE
   APIType Get(vtkIdType tupleIdx, int compIdx) const
@@ -128,19 +133,19 @@ struct vtkDataArrayAccessor
   }
 
   VTK_ALWAYS_INLINE
-  void Get(vtkIdType tupleIdx, APIType *tuple) const
+  void Get(vtkIdType tupleIdx, APIType* tuple) const
   {
     this->Array->GetTypedTuple(tupleIdx, tuple);
   }
 
   VTK_ALWAYS_INLINE
-  void Set(vtkIdType tupleIdx, const APIType *tuple) const
+  void Set(vtkIdType tupleIdx, const APIType* tuple) const
   {
     this->Array->SetTypedTuple(tupleIdx, tuple);
   }
 
   VTK_ALWAYS_INLINE
-  void Insert(vtkIdType tupleIdx, const APIType *tuple) const
+  void Insert(vtkIdType tupleIdx, const APIType* tuple) const
   {
     this->Array->InsertTypedTuple(tupleIdx, tuple);
   }
@@ -153,9 +158,12 @@ struct vtkDataArrayAccessor<vtkDataArray>
   typedef vtkDataArray ArrayType;
   typedef double APIType;
 
-  ArrayType *Array;
+  ArrayType* Array;
 
-  vtkDataArrayAccessor(ArrayType *array) : Array(array) {}
+  vtkDataArrayAccessor(ArrayType* array)
+    : Array(array)
+  {
+  }
 
   VTK_ALWAYS_INLINE
   APIType Get(vtkIdType tupleIdx, int compIdx) const
@@ -176,25 +184,20 @@ struct vtkDataArrayAccessor<vtkDataArray>
   }
 
   VTK_ALWAYS_INLINE
-  void Get(vtkIdType tupleIdx, APIType *tuple) const
-  {
-    this->Array->GetTuple(tupleIdx, tuple);
-  }
+  void Get(vtkIdType tupleIdx, APIType* tuple) const { this->Array->GetTuple(tupleIdx, tuple); }
 
   VTK_ALWAYS_INLINE
-  void Set(vtkIdType tupleIdx, const APIType *tuple) const
+  void Set(vtkIdType tupleIdx, const APIType* tuple) const
   {
     this->Array->SetTuple(tupleIdx, tuple);
   }
 
   VTK_ALWAYS_INLINE
-  void Insert(vtkIdType tupleIdx, const APIType *tuple) const
+  void Insert(vtkIdType tupleIdx, const APIType* tuple) const
   {
     this->Array->InsertTuple(tupleIdx, tuple);
   }
 };
-
-#endif
 
 #endif // vtkDataArrayAccessor_h
 // VTK-HeaderTest-Exclude: vtkDataArrayAccessor.h

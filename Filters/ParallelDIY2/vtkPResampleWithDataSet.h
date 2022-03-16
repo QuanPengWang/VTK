@@ -20,14 +20,13 @@
  * filter
  * @sa
  * vtkResampleWithDataSet vtkPResampleToImage
-*/
+ */
 
 #ifndef vtkPResampleWithDataSet_h
 #define vtkPResampleWithDataSet_h
 
 #include "vtkFiltersParallelDIY2Module.h" // For export macro
 #include "vtkResampleWithDataSet.h"
-
 
 class vtkMultiProcessController;
 
@@ -37,18 +36,18 @@ public:
   vtkTypeMacro(vtkPResampleWithDataSet, vtkResampleWithDataSet);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkPResampleWithDataSet *New();
+  static vtkPResampleWithDataSet* New();
 
-  //@{
+  ///@{
   /**
    * By default this filter uses the global controller,
    * but this method can be used to set another instead.
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get if the filter should use Balanced Partitioning for fast lookup of
    * the input points. Balanced Partitioning partitions the points into similar
@@ -65,18 +64,16 @@ public:
   vtkSetMacro(UseBalancedPartitionForPointsLookup, bool);
   vtkGetMacro(UseBalancedPartitionForPointsLookup, bool);
   vtkBooleanMacro(UseBalancedPartitionForPointsLookup, bool);
-  //@}
+  ///@}
 
 protected:
   vtkPResampleWithDataSet();
-  ~vtkPResampleWithDataSet();
+  ~vtkPResampleWithDataSet() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
-  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
   bool UseBalancedPartitionForPointsLookup;
 
 private:

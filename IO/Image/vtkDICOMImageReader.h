@@ -32,7 +32,7 @@
  *
  * @sa
  * vtkBMPReader vtkPNMReader vtkTIFFReader
-*/
+ */
 
 #ifndef vtkDICOMImageReader_h
 #define vtkDICOMImageReader_h
@@ -46,34 +46,34 @@ class DICOMAppHelper;
 
 class VTKIOIMAGE_EXPORT vtkDICOMImageReader : public vtkImageReader2
 {
- public:
-  //@{
+public:
+  ///@{
   /**
    * Static method for construction.
    */
-  static vtkDICOMImageReader *New();
-  vtkTypeMacro(vtkDICOMImageReader,vtkImageReader2);
-  //@}
+  static vtkDICOMImageReader* New();
+  vtkTypeMacro(vtkDICOMImageReader, vtkImageReader2);
+  ///@}
 
   /**
    * Prints the ivars.
    */
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the filename for the file to read. If this method is used,
    * the reader will only read a single file.
    */
-  void SetFileName(const char* fn) override
+  void SetFileName(VTK_FILEPATH const char* fn) override
   {
-    delete [] this->DirectoryName;
-    delete [] this->FileName;
+    delete[] this->DirectoryName;
+    delete[] this->FileName;
     this->DirectoryName = nullptr;
     this->FileName = nullptr;
     this->vtkImageReader2::SetFileName(fn);
   }
-  //@}
+  ///@}
 
   /**
    * Set the directory name for the reader to look in for DICOM
@@ -84,14 +84,14 @@ class VTKIOIMAGE_EXPORT vtkDICOMImageReader : public vtkImageReader2
    * the slice number. The volume building will be upgraded to
    * something more sophisticated in the future.
    */
-  void SetDirectoryName(const char* dn);
+  void SetDirectoryName(VTK_FILEPATH const char* dn);
 
-  //@{
+  ///@{
   /**
    * Returns the directory name.
    */
-  vtkGetStringMacro(DirectoryName);
-  //@}
+  vtkGetFilePathMacro(DirectoryName);
+  ///@}
 
   /**
    * Returns the pixel spacing (in X, Y, Z).
@@ -181,23 +181,17 @@ class VTKIOIMAGE_EXPORT vtkDICOMImageReader : public vtkImageReader2
   //
   // Can I read the file?
   //
-  int CanReadFile(const char* fname) override;
+  int CanReadFile(VTK_FILEPATH const char* fname) override;
 
   //
   // What file extensions are supported?
   //
-  const char* GetFileExtensions() override
-  {
-    return ".dcm";
-  }
+  const char* GetFileExtensions() override { return ".dcm"; }
 
   /**
    * Return a descriptive name for the file format that might be useful in a GUI.
    */
-  const char* GetDescriptiveName() override
-  {
-    return "DICOM";
-  }
+  const char* GetDescriptiveName() override { return "DICOM"; }
 
 protected:
   //
@@ -206,7 +200,7 @@ protected:
   void SetupOutputInformation(int num_slices);
 
   void ExecuteInformation() override;
-  void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation *outInfo) override;
+  void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) override;
 
   //
   // Constructor
@@ -241,11 +235,11 @@ protected:
 
   // DICOMFileNames accessor methods for subclasses:
   int GetNumberOfDICOMFileNames();
-  const char* GetDICOMFileName(int index);
+  VTK_FILEPATH const char* GetDICOMFileName(int index);
+
 private:
   vtkDICOMImageReader(const vtkDICOMImageReader&) = delete;
   void operator=(const vtkDICOMImageReader&) = delete;
-
 };
 
 #endif

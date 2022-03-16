@@ -13,18 +13,17 @@
 
 =========================================================================*/
 /**
- * @class   vtkMultiBlockFromTimeSeriesFilter
- * @brief   collects multiple inputs into one multi-group dataset
+ * @class vtkMultiBlockFromTimeSeriesFilter
+ * @brief converts a temporal dataset into multiblock.
  *
- * vtkMultiBlockFromTimeSeriesFilter is a 1 to 1 filter that merges multiple
- * time steps from the input into one multiblock dataset.  It will assign each
- * time step from the input to one group of the multi-block dataset and will
- * assign each timestep's data as a block in the multi-block datset.
-*/
+ * @deprecated Use vtkGroupTimeStepsFilter instead. vtkGroupTimeStepsFilter can
+ * handle vtkPartitionedDataSetCollection and other input types better.
+ */
 
 #ifndef vtkMultiBlockFromTimeSeriesFilter_h
 #define vtkMultiBlockFromTimeSeriesFilter_h
 
+#include "vtkDeprecation.h"          // For VTK_DEPRECATED_IN_9_1_0
 #include "vtkFiltersGeneralModule.h" // For export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkSmartPointer.h" // Smart pointer
@@ -33,29 +32,24 @@
 
 class vtkMultiBlockDataSet;
 
-class VTKFILTERSGENERAL_EXPORT vtkMultiBlockFromTimeSeriesFilter : public vtkMultiBlockDataSetAlgorithm
+class VTK_DEPRECATED_IN_9_1_0(
+  "Use vtkGroupTimeStepsFilter instead") VTKFILTERSGENERAL_EXPORT vtkMultiBlockFromTimeSeriesFilter
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkMultiBlockFromTimeSeriesFilter,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkMultiBlockFromTimeSeriesFilter, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkMultiBlockFromTimeSeriesFilter *New();
+  static vtkMultiBlockFromTimeSeriesFilter* New();
 
 protected:
   vtkMultiBlockFromTimeSeriesFilter();
   ~vtkMultiBlockFromTimeSeriesFilter() override;
 
-  int FillInputPortInformation(int, vtkInformation *) override;
-
-  int RequestInformation(vtkInformation *,
-                  vtkInformationVector **,
-                  vtkInformationVector *) override;
-  int RequestUpdateExtent(vtkInformation *,
-                  vtkInformationVector **,
-                  vtkInformationVector *) override;
-  int RequestData(vtkInformation *,
-                  vtkInformationVector **,
-                  vtkInformationVector *) override;
+  int FillInputPortInformation(int, vtkInformation*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkMultiBlockFromTimeSeriesFilter(const vtkMultiBlockFromTimeSeriesFilter&) = delete;
@@ -67,3 +61,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkMultiBlockFromTimeSeriesFilter.h

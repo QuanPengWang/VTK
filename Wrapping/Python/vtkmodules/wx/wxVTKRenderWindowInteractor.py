@@ -36,7 +36,8 @@ Behaviour:
 # import usual libraries
 import math, os, sys
 import wx
-from vtkmodules.vtkRenderingCore import vtkGenericRenderWindowInteractor, vtkRenderWindow
+from vtkmodules.vtkRenderingCore import vtkRenderWindow
+from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
 # a few configuration items, see what works best on your system
 
@@ -662,6 +663,9 @@ def wxVTKRenderWindowInteractorConeExample():
 
     from vtkmodules.vtkFiltersSources import vtkConeSource
     from vtkmodules.vtkRenderingCore import vtkActor, vtkPolyDataMapper, vtkRenderer
+    # load implementations for rendering and interaction factory classes
+    import vtkmodules.vtkRenderingOpenGL2
+    import vtkmodules.vtkInteractionStyle
 
     # every wx app needs an app
     app = wx.App(False)

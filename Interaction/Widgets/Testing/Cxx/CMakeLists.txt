@@ -20,7 +20,9 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests tests
   TestCoincidentHandleWidgets.cxx
   TestConstrainedHandleWidget.cxx
   TestContourWidget2.cxx
+  TestCoordinateFrameWidget.cxx
   TestDijkstraImageGeodesicPath.cxx
+  TestDisplaySizedImplicitPlaneWidget.cxx
   TestDistanceWidget.cxx
   TestDistanceWidget3D.cxx
   TestFinitePlaneWidget.cxx
@@ -36,6 +38,7 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests tests
   TestImplicitPlaneWidget2LockNormalToCamera.cxx
   TestImplicitPlaneWidget2b.cxx
   TestImplicitPlaneWidget3.cxx
+  TestLightWidget.cxx
   TestLogoWidget.cxx
   TestLogoWidgetAlphaBlending.cxx
   TestLogoWidgetDepthPeeling.cxx
@@ -67,9 +70,12 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests tests
   TestSphereWidgetZoomInOut.cxx
   TestSplineWidget.cxx
   TestTextWidget.cxx
+  TestTextRepresentationWithBorders.cxx
+  TestTextWidgetBackgroundInteractive.cxx
   )
 vtk_add_test_cxx(vtkInteractionWidgetsCxxTests no_valid_tests
   NO_VALID
+  TestEqualizerContextItem.cxx
   vtkAngleRepresentation2DTest1.cxx
   vtkAngleRepresentation3DTest1.cxx
   vtkAngleWidgetTest1.cxx
@@ -78,6 +84,7 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests no_valid_tests
   vtkBiDimensionalRepresentation2DTest1.cxx
   vtkBiDimensionalWidgetTest1.cxx
   vtkBorderWidgetTest1.cxx
+  vtkCameraPathRepresentationTest1.cxx
   vtkCaptionRepresentationTest1.cxx
   vtkCaptionWidgetTest1.cxx
   vtkConstrainedPointHandleRepresentationTest1.cxx
@@ -86,6 +93,7 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests no_valid_tests
   vtkLineWidget2Test1.cxx
   vtkPolyLineRepresentationTest1.cxx
   vtkPolyLineWidgetTest1.cxx
+  vtkResliceCursorRepresentationTest1.cxx
   vtkSeedRepresentationTest1.cxx
   vtkSeedWidgetTest1.cxx
   vtkSplineRepresentationTest1.cxx
@@ -98,6 +106,7 @@ vtk_add_test_cxx(vtkInteractionWidgetsCxxTests no_valid_tests
 vtk_add_test_cxx(vtkInteractionWidgetsCxxTests data_tests
   TestButtonWidget.cxx
   TestButtonWidgetMultipleViewports.cxx
+  TestButtonWidgetPlacement.cxx
   TestDijkstraGraphGeodesicPath.cxx
   TestLineWidget.cxx
   TestLineWidget2.cxx
@@ -127,6 +136,7 @@ set(all_tests
   ${ogl_tests}
   )
 vtk_test_cxx_executable(vtkInteractionWidgetsCxxTests all_tests
+  DISABLE_FLOATING_POINT_EXCEPTIONS
   RENDERING_FACTORY
   )
 

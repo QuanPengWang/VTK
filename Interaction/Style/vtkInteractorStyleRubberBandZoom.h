@@ -20,7 +20,7 @@
  * window using the left mouse button.  When the mouse button is released,
  * the current camera zooms by an amount determined from the shorter side of
  * the drawn rectangle.
-*/
+ */
 
 #ifndef vtkInteractorStyleRubberBandZoom_h
 #define vtkInteractorStyleRubberBandZoom_h
@@ -34,11 +34,11 @@ class vtkUnsignedCharArray;
 class VTKINTERACTIONSTYLE_EXPORT vtkInteractorStyleRubberBandZoom : public vtkInteractorStyle
 {
 public:
-  static vtkInteractorStyleRubberBandZoom *New();
+  static vtkInteractorStyleRubberBandZoom* New();
   vtkTypeMacro(vtkInteractorStyleRubberBandZoom, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * When set to true (default, false), the interactor will lock the rendered box to the
    * viewport's aspect ratio.
@@ -46,9 +46,9 @@ public:
   vtkSetMacro(LockAspectToViewport, bool);
   vtkGetMacro(LockAspectToViewport, bool);
   vtkBooleanMacro(LockAspectToViewport, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When set to true (default, false), the position where the user starts the
    * interaction is treated as the center of the box rather that one of the
@@ -62,9 +62,9 @@ public:
   vtkSetMacro(CenterAtStartPosition, bool);
   vtkGetMacro(CenterAtStartPosition, bool);
   vtkBooleanMacro(CenterAtStartPosition, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If camera is in perspective projection mode, this interactor style uses
    * vtkCamera::Dolly to dolly the camera ahead for zooming. However, that can
@@ -77,16 +77,16 @@ public:
   vtkSetMacro(UseDollyForPerspectiveProjection, bool);
   vtkGetMacro(UseDollyForPerspectiveProjection, bool);
   vtkBooleanMacro(UseDollyForPerspectiveProjection, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Event bindings
    */
   void OnMouseMove() override;
   void OnLeftButtonDown() override;
   void OnLeftButtonUp() override;
-  //@}
+  ///@}
 
 protected:
   vtkInteractorStyleRubberBandZoom();
@@ -94,13 +94,22 @@ protected:
 
   void Zoom() override;
 
+  virtual void ZoomTraditional(const vtkRecti& box);
+
+  /**
+   * Calculates the focal point to be used when zooming on perspective
+   * projection using the view angle based on the provided rubber band box.
+   */
+  virtual vtkVector3d CalculatePerspectiveZoomFocalPoint(const vtkRecti& box) const;
+
   int StartPosition[2];
   int EndPosition[2];
   int Moving;
   bool LockAspectToViewport;
   bool CenterAtStartPosition;
   bool UseDollyForPerspectiveProjection;
-  vtkUnsignedCharArray *PixelArray;
+  vtkUnsignedCharArray* PixelArray;
+
 private:
   vtkInteractorStyleRubberBandZoom(const vtkInteractorStyleRubberBandZoom&) = delete;
   void operator=(const vtkInteractorStyleRubberBandZoom&) = delete;
@@ -111,9 +120,6 @@ private:
    * endPosition or both.
    */
   void AdjustBox(int startPosition[2], int endPosition[2]) const;
-
-  void ZoomTraditional(const vtkRecti& box);
-  void ZoomPerspectiveProjectionUsingViewAngle(const vtkRecti& box);
 };
 
 #endif

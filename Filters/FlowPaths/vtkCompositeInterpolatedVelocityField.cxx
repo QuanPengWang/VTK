@@ -14,31 +14,54 @@
 =========================================================================*/
 #include "vtkCompositeInterpolatedVelocityField.h"
 
-#include "vtkMath.h"
-#include "vtkDataSet.h"
 #include "vtkDataArray.h"
-#include "vtkPointData.h"
+#include "vtkDataSet.h"
 #include "vtkGenericCell.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 
-
+//------------------------------------------------------------------------------
 vtkCompositeInterpolatedVelocityField::vtkCompositeInterpolatedVelocityField()
 {
   this->LastDataSetIndex = 0;
   this->DataSets = new vtkCompositeInterpolatedVelocityFieldDataSetsType;
 }
 
-
+//------------------------------------------------------------------------------
 vtkCompositeInterpolatedVelocityField::~vtkCompositeInterpolatedVelocityField()
 {
   delete this->DataSets;
   this->DataSets = nullptr;
 }
 
-void vtkCompositeInterpolatedVelocityField::PrintSelf( ostream & os, vtkIndent indent )
+//------------------------------------------------------------------------------
+// Copy the list of datasets to copy from.
+void vtkCompositeInterpolatedVelocityField::CopyParameters(
+  vtkAbstractInterpolatedVelocityField* from)
 {
-  this->Superclass::PrintSelf( os, indent );
+  this->Superclass::CopyParameters(from);
 
-  os << indent << "DataSets: "           << this->DataSets         << endl;
+  // See if we need to copy our parameters
+  vtkCompositeInterpolatedVelocityField* obj =
+    vtkCompositeInterpolatedVelocityField::SafeDownCast(from);
+  if (!obj)
+  {
+    return;
+  }
+  *(this->DataSets) = *(obj->DataSets);
+
+  // The weights must be copied as well
+  this->WeightsSize = obj->WeightsSize;
+  delete[] this->Weights;
+  this->Weights = new double[obj->WeightsSize];
+}
+
+//------------------------------------------------------------------------------
+void vtkCompositeInterpolatedVelocityField::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "DataSets: " << this->DataSets << endl;
   os << indent << "Last Dataset Index: " << this->LastDataSetIndex << endl;
 }

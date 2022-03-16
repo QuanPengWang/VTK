@@ -1,14 +1,16 @@
 set(classes
   vtkAutoCorrelativeStatistics
   vtkBivariateLinearTableThreshold
+  vtkComputeQuantiles
   vtkComputeQuartiles
   vtkContingencyStatistics
   vtkCorrelativeStatistics
   vtkDescriptiveStatistics
-  vtkHighestDensityRegionsStatistics
   vtkExtractFunctionalBagPlot
-  vtkKMeansDistanceFunctorCalculator
+  vtkExtractHistogram
+  vtkHighestDensityRegionsStatistics
   vtkKMeansDistanceFunctor
+  vtkKMeansDistanceFunctorCalculator
   vtkKMeansStatistics
   vtkMultiCorrelativeStatistics
   vtkOrderStatistics
@@ -17,5 +19,9 @@ set(classes
   vtkStrahlerMetric
   vtkStreamingStatistics)
 
+set(nowrap_headers
+  vtkStatisticsAlgorithmPrivate.h)
+
 vtk_module_add_module(VTK::FiltersStatistics
-  CLASSES ${classes})
+  CLASSES ${classes}
+  NOWRAP_HEADERS ${nowrap_headers})

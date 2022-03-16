@@ -18,22 +18,21 @@
  *
  * @par Thanks:
  * Thanks to the galaxy for inspiring this layout strategy.
-*/
+ */
 
 #ifndef vtkTreeOrbitLayoutStrategy_h
 #define vtkTreeOrbitLayoutStrategy_h
 
-#include "vtkInfovisLayoutModule.h" // For export macro
 #include "vtkGraphLayoutStrategy.h"
+#include "vtkInfovisLayoutModule.h" // For export macro
 
 class vtkPoints;
 class vtkTree;
 
-
 class VTKINFOVISLAYOUT_EXPORT vtkTreeOrbitLayoutStrategy : public vtkGraphLayoutStrategy
 {
 public:
-  static vtkTreeOrbitLayoutStrategy *New();
+  static vtkTreeOrbitLayoutStrategy* New();
 
   vtkTypeMacro(vtkTreeOrbitLayoutStrategy, vtkGraphLayoutStrategy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
@@ -43,7 +42,7 @@ public:
    */
   void Layout() override;
 
-  //@{
+  ///@{
   /**
    * The spacing of orbital levels. Levels near zero give more space
    * to levels near the root, while levels near one (the default)
@@ -52,9 +51,9 @@ public:
    */
   vtkSetMacro(LogSpacingValue, double);
   vtkGetMacro(LogSpacingValue, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The spacing of leaves.  Levels near one evenly space leaves
    * with no gaps between subtrees.  Levels near zero creates
@@ -62,9 +61,9 @@ public:
    */
   vtkSetClampMacro(LeafSpacing, double, 0.0, 1.0);
   vtkGetMacro(LeafSpacing, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This is a magic number right now. Controls the radius
    * of the child layout, all of this should be fixed at
@@ -72,23 +71,21 @@ public:
    */
   vtkSetMacro(ChildRadiusFactor, double);
   vtkGetMacro(ChildRadiusFactor, double);
-  //@}
+  ///@}
 
 protected:
   vtkTreeOrbitLayoutStrategy();
   ~vtkTreeOrbitLayoutStrategy() override;
 
-  void OrbitChildren(vtkTree *t, vtkPoints *p, vtkIdType parent, double radius);
+  void OrbitChildren(vtkTree* t, vtkPoints* p, vtkIdType parent, double radius);
 
   double LogSpacingValue;
   double LeafSpacing;
   double ChildRadiusFactor;
 
 private:
-
   vtkTreeOrbitLayoutStrategy(const vtkTreeOrbitLayoutStrategy&) = delete;
   void operator=(const vtkTreeOrbitLayoutStrategy&) = delete;
 };
 
 #endif
-

@@ -12,17 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// VTK-HeaderTest-Exclude: vtkXdmfHeavyData.h
-
 #ifndef vtkXdmfHeavyData_h
 #define vtkXdmfHeavyData_h
-#ifndef __VTK_WRAP__
-#ifndef VTK_WRAPPING_CXX
 
 #include "vtk_xdmf2.h"
 #include VTKXDMF2_HEADER(XdmfDataItem.h)
 #include VTKXDMF2_HEADER(XdmfGrid.h) //won't compile without it
-#include "vtkIOXdmf2Module.h" // For export macro
+#include "vtkIOXdmf2Module.h"        // For export macro
 
 class vtkAlgorithm;
 class vtkDataArray;
@@ -43,6 +39,7 @@ class VTKIOXDMF2_EXPORT vtkXdmfHeavyData
   vtkXdmfDomain* Domain;
   xdmf2::XdmfDataItem DataItem;
   vtkAlgorithm* Reader;
+
 public:
   // These must be set before using this class.
   int Piece;
@@ -72,7 +69,6 @@ public:
   // Returns the number of points per cell. -1 for error. 0 when no fixed number
   // of points possible.
   static int GetNumberOfPointsPerCell(int vtk_cell_type);
-
 
 private:
   // Description:
@@ -112,30 +108,27 @@ private:
   // vtkPointSet subclasses. The extents only make sense when reading
   // vtkStructuredGrid. If non-null, then the only the points for the sub-grid
   // are read.
-  vtkPoints* ReadPoints(xdmf2::XdmfGeometry* xmfGeometry,
-    int *update_extents=nullptr,
-    int *whole_extents=nullptr);
+  vtkPoints* ReadPoints(
+    xdmf2::XdmfGeometry* xmfGeometry, int* update_extents = nullptr, int* whole_extents = nullptr);
 
   // Description:
   // Read attributes.
-  bool ReadAttributes(vtkDataSet* dataSet, xdmf2::XdmfGrid* xmfGrid,
-    int* update_extents=0);
+  bool ReadAttributes(vtkDataSet* dataSet, xdmf2::XdmfGrid* xmfGrid, int* update_extents = 0);
 
   // Description:
   // Reads an attribute.
   // If update_extents are non-null, then we are reading structured attributes
   // and we read only the sub-set specified by update_extents.
-  vtkDataArray* ReadAttribute(xdmf2::XdmfAttribute* xmfAttribute,
-    int data_dimensionality, int* update_extents=0);
+  vtkDataArray* ReadAttribute(
+    xdmf2::XdmfAttribute* xmfAttribute, int data_dimensionality, int* update_extents = 0);
 
   // Description:
   // Read sets that mark ghost cells/nodes and then create attribute arrays for
   // marking the cells as such.
-  bool ReadGhostSets(vtkDataSet* ds, xdmf2::XdmfGrid* xmfGrid,
-    int* update_extents=0);
+  bool ReadGhostSets(vtkDataSet* ds, xdmf2::XdmfGrid* xmfGrid, int* update_extents = 0);
 
-  vtkMultiBlockDataSet* ReadSets(vtkDataSet* dataSet, xdmf2::XdmfGrid* xmfGrid,
-    int *update_extents=0);
+  vtkMultiBlockDataSet* ReadSets(
+    vtkDataSet* dataSet, xdmf2::XdmfGrid* xmfGrid, int* update_extents = 0);
 
   // Description:
   // Used when reading node-sets.
@@ -163,5 +156,5 @@ private:
 };
 
 #endif
-#endif
-#endif
+
+// VTK-HeaderTest-Exclude: vtkXdmfHeavyData.h

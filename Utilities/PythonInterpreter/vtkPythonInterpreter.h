@@ -52,7 +52,7 @@
  * after Finalize especially when concerning with imported modules. Refer to
  * Python docs for details. In short, modules like numpy don't continue to work
  * after a re-initialize. Hence use it with caution.
-*/
+ */
 
 #ifndef vtkPythonInterpreter_h
 #define vtkPythonInterpreter_h
@@ -60,6 +60,10 @@
 #include "vtkObject.h"
 #include "vtkPythonInterpreterModule.h" // For export macro
 #include "vtkStdString.h"               // needed for vtkStdString.
+
+#if defined(_WIN32)
+#include <vector> // for vtkWideArgsConverter
+#endif
 
 class VTKPYTHONINTERPRETER_EXPORT vtkPythonInterpreter : public vtkObject
 {
@@ -128,9 +132,27 @@ public:
    * that if Python is initialized again (by calls to Initialize()), then these
    * paths will be re-added.
    */
-  static void PrependPythonPath(const char*);
+  static void PrependPythonPath(const char* dir);
 
-  //@{
+  ///@{
+  /**
+   * Prepend custom paths to `sys.path` after attempt to find the `landmark` using the
+   * `anchor` prefix provided. If found, the path to the landmark gets added the python path
+   * using `PrependPythonPath`. Applications can use this to add paths to custom modules
+   * in the module search path. This is also needed for static builds to assist the
+   * interpreter in locating the path to `vtk` package.
+   *
+   * When `add_landmark` is true, then instead of adding the path to the
+   * landmark to the module search path, the successfully located landmark itself is
+   * added to the module search path. This is helpful when using zip-modules,
+   * for example, since in that case, the zip file itself should be added to the
+   * module search path and not its location.
+   */
+  static void PrependPythonPath(
+    const char* anchor, const char* landmark, bool add_landmark = false);
+  ///@}
+
+  ///@{
   /**
    * To capture stdin, especially for non-terminal applications, set CaptureStdin
    * to true. In that case vtkCommand::UpdateEvent will be fired with the calldata
@@ -139,18 +161,24 @@ public:
    */
   static void SetCaptureStdin(bool);
   static bool GetCaptureStdin();
-  //@}
+  ///@}
 
-  VTK_LEGACY(static int GetPythonVerboseFlag());
+  ///@{
+  /**
+   * Enable/disable VTK from redirecting Python output to vtkOutputWindow. On by default.
+   */
+  static void SetRedirectOutput(bool redirect);
+  static bool GetRedirectOutput();
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the verbosity level at which vtkPythonInterpreter should generate
    * log output. Default value is `vtkLogger::VERBOSITY_TRACE`.
    */
   static void SetLogVerbosity(int);
   static int GetLogVerbosity();
-  //@}
+  ///@}
 
 protected:
   vtkPythonInterpreter();
@@ -158,7 +186,7 @@ protected:
 
   friend struct vtkPythonStdStreamCaptureHelper;
 
-  //@{
+  ///@{
   /**
    * Internal methods used by Python. Don't call directly.
    */
@@ -167,26 +195,29 @@ protected:
   static void WriteStdErr(const char* txt);
   static void FlushStdErr();
   static vtkStdString ReadStdin();
-  //@}
+  ///@}
 
 private:
+  static bool InitializeWithArgs(int initsigs, int argc, char* argv[]);
+
   vtkPythonInterpreter(const vtkPythonInterpreter&) = delete;
   void operator=(const vtkPythonInterpreter&) = delete;
 
   static bool InitializedOnce;
   static bool CaptureStdin;
+  static bool RedirectOutput;
   /**
    * If true, buffer output to console and sent it to other modules at
    * the end of the operation. If false, send the output as it becomes available.
    */
   static bool ConsoleBuffering;
-  //@{
+  ///@{
   /**
    * Accumulate here output printed to console by the python interpreter.
    */
   static std::string StdErrBuffer;
   static std::string StdOutBuffer;
-  //@}
+  ///@}
 
   /**
    * Since vtkPythonInterpreter is often used outside CPython executable, e.g.
@@ -214,6 +245,7 @@ class VTKPYTHONINTERPRETER_EXPORT vtkPythonGlobalInterpreters
 public:
   vtkPythonGlobalInterpreters();
   ~vtkPythonGlobalInterpreters();
+
 private:
   vtkPythonGlobalInterpreters(const vtkPythonGlobalInterpreters&) = delete;
   vtkPythonGlobalInterpreters& operator=(const vtkPythonGlobalInterpreters&) = delete;
@@ -221,5 +253,24 @@ private:
 
 // This is here to implement the Schwarz counter idiom.
 static vtkPythonGlobalInterpreters vtkPythonInterpreters;
+
+#if defined(_WIN32)
+class VTKPYTHONINTERPRETER_EXPORT vtkWideArgsConverter
+{
+public:
+  vtkWideArgsConverter(int argc, wchar_t* wargv[]);
+  ~vtkWideArgsConverter();
+
+  char** GetArgs() { return &this->Args[0]; }
+  int GetArgCount() { return this->Argc; }
+
+private:
+  int Argc;
+  std::vector<char*> Args;
+  std::vector<char*> MemCache;
+  vtkWideArgsConverter(const vtkWideArgsConverter&) = delete;
+  vtkWideArgsConverter& operator=(const vtkWideArgsConverter&) = delete;
+};
+#endif
 
 #endif

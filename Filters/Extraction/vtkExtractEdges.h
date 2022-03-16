@@ -21,7 +21,7 @@
  *
  * @sa
  * vtkFeatureEdges
-*/
+ */
 
 #ifndef vtkExtractEdges_h
 #define vtkExtractEdges_h
@@ -34,23 +34,32 @@ class vtkIncrementalPointLocator;
 class VTKFILTERSEXTRACTION_EXPORT vtkExtractEdges : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkExtractEdges *New();
-  vtkTypeMacro(vtkExtractEdges,vtkPolyDataAlgorithm);
+  static vtkExtractEdges* New();
+  vtkTypeMacro(vtkExtractEdges, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set / get a spatial locator for merging points. By
    * default an instance of vtkMergePoints is used.
    */
-  void SetLocator(vtkIncrementalPointLocator *locator);
-  vtkGetObjectMacro(Locator,vtkIncrementalPointLocator);
-  //@}
+  void SetLocator(vtkIncrementalPointLocator* locator);
+  vtkGetObjectMacro(Locator, vtkIncrementalPointLocator);
+  ///@}
 
   /**
    * Create default locator. Used to create one when none is specified.
    */
   void CreateDefaultLocator();
+
+  ///@{
+  /**
+   * Indicates that all of the points of the input mesh should exist in the output.
+   */
+  vtkSetMacro(UseAllPoints, bool);
+  vtkGetMacro(UseAllPoints, bool);
+  vtkBooleanMacro(UseAllPoints, bool);
+  ///@}
 
   /**
    * Return MTime also considering the locator.
@@ -62,16 +71,19 @@ protected:
   ~vtkExtractEdges() override;
 
   // Usual data generation method
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int NonLocatorExtraction(vtkDataSet* input, vtkPolyData* output);
 
-  vtkIncrementalPointLocator *Locator;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+
+  vtkIncrementalPointLocator* Locator;
+
+  bool UseAllPoints;
+
 private:
   vtkExtractEdges(const vtkExtractEdges&) = delete;
   void operator=(const vtkExtractEdges&) = delete;
 };
 
 #endif
-
-

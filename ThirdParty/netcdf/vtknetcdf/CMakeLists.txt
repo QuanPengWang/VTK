@@ -1,13 +1,13 @@
 set(NC_VERSION_MAJOR 4)
-set(NC_VERSION_MINOR 6)
+set(NC_VERSION_MINOR 8)
 set(NC_VERSION_PATCH 1)
 set(NC_VERSION_NOTE "")
 set(netCDF_VERSION ${NC_VERSION_MAJOR}.${NC_VERSION_MINOR}.${NC_VERSION_PATCH}${NC_VERSION_NOTE})
 set(VERSION ${netCDF_VERSION})
 set(NC_VERSION ${netCDF_VERSION})
+set(NC_DISPATCH_VERSION 3)
 
 set(sources
-  libdispatch/crc32.c
   libdispatch/datt.c
   libdispatch/dattget.c
   libdispatch/dattinq.c
@@ -16,11 +16,14 @@ set(sources
   libdispatch/daux.c
   libdispatch/dcompound.c
   libdispatch/dcopy.c
+  libdispatch/dcrc32.c
+  libdispatch/dcrc64.c
   libdispatch/ddim.c
   libdispatch/ddispatch.c
   libdispatch/denum.c
   libdispatch/derror.c
   libdispatch/dfile.c
+  libdispatch/dfilter.c
   libdispatch/dgroup.c
   libdispatch/dinfermodel.c
   libdispatch/dinternal.c
@@ -29,6 +32,7 @@ set(sources
   libdispatch/doffsets.c
   libdispatch/dopaque.c
   libdispatch/dparallel.c
+  libdispatch/dpathmgr.c
   libdispatch/drc.c
   libdispatch/dreadonly.c
   libdispatch/dstring.c
@@ -40,16 +44,19 @@ set(sources
   libdispatch/dvarinq.c
   libdispatch/dvarput.c
   libdispatch/dvlen.c
-  libdispatch/dwinpath.c
-  libdispatch/ncbytes.c
   libdispatch/nc.c
+  libdispatch/ncbytes.c
+  libdispatch/ncexhash.c
   libdispatch/nchashmap.c
+  libdispatch/ncjson.c
   libdispatch/nclist.c
   libdispatch/nclistmgr.c
   libdispatch/nclog.c
   libdispatch/nctime.c
   libdispatch/ncuri.c
+  libdispatch/ncxcache.c
   libdispatch/utf8proc.c
+  libdispatch/utf8proc.h
 
   liblib/nc_initialize.c
 
@@ -68,11 +75,11 @@ set(sources
 
   libsrc4/error4.c
   libsrc4/nc4attr.c
+  libsrc4/nc4cache.c
   libsrc4/nc4dim.c
   libsrc4/nc4dispatch.c
   libsrc4/nc4grp.c
   libsrc4/nc4internal.c
-  libsrc4/nc4printer.c
   libsrc4/nc4type.c
   libsrc4/nc4var.c
   libsrc4/ncfunc.c
@@ -80,9 +87,11 @@ set(sources
 
   libhdf5/nc4hdf.c
   libhdf5/nc4info.c
-  libhdf5/hdf5file.c
   libhdf5/hdf5attr.c
+  libhdf5/hdf5debug.c
   libhdf5/hdf5dim.c
+  libhdf5/hdf5file.c
+  libhdf5/hdf5filter.c
   libhdf5/hdf5grp.c
   libhdf5/hdf5type.c
   libhdf5/hdf5internal.c
@@ -91,7 +100,6 @@ set(sources
   libhdf5/hdf5var.c
   libhdf5/nc4mem.c
   libhdf5/nc4memcb.c
-  libhdf5/hdf5cache.c
   libhdf5/hdf5dispatch.c
   )
 
@@ -172,7 +180,7 @@ check_symbol_exists("sysconf" "unistd.h" HAVE_SYSCONF)
 
 set(HAVE_HDF5_H 1)
 set(H5_USE_16_API 1) # Enable HDF5 1.6.x Compatibility(Required)
-if (VTK_MODULE_USE_EXTERNAL_hdf5)
+if (VTK_MODULE_USE_EXTERNAL_VTK_hdf5)
   set(CMAKE_REQUIRED_INCLUDES_save "${CMAKE_REQUIRED_INCLUDES}")
   list(APPEND CMAKE_REQUIRED_INCLUDES
     "${CMAKE_CURRENT_BINARY_DIR}/../../hdf5")
@@ -229,6 +237,7 @@ check_type_size("unsigned char" SIZEOF_UNSIGNED_CHAR)
 check_type_size("unsigned int" SIZEOF_UNSIGNED_INT)
 check_type_size("unsigned long long" SIZEOF_UNSIGNED_LONG_LONG)
 check_type_size("unsigned short int" SIZEOF_UNSIGNED_SHORT_INT)
+check_type_size("uint64_t" HAVE_UINT64_T)
 
 set(SIZEOF_UCHAR ${HAVE_UCHAR})
 set(SIZEOF_UINT ${HAVE_UINT})
@@ -246,6 +255,10 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/include/netcdf_meta.h"
   @ONLY)
 configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/netcdf_dispatch.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/include/netcdf_dispatch.h"
+  @ONLY)
+configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtk_netcdf_config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/vtk_netcdf_config.h"
   @ONLY)
@@ -256,7 +269,9 @@ configure_file(
 
 set(headers
   include/netcdf.h
+  include/netcdf_filter_build.h
   include/vtk_netcdf_mangle.h
+  "${CMAKE_CURRENT_BINARY_DIR}/include/netcdf_dispatch.h"
   "${CMAKE_CURRENT_BINARY_DIR}/include/netcdf_meta.h"
   "${CMAKE_CURRENT_BINARY_DIR}/vtk_netcdf_config.h")
 
@@ -280,6 +295,16 @@ target_include_directories(netcdf
     "${CMAKE_CURRENT_SOURCE_DIR}/libsrc"
     "${CMAKE_CURRENT_SOURCE_DIR}/libsrc4"
     "${CMAKE_CURRENT_BINARY_DIR}/include")
+if (HDF5_PARALLEL)
+  if (NOT TARGET VTK::mpi)
+    message(FATAL_ERROR
+      "HDF5 is parallel, but VTK's MPI support was not available; this is not "
+      "supported.")
+  endif ()
+  vtk_module_link(VTK::netcdf
+    INTERFACE
+      VTK::mpi)
+endif ()
 
 if (UNIX)
   # link against the math library.

@@ -34,11 +34,12 @@
  *
  * @sa
  * vtkAffineWidget vtkWidgetRepresentation vtkAbstractWidget
-*/
+ */
 
 #ifndef vtkAffineRepresentation_h
 #define vtkAffineRepresentation_h
 
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
 #include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkWidgetRepresentation.h"
 
@@ -47,13 +48,13 @@ class vtkTransform;
 class VTKINTERACTIONWIDGETS_EXPORT vtkAffineRepresentation : public vtkWidgetRepresentation
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instances of this class.
    */
-  vtkTypeMacro(vtkAffineRepresentation,vtkWidgetRepresentation);
+  vtkTypeMacro(vtkAffineRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Retrieve a linear transform characterizing the affine transformation
@@ -61,33 +62,53 @@ public:
    * the transform provided. The transform is relative to the initial placement
    * of the representation (i.e., when PlaceWidget() is invoked).
    */
-  virtual void GetTransform(vtkTransform *t) = 0;
+  virtual void GetTransform(vtkTransform* t) = 0;
 
-  //@{
+  ///@{
   /**
    * The tolerance representing the distance to the widget (in pixels)
    * in which the cursor is considered near enough to the widget to
    * be active.
    */
-  vtkSetClampMacro(Tolerance,int,1,100);
-  vtkGetMacro(Tolerance,int);
-  //@}
+  vtkSetClampMacro(Tolerance, int, 1, 100);
+  vtkGetMacro(Tolerance, int);
+  ///@}
 
   // Enums define the state of the representation relative to the mouse pointer
   // position. Used by ComputeInteractionState() to communicate with the
   // widget.
-  enum _InteractionState
+  enum InteractionStateType
   {
-    Outside=0, Rotate, Translate, TranslateX, TranslateY, ScaleWEdge, ScaleEEdge,
-    ScaleNEdge, ScaleSEdge, ScaleNE, ScaleSW, ScaleNW, ScaleSE,
-    ShearEEdge, ShearWEdge, ShearNEdge, ShearSEdge,
-    MoveOriginX, MoveOriginY, MoveOrigin
+    Outside = 0,
+    Rotate,
+    Translate,
+    TranslateX,
+    TranslateY,
+    ScaleWEdge,
+    ScaleEEdge,
+    ScaleNEdge,
+    ScaleSEdge,
+    ScaleNE,
+    ScaleSW,
+    ScaleNW,
+    ScaleSE,
+    ShearEEdge,
+    ShearWEdge,
+    ShearNEdge,
+    ShearSEdge,
+    MoveOriginX,
+    MoveOriginY,
+    MoveOrigin
   };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef InteractionStateType _InteractionState;
+#endif
 
   /**
    * Methods to make this class properly act like a vtkWidgetRepresentation.
    */
-  void ShallowCopy(vtkProp *prop) override;
+  void ShallowCopy(vtkProp* prop) override;
 
 protected:
   vtkAffineRepresentation();
@@ -97,7 +118,7 @@ protected:
   int Tolerance;
 
   // The internal transformation matrix
-  vtkTransform *Transform;
+  vtkTransform* Transform;
 
 private:
   vtkAffineRepresentation(const vtkAffineRepresentation&) = delete;

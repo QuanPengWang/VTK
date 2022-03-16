@@ -28,7 +28,7 @@
  *   x=it->GetPosition();
  *   }
  * </pre>
-*/
+ */
 
 #ifndef vtkGenericPointIterator_h
 #define vtkGenericPointIterator_h
@@ -39,13 +39,13 @@
 class VTKCOMMONDATAMODEL_EXPORT vtkGenericPointIterator : public vtkObject
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard VTK construction and type macros.
    */
-  vtkTypeMacro(vtkGenericPointIterator,vtkObject);
+  vtkTypeMacro(vtkGenericPointIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Move iterator to first position if any (loop initialization).
@@ -68,7 +68,7 @@ public:
    * \pre not_off: !IsAtEnd()
    * \post result_exists: result!=0
    */
-  virtual double *GetPosition() = 0;
+  virtual double* GetPosition() = 0;
 
   /**
    * Get the coordinates of the point at the current iterator position.
@@ -84,13 +84,13 @@ public:
   virtual vtkIdType GetId() = 0;
 
 protected:
-  //@{
+  ///@{
   /**
    * Destructor.
    */
   vtkGenericPointIterator();
   ~vtkGenericPointIterator() override;
-  //@}
+  ///@}
 
 private:
   vtkGenericPointIterator(const vtkGenericPointIterator&) = delete;

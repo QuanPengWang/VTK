@@ -13,5 +13,7 @@ DEPENDS
   VTK::CommonMath
 PRIVATE_DEPENDS
   VTK::vtksys
+  VTK::exprtk
 TEST_DEPENDS
+  VTK::CommonDataModel
   VTK::TestingCore

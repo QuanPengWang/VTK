@@ -25,28 +25,28 @@
  *
  * This class is used mainly as a superclass for continuous value widgets
  *
-*/
+ */
 
 #ifndef vtkContinuousValueWidgetRepresentation_h
 #define vtkContinuousValueWidgetRepresentation_h
 
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
 #include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkWidgetRepresentation.h"
 
-class VTKINTERACTIONWIDGETS_EXPORT vtkContinuousValueWidgetRepresentation :
-  public vtkWidgetRepresentation
+class VTKINTERACTIONWIDGETS_EXPORT vtkContinuousValueWidgetRepresentation
+  : public vtkWidgetRepresentation
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for the class.
    */
-  vtkTypeMacro(vtkContinuousValueWidgetRepresentation,
-                       vtkWidgetRepresentation);
+  vtkTypeMacro(vtkContinuousValueWidgetRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to interface with the vtkSliderWidget. The PlaceWidget() method
    * assumes that the parameter bounds[6] specifies the location in display
@@ -56,20 +56,24 @@ public:
   void BuildRepresentation() override {}
   void StartWidgetInteraction(double eventPos[2]) override = 0;
   void WidgetInteraction(double eventPos[2]) override = 0;
-//  virtual void Highlight(int);
-  //@}
+  //  virtual void Highlight(int);
+  ///@}
 
   // Enums are used to describe what is selected
-  enum _InteractionState
+  enum InteractionStateType
   {
-    Outside=0,
+    Outside = 0,
     Inside,
     Adjusting
   };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef InteractionStateType _InteractionState;
+#endif
 
   // Set/Get the value
   virtual void SetValue(double value);
-  virtual double GetValue() {return this->Value;};
+  virtual double GetValue() { return this->Value; }
 
 protected:
   vtkContinuousValueWidgetRepresentation();
@@ -78,8 +82,7 @@ protected:
   double Value;
 
 private:
-  vtkContinuousValueWidgetRepresentation
-  (const vtkContinuousValueWidgetRepresentation&) = delete;
+  vtkContinuousValueWidgetRepresentation(const vtkContinuousValueWidgetRepresentation&) = delete;
   void operator=(const vtkContinuousValueWidgetRepresentation&) = delete;
 };
 

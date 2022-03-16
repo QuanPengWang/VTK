@@ -70,8 +70,8 @@
 #ifndef vtk3DLinearGridCrinkleExtractor_h
 #define vtk3DLinearGridCrinkleExtractor_h
 
-#include "vtkFiltersCoreModule.h" // For export macro
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkFiltersCoreModule.h" // For export macro
 
 class vtkUnstructuredGrid;
 class vtkImplicitFunction;
@@ -79,46 +79,46 @@ class vtkImplicitFunction;
 class VTKFILTERSCORE_EXPORT vtk3DLinearGridCrinkleExtractor : public vtkDataObjectAlgorithm
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for construction, type info, and printing.
    */
-  static vtk3DLinearGridCrinkleExtractor *New();
-  vtkTypeMacro(vtk3DLinearGridCrinkleExtractor,vtkDataObjectAlgorithm);
+  static vtk3DLinearGridCrinkleExtractor* New();
+  vtkTypeMacro(vtk3DLinearGridCrinkleExtractor, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the implicit function which is used to select the output cell
    * faces. Note that the implicit function invocation must be thread
    * safe. Also, there is a fast path for vtkPlane implicit functions.
    */
   virtual void SetImplicitFunction(vtkImplicitFunction*);
-  vtkGetObjectMacro(ImplicitFunction,vtkImplicitFunction);
-  //@}
+  vtkGetObjectMacro(ImplicitFunction, vtkImplicitFunction);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicate whether to copy input point data/attributes onto the output
    * points. By default this option is on.
    */
-  vtkSetMacro(CopyPointData,bool);
-  vtkGetMacro(CopyPointData,bool);
-  vtkBooleanMacro(CopyPointData,bool);
-  //@}
+  vtkSetMacro(CopyPointData, bool);
+  vtkGetMacro(CopyPointData, bool);
+  vtkBooleanMacro(CopyPointData, bool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicate whether to copy input cell data/attributes onto the output
    * cells. By default this option is off.
    */
-  vtkSetMacro(CopyCellData,bool);
-  vtkGetMacro(CopyCellData,bool);
-  vtkBooleanMacro(CopyCellData,bool);
-  //@}
+  vtkSetMacro(CopyCellData, bool);
+  vtkGetMacro(CopyCellData, bool);
+  vtkBooleanMacro(CopyCellData, bool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Indicate whether to eliminate unused output points. When this flag is
    * disabled, the input points and associated point data are simply shallow
@@ -127,10 +127,10 @@ public:
    * nor is associated point data copied. By default this option is disabled.
    * Removing unused points does have a significant performance impact.
    */
-  vtkSetMacro(RemoveUnusedPoints,bool);
-  vtkGetMacro(RemoveUnusedPoints,bool);
-  vtkBooleanMacro(RemoveUnusedPoints,bool);
-  //@}
+  vtkSetMacro(RemoveUnusedPoints, bool);
+  vtkGetMacro(RemoveUnusedPoints, bool);
+  vtkBooleanMacro(RemoveUnusedPoints, bool);
+  ///@}
 
   /**
    * Overloaded GetMTime() because of delegation to the helper
@@ -138,7 +138,7 @@ public:
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Set/get the desired precision for the output points. See the
    * documentation for the vtkAlgorithm::Precision enum for an explanation of
@@ -146,9 +146,9 @@ public:
    */
   void SetOutputPointsPrecision(int precision);
   int GetOutputPointsPrecision() const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Force sequential processing (i.e. single thread) of the crinkle cut
    * process. By default, sequential processing is off. Note this flag only
@@ -157,17 +157,16 @@ public:
    * filter always runs in serial mode.) This flag is typically used for
    * benchmarking purposes.
    */
-  vtkSetMacro(SequentialProcessing,bool)
-  vtkGetMacro(SequentialProcessing,bool);
-  vtkBooleanMacro(SequentialProcessing,bool);
-  //@}
+  vtkSetMacro(SequentialProcessing, bool);
+  vtkGetMacro(SequentialProcessing, bool);
+  vtkBooleanMacro(SequentialProcessing, bool);
+  ///@}
 
   /**
    *  Return the number of threads actually used during execution. This is
    *  valid only after algorithm execution.
    */
-  int GetNumberOfThreadsUsed()
-  {return this->NumberOfThreadsUsed;}
+  int GetNumberOfThreadsUsed() { return this->NumberOfThreadsUsed; }
 
   /**
    * Returns true if the data object passed in is fully supported by this
@@ -181,7 +180,7 @@ protected:
   vtk3DLinearGridCrinkleExtractor();
   ~vtk3DLinearGridCrinkleExtractor() override;
 
-  vtkImplicitFunction *ImplicitFunction;
+  vtkImplicitFunction* ImplicitFunction;
   bool RemoveUnusedPoints;
   bool CopyPointData;
   bool CopyCellData;
@@ -190,21 +189,17 @@ protected:
   int NumberOfThreadsUsed;
 
   // Process the data: input unstructured grid and output an unstructured grid
-  int ProcessPiece(vtkUnstructuredGrid *input, vtkImplicitFunction *f,
-                   vtkUnstructuredGrid *grid);
+  int ProcessPiece(vtkUnstructuredGrid* input, vtkImplicitFunction* f, vtkUnstructuredGrid* grid);
 
-  int RequestDataObject(vtkInformation* request,
-                        vtkInformationVector** inputVector,
-                        vtkInformationVector* outputVector) override;
-  int RequestData(vtkInformation* request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector) override;
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtk3DLinearGridCrinkleExtractor(const vtk3DLinearGridCrinkleExtractor&) = delete;
   void operator=(const vtk3DLinearGridCrinkleExtractor&) = delete;
 };
-
 
 #endif

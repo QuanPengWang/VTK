@@ -23,16 +23,15 @@
  *
  * @sa
  * vtkBorderWidget
-*/
+ */
 
 #ifndef vtkPlaybackWidget_h
 #define vtkPlaybackWidget_h
 
-#include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkBorderWidget.h"
+#include "vtkInteractionWidgetsModule.h" // For export macro
 
 class vtkPlaybackRepresentation;
-
 
 class VTKINTERACTIONWIDGETS_EXPORT vtkPlaybackWidget : public vtkBorderWidget
 {
@@ -40,23 +39,25 @@ public:
   /**
    * Instantiate this class.
    */
-  static vtkPlaybackWidget *New();
+  static vtkPlaybackWidget* New();
 
-  //@{
+  ///@{
   /**
    * Standard VTK class methods.
    */
-  vtkTypeMacro(vtkPlaybackWidget,vtkBorderWidget);
+  vtkTypeMacro(vtkPlaybackWidget, vtkBorderWidget);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Specify an instance of vtkPlaybackRepresentation used to represent this
    * widget in the scene. Note that the representation is a subclass of vtkProp
    * so it can be added to the renderer independent of the widget.
    */
-  void SetRepresentation(vtkPlaybackRepresentation *r)
-    {this->Superclass::SetWidgetRepresentation(reinterpret_cast<vtkWidgetRepresentation*>(r));}
+  void SetRepresentation(vtkPlaybackRepresentation* r)
+  {
+    this->Superclass::SetWidgetRepresentation(reinterpret_cast<vtkWidgetRepresentation*>(r));
+  }
 
   /**
    * Create the default widget representation if one is not set.

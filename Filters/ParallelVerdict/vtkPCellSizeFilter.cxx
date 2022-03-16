@@ -20,17 +20,19 @@
 
 vtkStandardNewMacro(vtkPCellSizeFilter);
 
-//-----------------------------------------------------------------------------
-vtkPCellSizeFilter::vtkPCellSizeFilter()
+//------------------------------------------------------------------------------
+void vtkPCellSizeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
 }
 
-//-----------------------------------------------------------------------------
-vtkPCellSizeFilter::~vtkPCellSizeFilter()
-{
-}
+//------------------------------------------------------------------------------
+vtkPCellSizeFilter::vtkPCellSizeFilter() = default;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+vtkPCellSizeFilter::~vtkPCellSizeFilter() = default;
+
+//------------------------------------------------------------------------------
 void vtkPCellSizeFilter::ComputeGlobalSum(double sum[4])
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
@@ -38,7 +40,7 @@ void vtkPCellSizeFilter::ComputeGlobalSum(double sum[4])
   {
     double globalSum[4];
     controller->AllReduce(sum, globalSum, 4, vtkCommunicator::SUM_OP);
-    for (int i=0;i<4;i++)
+    for (int i = 0; i < 4; i++)
     {
       sum[i] = globalSum[i];
     }

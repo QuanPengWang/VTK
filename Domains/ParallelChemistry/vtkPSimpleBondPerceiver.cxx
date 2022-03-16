@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkYoungsMaterialInterfaceCEA.h,v $
+  Module:    vtkPSimpleBondPerceiver.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -26,17 +26,24 @@
 #include "vtkPeriodicTable.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkUnsignedCharArray.h"
 
 vtkStandardNewMacro(vtkPSimpleBondPerceiver);
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void vtkPSimpleBondPerceiver::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//------------------------------------------------------------------------------
 static inline bool InBounds(const double* bounds, const double* p)
 {
   return p[0] >= bounds[0] && p[0] <= bounds[1] && p[1] >= bounds[2] && p[1] <= bounds[3] &&
     p[2] >= bounds[4] && p[2] <= bounds[5];
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkPSimpleBondPerceiver::CreateGhosts(vtkMolecule* molecule)
 {
   if (molecule == nullptr)
@@ -78,8 +85,7 @@ bool vtkPSimpleBondPerceiver::CreateGhosts(vtkMolecule* molecule)
   vtkDistributedPointCloudFilter::GetPointsInsideBounds(
     controller, inputPoly.Get(), outputPoly.Get(), outterBounds);
 
-  molecule->Initialize(
-    outputPoly->GetPoints(), outputPoly->GetPointData());
+  molecule->Initialize(outputPoly->GetPoints(), outputPoly->GetPointData());
 
   molecule->AllocateAtomGhostArray();
   vtkUnsignedCharArray* atomGhostArray = molecule->GetAtomGhostArray();
@@ -114,7 +120,7 @@ bool vtkPSimpleBondPerceiver::CreateGhosts(vtkMolecule* molecule)
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPSimpleBondPerceiver::ComputeBonds(vtkMolecule* molecule)
 {
   if (!this->CreateGhosts(molecule))

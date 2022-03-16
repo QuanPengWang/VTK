@@ -23,15 +23,15 @@
 #ifndef vtkAvatar_h
 #define vtkAvatar_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkActor.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
-class VTKRENDERINGCORE_EXPORT vtkAvatar: public vtkActor
+class VTKRENDERINGCORE_EXPORT vtkAvatar : public vtkActor
 {
 public:
   static vtkAvatar* New();
-  vtkTypeMacro(vtkAvatar, vtkActor)
-  void PrintSelf(ostream &os, vtkIndent indent) override;
+  vtkTypeMacro(vtkAvatar, vtkActor);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set/Get the head and hand transforms.
@@ -57,7 +57,7 @@ public:
   vtkGetVector3Macro(UpVector, double);
   vtkSetVector3Macro(UpVector, double);
 
-  //@{
+  ///@{
   /**
    * Normally, hand position/orientation is set explicitly.
    * If set to false, hand and arm will follow the torso
@@ -69,16 +69,16 @@ public:
   vtkSetMacro(UseRightHand, bool);
   vtkGetMacro(UseRightHand, bool);
   vtkBooleanMacro(UseRightHand, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Show just the hands. Default false.
    */
   vtkSetMacro(ShowHandsOnly, bool);
   vtkGetMacro(ShowHandsOnly, bool);
   vtkBooleanMacro(ShowHandsOnly, bool);
-  //@}
+  ///@}
 
 protected:
   vtkAvatar();
@@ -90,7 +90,8 @@ protected:
   double LeftHandOrientation[3];
   double RightHandPosition[3];
   double RightHandOrientation[3];
-  enum {
+  enum
+  {
     TORSO,
     LEFT_FORE,
     RIGHT_FORE,

@@ -1,14 +1,16 @@
 set(classes
   vtkCompositeSurfaceLICMapper
   vtkImageDataLIC2D
-  vtkLICNoiseHelper
   vtkLineIntegralConvolution2D
   vtkStructuredGridLIC2D
   vtkSurfaceLICComposite
-  vtkSurfaceLICHelper
   vtkSurfaceLICInterface
   vtkSurfaceLICMapper
   vtkTextureIO)
+
+set(nowrap_classes
+  vtkLICNoiseHelper
+  vtkSurfaceLICHelper)
 
 set(headers
   vtkPainterCommunicator.h)
@@ -42,6 +44,7 @@ endforeach ()
 
 vtk_module_add_module(VTK::RenderingLICOpenGL2
   CLASSES ${classes}
+  NOWRAP_CLASSES ${nowrap_classes}
   SOURCES ${shader_cxx_files}
   HEADERS ${headers}
   PRIVATE_HEADERS ${shader_h_files})
@@ -51,7 +54,7 @@ if (VTK_RENDERINGPARALLELLIC_SURFACELICPAINTER_TIMER)
     PRIVATE
       vtkSurfaceLICPainterTIME)
 endif ()
-if (VTK_RENDERINGPARALLELLIC_LINEINTEGRALCONVLOLUTION2D_TIMER)
+if (VTK_RENDERINGPARALLELLIC_LINEINTEGRALCONVOLUTION2D_TIMER)
   vtk_module_definitions(VTK::RenderingLICOpenGL2
     PRIVATE
       vtkLineIntegralConvolution2DTIME)

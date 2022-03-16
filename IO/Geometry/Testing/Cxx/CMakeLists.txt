@@ -1,6 +1,5 @@
 vtk_add_test_cxx(vtkIOGeometryCxxTests tests
   TestDataObjectIO.cxx,NO_VALID
-  TestIncrementalOctreePointLocator.cxx,NO_VALID
   UnstructuredGridCellGradients.cxx
   UnstructuredGridFastGradients.cxx
   UnstructuredGridGradients.cxx
@@ -9,20 +8,64 @@ vtk_add_test_cxx(vtkIOGeometryCxxTests tests
   TestOBJReaderGroups.cxx,NO_VALID
   TestOBJReaderMaterials.cxx,NO_VALID
   TestOBJReaderMultiTexture.cxx,NO_VALID
+  TestOBJWriterMultiTexture.cxx,NO_VALID
   TestOBJReaderNormalsTCoords.cxx,NO_VALID
   TestOBJReaderRelative.cxx,NO_VALID
   TestOBJReaderSingleTexture.cxx,NO_VALID
   TestOpenFOAMReader.cxx
-  TestOpenFOAMReader64BitFloats.cxx
+  TestOpenFOAMReaderDimensionedFields.cxx,NO_VALID
+  TestOpenFOAMReaderFaceZone.cxx
+  TestOpenFOAMReaderLagrangianSerial.cxx,NO_VALID
+  TestOpenFOAMReaderLargePolyhedral.cxx,NO_VALID
+  TestOpenFOAMReaderPrecision.cxx
   TestOpenFOAMReaderRegEx.cxx,NO_VALID
+  TestOpenFOAMReaderValuePointPatch.cxx
   TestProStarReader.cxx
   TestTecplotReader.cxx
-  TestTecplotReader2.cxx,NO_VALID
   TestAMRReadWrite.cxx,NO_VALID
   TestSimplePointsReaderWriter.cxx,NO_VALID
   TestHoudiniPolyDataWriter.cxx,NO_VALID
   UnitTestSTLWriter.cxx,NO_VALID
   )
+
+LIST(APPEND tecplotFiles
+    3dgeom.dat
+    block_febrick_3d.dat
+    block_fetet_3d.dat
+    channel.dat
+    crystal_plot.dat
+    cube.dat
+    cylinder_3d.dat
+    cylinder_slice.dat
+    cylindrical.dat
+    ell.dat
+    humanoid_quad.dat
+    humanoid_tri.dat
+    movie.dat
+    multzn2d.dat
+    plane_slice.dat
+    point_febrick_3d_01.dat
+    point_febrick_3d_02.dat
+    point_fequad_2d.dat
+    point_fetet_3d.dat
+    point_fetri_2d_01.dat
+    point_fetri_2d_03.dat
+    simp3dbk.dat
+    simp3dpt.dat
+    simpscat.dat
+    simpxy.dat
+    simpxy2.dat
+    tecplot_fepolygon.dat
+    tecplot_fepolyhedron.dat
+    tiny.dat
+)
+foreach(item IN LISTS tecplotFiles)
+    get_filename_component(name "${item}" NAME_WE)
+
+    vtk_add_test_cxx(vtkIOGeometryCxxTests tests
+      TestTecplotReader2_${name},TestTecplotReader2.cxx ${item} NO_VALID NO_OUTPUT)
+
+endforeach()
 
 vtk_add_test_cxx(vtkIOGeometryCxxTests tests
   TestSTLReaderSinglePatch,TestSTLReader.cxx DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/42400-IDGH.stl}
@@ -121,6 +164,15 @@ vtk_add_test_cxx(vtkIOGeometryCxxTests tests
 vtk_add_test_cxx(vtkIOGeometryCxxTests tests
   TestGLTFReaderReadTriangleStripIndices,TestGLTFReaderGeometry.cxx DATA{../Data/glTF/PrimitiveModes/Mesh_PrimitiveMode_TRIANGLE_STRIP_2.gltf,Mesh_PrimitiveMode_11.bin}
 )
+
+vtk_add_test_cxx(vtkIOGeometryCxxTests tests
+  TestGLTFWriterCityGML,TestGLTFWriter.cxx DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/CityGML/Part-4-Buildings-V4-one.gml}
+)
+
+vtk_add_test_cxx(vtkIOGeometryCxxTests tests
+  TestGLTFWriterObj,TestGLTFWriter.cxx DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/jacksonville_15.obj}
+)
+
 
 if(enable_large_data_tests)
   vtk_add_test_cxx(vtkIOGeometryCxxTests large_data_tests

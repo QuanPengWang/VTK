@@ -12,28 +12,37 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
+
+// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkPDataSetGhostGenerator.h"
 
-#include "vtkMultiProcessController.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
 #include <cassert>
+
+vtkCxxSetObjectMacro(vtkPDataSetGhostGenerator, Controller, vtkMultiProcessController);
 
 vtkPDataSetGhostGenerator::vtkPDataSetGhostGenerator()
 {
   this->Initialized = false;
-  this->Controller  = vtkMultiProcessController::GetGlobalController();
+  this->Controller = nullptr;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //------------------------------------------------------------------------------
 vtkPDataSetGhostGenerator::~vtkPDataSetGhostGenerator()
 {
+  this->SetController(nullptr);
 }
 
 //------------------------------------------------------------------------------
 void vtkPDataSetGhostGenerator::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << "Controller: " << this->Controller << std::endl;
 }
 
@@ -52,5 +61,3 @@ void vtkPDataSetGhostGenerator::Barrier()
   assert("pre: Instance has not been initialized!" && this->Initialized);
   this->Controller->Barrier();
 }
-
-

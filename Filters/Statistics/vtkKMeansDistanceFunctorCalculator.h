@@ -19,7 +19,7 @@
  * An example distance expression is "sqrt( (x0-y0)^2 + (x1-y1)^2 )"
  * which computes Euclidian distance in a plane defined by the first
  * 2 coordinates of the vectors specified.
-*/
+ */
 
 #include "vtkFiltersStatisticsModule.h" // For export macro
 #include "vtkKMeansDistanceFunctor.h"
@@ -27,37 +27,38 @@
 class vtkFunctionParser;
 class vtkDoubleArray;
 
-class VTKFILTERSSTATISTICS_EXPORT vtkKMeansDistanceFunctorCalculator : public vtkKMeansDistanceFunctor
+class VTKFILTERSSTATISTICS_EXPORT vtkKMeansDistanceFunctorCalculator
+  : public vtkKMeansDistanceFunctor
 {
 public:
   static vtkKMeansDistanceFunctorCalculator* New();
-  vtkTypeMacro(vtkKMeansDistanceFunctorCalculator,vtkKMeansDistanceFunctor);
-  void PrintSelf( ostream& os, vtkIndent indent ) override;
+  vtkTypeMacro(vtkKMeansDistanceFunctorCalculator, vtkKMeansDistanceFunctor);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Compute the distance from one observation to another, returning the distance
    * in the first argument.
    */
-  void operator() ( double&, vtkVariantArray*, vtkVariantArray * ) override;
+  void operator()(double&, vtkVariantArray*, vtkVariantArray*) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the distance function expression.
    */
   vtkSetStringMacro(DistanceExpression);
   vtkGetStringMacro(DistanceExpression);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the string containing an expression which evaluates to the
    * distance metric used for k-means computation. The scalar variables
    * "x0", "x1", ... "xn" and "y0", "y1", ..., "yn" refer to the coordinates
    * involved in the computation.
    */
-  virtual void SetFunctionParser( vtkFunctionParser* );
-  vtkGetObjectMacro(FunctionParser,vtkFunctionParser);
-  //@}
+  virtual void SetFunctionParser(vtkFunctionParser*);
+  vtkGetObjectMacro(FunctionParser, vtkFunctionParser);
+  ///@}
 
 protected:
   vtkKMeansDistanceFunctorCalculator();
@@ -68,8 +69,8 @@ protected:
   vtkFunctionParser* FunctionParser;
 
 private:
-  vtkKMeansDistanceFunctorCalculator( const vtkKMeansDistanceFunctorCalculator& ) = delete;
-  void operator = ( const vtkKMeansDistanceFunctorCalculator& ) = delete;
+  vtkKMeansDistanceFunctorCalculator(const vtkKMeansDistanceFunctorCalculator&) = delete;
+  void operator=(const vtkKMeansDistanceFunctorCalculator&) = delete;
 };
 
 #endif // vtkKMeansDistanceFunctorCalculator_h

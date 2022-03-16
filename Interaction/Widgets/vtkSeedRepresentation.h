@@ -23,7 +23,7 @@
  *
  * @sa
  * vtkSeedWidget vtkHandleRepresentation vtkSeedRepresentation
-*/
+ */
 
 #ifndef vtkSeedRepresentation_h
 #define vtkSeedRepresentation_h
@@ -34,35 +34,34 @@
 class vtkHandleList;
 class vtkHandleRepresentation;
 
-
 class VTKINTERACTIONWIDGETS_EXPORT vtkSeedRepresentation : public vtkWidgetRepresentation
 {
 public:
   /**
    * Instantiate class.
    */
-  static vtkSeedRepresentation *New();
+  static vtkSeedRepresentation* New();
 
-  //@{
+  ///@{
   /**
    * Standard VTK methods.
    */
-  vtkTypeMacro(vtkSeedRepresentation,vtkWidgetRepresentation);
+  vtkTypeMacro(vtkSeedRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to Set/Get the coordinates of seed points defining
    * this representation. Note that methods are available for both
    * display and world coordinates. The seeds are accessed by a seed
    * number.
    */
-  virtual void GetSeedWorldPosition( unsigned int seedNum, double pos[3] );
-  virtual void SetSeedWorldPosition( unsigned int seedNum, double pos[3] );
-  virtual void SetSeedDisplayPosition( unsigned int seedNum, double pos[3] );
-  virtual void GetSeedDisplayPosition( unsigned int seedNum, double pos[3] );
-  //@}
+  virtual void GetSeedWorldPosition(unsigned int seedNum, double pos[3]);
+  virtual void SetSeedWorldPosition(unsigned int seedNum, double pos[3]);
+  virtual void SetSeedDisplayPosition(unsigned int seedNum, double pos[3]);
+  virtual void GetSeedDisplayPosition(unsigned int seedNum, double pos[3]);
+  ///@}
 
   /**
    * Return the number of seeds (or handles) that have been created.
@@ -77,34 +76,31 @@ public:
    * dummy to clone vtkHandleWidgets of the same type. Make sure you set the
    * handle representation before the widget is enabled.
    */
-  void SetHandleRepresentation( vtkHandleRepresentation *handle );
+  void SetHandleRepresentation(vtkHandleRepresentation* handle);
 
   /**
    * Get the handle representations used for a particular seed. A side effect of
    * this method is that it will create a handle representation in the list of
    * representations if one has not yet been created.
    */
-  vtkHandleRepresentation *GetHandleRepresentation( unsigned int num );
+  vtkHandleRepresentation* GetHandleRepresentation(unsigned int num);
 
-  //@{
+  ///@{
   /**
    * Returns the model HandleRepresentation.
    */
-  vtkHandleRepresentation *GetHandleRepresentation()
-  {
-    return this->HandleRepresentation;
-  };
-  //@}
+  vtkHandleRepresentation* GetHandleRepresentation() { return this->HandleRepresentation; };
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The tolerance representing the distance to the widget (in pixels) in
    * which the cursor is considered near enough to the seed points of
    * the widget to be active.
    */
-  vtkSetClampMacro( Tolerance, int, 1, 100 );
-  vtkGetMacro( Tolerance, int );
-  //@}
+  vtkSetClampMacro(Tolerance, int, 1, 100);
+  vtkGetMacro(Tolerance, int);
+  ///@}
 
   // Used to communicate about the state of the representation
   enum
@@ -113,41 +109,42 @@ public:
     NearSeed
   };
 
-  //@{
+  ///@{
   /**
    * These are methods specific to vtkSeedRepresentation and which are
    * invoked from vtkSeedWidget.
    */
   virtual int GetActiveHandle();
-  virtual void SetActiveHandle( int handleId );
+  virtual void SetActiveHandle(int handleId);
   // Returns the id of the seed created, -1 on failure. e is the display position.
-  virtual int CreateHandle( double e[2] );
+  virtual int CreateHandle(double e[2]);
   // Delete last handle created
   virtual void RemoveLastHandle();
   // Delete the currently active handle
   virtual void RemoveActiveHandle();
-  //@}
+  ///@}
 
   /**
    * Remove the nth handle.
    */
-  virtual void RemoveHandle( int n );
+  virtual void RemoveHandle(int n);
 
-  //@{
+  ///@{
   /**
    * These are methods that satisfy vtkWidgetRepresentation's API.
    */
   void BuildRepresentation() override;
-  int ComputeInteractionState( int X, int Y, int modify = 0 ) override;
-  //@}
+  int ComputeInteractionState(int X, int Y, int modify = 0) override;
+  void GetActors(vtkPropCollection*) override;
+  ///@}
 
 protected:
   vtkSeedRepresentation();
   ~vtkSeedRepresentation() override;
 
   // The handle and the rep used to close the handles
-  vtkHandleRepresentation  *HandleRepresentation;
-  vtkHandleList            *Handles;
+  vtkHandleRepresentation* HandleRepresentation;
+  vtkHandleList* Handles;
 
   // Selection tolerance for the handles
   int Tolerance;

@@ -9,7 +9,7 @@ Provides the following variables:
 # No .pc files are shipped with ODBC on Windows.
 set(_ODBC_use_pkgconfig 0)
 if (NOT WIN32)
-  find_package(PkgConfig)
+  find_package(PkgConfig QUIET)
   if (PkgConfig_FOUND)
     set(_ODBC_use_pkgconfig 1)
   endif ()
@@ -45,7 +45,7 @@ else ()
     PATHS
       "C:/Program Files/ODBC"
       "C:/ODBC"
-    PATH_SUFFIXES include include/odbc
+    PATH_SUFFIXES include include/odbc libiodbc
     DOC "Location of sql.h")
   mark_as_advanced(ODBC_INCLUDE_DIR)
   find_library(ODBC_LIBRARY
@@ -62,12 +62,14 @@ else ()
     REQUIRED_VARS ODBC_INCLUDE_DIR ODBC_LIBRARY)
 
   if (ODBC_FOUND)
-    add_library(ODBC::ODBC UNKNOWN IMPORTED)
-    set_target_properties(ODBC::ODBC PROPERTIES
-      IMPORTED_LOCATION "${ODBC_LIBRARY}"
-      INTERFACE_INCLUDE_DIRECTORIES "${ODBC_INCLUDE_DIR}")
     set(ODBC_INCLUDE_DIRS "${ODBC_INCLUDE_DIR}")
     set(ODBC_LIBRARIES "${ODBC_LIBRARY}")
+    if (NOT TARGET ODBC::ODBC)
+      add_library(ODBC::ODBC UNKNOWN IMPORTED)
+      set_target_properties(ODBC::ODBC PROPERTIES
+        IMPORTED_LOCATION "${ODBC_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${ODBC_INCLUDE_DIR}")
+    endif ()
   endif ()
 endif ()
 unset(_ODBC_use_pkgconfig)

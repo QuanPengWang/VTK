@@ -19,7 +19,7 @@
  * vtkStructuredGridOutlineFilter is a filter that generates a wireframe
  * outline of a structured grid (vtkStructuredGrid). Structured data is
  * topologically a cube, so the outline will have 12 "edges".
-*/
+ */
 
 #ifndef vtkStructuredGridOutlineFilter_h
 #define vtkStructuredGridOutlineFilter_h
@@ -30,15 +30,16 @@
 class VTKFILTERSCORE_EXPORT vtkStructuredGridOutlineFilter : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkStructuredGridOutlineFilter *New();
-  vtkTypeMacro(vtkStructuredGridOutlineFilter,vtkPolyDataAlgorithm);
+  static vtkStructuredGridOutlineFilter* New();
+  vtkTypeMacro(vtkStructuredGridOutlineFilter, vtkPolyDataAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkStructuredGridOutlineFilter() {}
-  ~vtkStructuredGridOutlineFilter() override {}
+  vtkStructuredGridOutlineFilter() = default;
+  ~vtkStructuredGridOutlineFilter() override = default;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  int FillInputPortInformation(int port, vtkInformation *info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 private:
   vtkStructuredGridOutlineFilter(const vtkStructuredGridOutlineFilter&) = delete;
@@ -46,4 +47,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkStructuredGridOutlineFilter.h

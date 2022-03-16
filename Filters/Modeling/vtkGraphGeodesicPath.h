@@ -19,7 +19,7 @@
  * Serves as a base class for algorithms that trace a geodesic on a
  * polygonal dataset treating it as a graph. ie points connecting the
  * vertices of the graph
-*/
+ */
 
 #ifndef vtkGraphGeodesicPath_h
 #define vtkGraphGeodesicPath_h
@@ -32,29 +32,29 @@ class vtkIdList;
 class VTKFILTERSMODELING_EXPORT vtkGraphGeodesicPath : public vtkGeodesicPath
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for printing and determining type information.
    */
-  vtkTypeMacro(vtkGraphGeodesicPath,vtkGeodesicPath);
+  vtkTypeMacro(vtkGraphGeodesicPath, vtkGeodesicPath);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The vertex at the start of the shortest path
    */
   vtkGetMacro(StartVertex, vtkIdType);
   vtkSetMacro(StartVertex, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The vertex at the end of the shortest path
    */
   vtkGetMacro(EndVertex, vtkIdType);
   vtkSetMacro(EndVertex, vtkIdType);
-  //@}
+  ///@}
 
 protected:
   vtkGraphGeodesicPath();
@@ -66,8 +66,6 @@ protected:
 private:
   vtkGraphGeodesicPath(const vtkGraphGeodesicPath&) = delete;
   void operator=(const vtkGraphGeodesicPath&) = delete;
-
 };
 
 #endif
-

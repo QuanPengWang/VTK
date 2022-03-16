@@ -31,7 +31,7 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include <mpi.h>
+#include <vtk_mpi.h>
 
 #include "vtkDataArray.h"
 #include "vtkIdTypeArray.h"
@@ -64,8 +64,8 @@ int MPIGetSize();
  * @return xml as pugi object
  * @throws std::invalid_argument
  */
-pugi::xml_document XMLDocument(const std::string &input, const bool debugMode,
-                               const std::string &hint);
+pugi::xml_document XMLDocument(
+  const std::string& input, const bool debugMode, const std::string& hint);
 
 /**
  * Get safely a pugi::xml_document from a pugmi::xml_document
@@ -78,11 +78,9 @@ pugi::xml_document XMLDocument(const std::string &input, const bool debugMode,
  * @return node if found, empty node if not mandatory
  * @throws std::invalid_argument
  */
-pugi::xml_node XMLNode(const std::string nodeName,
-                       const pugi::xml_document &xmlDocument,
-                       const bool debugMode, const std::string &hint,
-                       const bool isMandatory = true,
-                       const bool isUnique = false);
+pugi::xml_node XMLNode(const std::string nodeName, const pugi::xml_document& xmlDocument,
+  const bool debugMode, const std::string& hint, const bool isMandatory = true,
+  const bool isUnique = false);
 
 /**
  * Overloaded version that gets a XML node from inside another node called
@@ -96,17 +94,16 @@ pugi::xml_node XMLNode(const std::string nodeName,
  * @return node if found, empty node if not mandatory
  * @throws std::invalid_argument
  */
-pugi::xml_node XMLNode(const std::string nodeName,
-                       const pugi::xml_node &upperNode, const bool debugMode,
-                       const std::string &hint, const bool isMandatory = true,
-                       const bool isUnique = false);
+pugi::xml_node XMLNode(const std::string nodeName, const pugi::xml_node& upperNode,
+  const bool debugMode, const std::string& hint, const bool isMandatory = true,
+  const bool isUnique = false);
 
 /**
  * Translate file contents to string
  * @param fileName input
  * @return file contents as a single string
  */
-std::string FileToString(const std::string &fileName);
+std::string FileToString(const std::string& fileName);
 
 /**
  * Get a node attribute identified by its key
@@ -118,17 +115,15 @@ std::string FileToString(const std::string &fileName);
  * @return attribute if found, empty node if not mandatory
  * @throws std::invalid_argument
  */
-pugi::xml_attribute XMLAttribute(const std::string attributeName,
-                                 const pugi::xml_node &node,
-                                 const bool debugMode, const std::string &hint,
-                                 const bool isMandatory = true);
+pugi::xml_attribute XMLAttribute(const std::string attributeName, const pugi::xml_node& node,
+  const bool debugMode, const std::string& hint, const bool isMandatory = true);
 
 /**
  * Convert a set of strings into a csv "string1,string2,string3" string
  * @param input set of ordered strings
  * @return csv string
  */
-std::string SetToCSV(const std::set<std::string> &input) noexcept;
+std::string SetToCSV(const std::set<std::string>& input) noexcept;
 
 /**
  * Converts a single string "s1 s2 s3" list to a vector
@@ -137,9 +132,14 @@ std::string SetToCSV(const std::set<std::string> &input) noexcept;
  * @return
  */
 template <class T>
-std::vector<T> StringToVector(const std::string &input) noexcept;
+std::vector<T> StringToVector(const std::string& input) noexcept;
 
-std::size_t TotalElements(const std::vector<std::size_t> &dimensions) noexcept;
+/**
+ * Return product of all dimensions components to get the total number of elements
+ * @param dimensions input
+ * @return total number of elements
+ */
+std::size_t TotalElements(const std::vector<std::size_t>& dimensions) noexcept;
 
 /**
  * Initialize DataSet structure from parsing a pugi::xml_node, loops through
@@ -149,8 +149,8 @@ std::size_t TotalElements(const std::vector<std::size_t> &dimensions) noexcept;
  * NumberOfComponents wasn't declared
  * @return initialiazed DataSet
  */
-types::DataSet XMLInitDataSet(const pugi::xml_node &dataSetNode,
-                              const std::set<std::string> &specialNames);
+types::DataSet XMLInitDataSet(
+  const pugi::xml_node& dataSetNode, const std::set<std::string>& specialNames);
 
 /**
  * Return a derived class of vtkDataArray specialized for supported types
@@ -170,7 +170,7 @@ vtkSmartPointer<vtkIdTypeArray> NewDataArrayIdType();
  * @param shape input
  * @return selection first=start second=count
  */
-adios2::Box<adios2::Dims> PartitionCart1D(const adios2::Dims &shape);
+adios2::Box<adios2::Dims> PartitionCart1D(const adios2::Dims& shape);
 
 /**
  * Map's keys to a vector
@@ -178,13 +178,45 @@ adios2::Box<adios2::Dims> PartitionCart1D(const adios2::Dims &shape);
  * @return vector with keys only
  */
 template <class T, class U>
-std::vector<T> MapKeysToVector(const std::map<T, U> &input) noexcept;
+std::vector<T> MapKeysToVector(const std::map<T, U>& input) noexcept;
 
+/**
+ * Print a vector with an associated name. For debugging purposes.
+ * @param input vector data
+ * @param name input name
+ */
 template <class T>
-void Print(const std::vector<T> &input, const std::string &name);
+void Print(const std::vector<T>& input, const std::string& name);
 
-size_t LinearizePoint(const adios2::Dims &shape,
-                      const adios2::Dims &point) noexcept;
+/**
+ * Linear index for a point within a box with shape dimensions from zero origin
+ * @param shape input shape box
+ * @param point input point
+ * @return linearized point inside shape
+ */
+size_t LinearizePoint(const adios2::Dims& shape, const adios2::Dims& point) noexcept;
+
+/**
+ * Set the appropriate file name based on recognized user input
+ * @param fileName input from user selected file
+ * @return file name to be used by adios2 engine
+ */
+std::string GetFileName(const std::string& fileName) noexcept;
+
+/**
+ * Set the appropriate engine type based on recognized user input
+ * @param fileName input from user selected file
+ * @return engine type to be used by adios2 engine
+ */
+std::string GetEngineType(const std::string& fileName) noexcept;
+
+/**
+ * Check if input ends with a certain (ends) string
+ * @param input string input
+ * @param ends ending string to check in input
+ * @return  true: input ends with "ends", false: it doesn't end with ends
+ */
+bool EndsWith(const std::string& input, const std::string& ends) noexcept;
 
 } // end namespace helper
 } // end namespace vtx

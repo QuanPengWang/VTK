@@ -21,23 +21,23 @@
  * ghost cells to make the results invariant to pieces.  There is a
  * "PieceInvariant" flag that lets the user change the behavior
  * of the filter to that of its superclass.
-*/
+ */
 
 #ifndef vtkPCellDataToPointData_h
 #define vtkPCellDataToPointData_h
 
-#include "vtkFiltersParallelModule.h" // For export macro
 #include "vtkCellDataToPointData.h"
+#include "vtkFiltersParallelModule.h" // For export macro
 
 class VTKFILTERSPARALLEL_EXPORT vtkPCellDataToPointData : public vtkCellDataToPointData
 {
 public:
-  vtkTypeMacro(vtkPCellDataToPointData,vtkCellDataToPointData);
+  vtkTypeMacro(vtkPCellDataToPointData, vtkCellDataToPointData);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkPCellDataToPointData *New();
+  static vtkPCellDataToPointData* New();
 
-  //@{
+  ///@{
   /**
    * To get piece invariance, this filter has to request an
    * extra ghost level.  By default piece invariance is on.
@@ -45,21 +45,19 @@ public:
   vtkSetMacro(PieceInvariant, vtkTypeBool);
   vtkGetMacro(PieceInvariant, vtkTypeBool);
   vtkBooleanMacro(PieceInvariant, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkPCellDataToPointData();
-  ~vtkPCellDataToPointData() override {}
+  ~vtkPCellDataToPointData() override = default;
 
   // Usual data generation method
-  int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector) override;
-  int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkTypeBool PieceInvariant;
+
 private:
   vtkPCellDataToPointData(const vtkPCellDataToPointData&) = delete;
   void operator=(const vtkPCellDataToPointData&) = delete;

@@ -23,9 +23,9 @@ set(classes
   vtkSpiderPlotActor
   vtkXYPlotActor)
 
-set(private_headers
+set(nowrap_headers
   vtkScalarBarActorInternal.h)
 
 vtk_module_add_module(VTK::RenderingAnnotation
   CLASSES ${classes}
-  PRIVATE_HEADERS ${private_headers})
+  NOWRAP_HEADERS ${nowrap_headers})

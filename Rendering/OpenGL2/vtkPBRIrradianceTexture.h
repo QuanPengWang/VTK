@@ -16,7 +16,8 @@
  * @class   vtkPBRIrradianceTexture
  * @brief   precompute irradiance texture used in physically based rendering
  *
- * Irradiance texture is a cubemap which average light of a hemisphere of the input cubemap.
+ * Irradiance texture is a cubemap which average light of a hemisphere of the input texture.
+ * The input texture can be a cubemap or an equirectangular projection.
  * It is used in Image Base Lighting to compute the diffuse part.
  */
 
@@ -38,13 +39,13 @@ public:
   vtkTypeMacro(vtkPBRIrradianceTexture, vtkOpenGLTexture);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
-   * Get/Set the input cubemap.
+   * Get/Set the input texture.
    */
-  void SetInputCubeMap(vtkOpenGLTexture* texture);
-  vtkGetObjectMacro(InputCubeMap, vtkOpenGLTexture);
-  //@}
+  void SetInputTexture(vtkOpenGLTexture* texture);
+  vtkGetObjectMacro(InputTexture, vtkOpenGLTexture);
+  ///@}
 
   /**
    * Implement base class method.
@@ -56,16 +57,16 @@ public:
    */
   void Render(vtkRenderer* ren) override { this->Load(ren); }
 
-  //@{
+  ///@{
   /**
    * Set/Get size of texture.
    * Default is 256.
    */
   vtkGetMacro(IrradianceSize, unsigned int);
   vtkSetMacro(IrradianceSize, unsigned int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the size of steps in radians used to sample hemisphere.
    * Default is (pi/64).
@@ -74,18 +75,26 @@ public:
    */
   vtkGetMacro(IrradianceStep, float);
   vtkSetMacro(IrradianceStep, float);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the conversion to linear color space.
-   * If the input cubemap is in sRGB color space and the conversion is not done by OpenGL
+   * If the input texture is in sRGB color space and the conversion is not done by OpenGL
    * directly with the texture format, the conversion can be done in the shader with this flag.
    */
   vtkGetMacro(ConvertToLinear, bool);
   vtkSetMacro(ConvertToLinear, bool);
   vtkBooleanMacro(ConvertToLinear, bool);
-  //@}
+  ///@}
+
+  /**
+   * Release any graphics resources that are being consumed by this texture.
+   * The parameter window could be used to determine which graphic
+   * resources to release. Using the same texture object in multiple
+   * render windows is NOT currently supported.
+   */
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
 protected:
   vtkPBRIrradianceTexture() = default;
@@ -93,7 +102,7 @@ protected:
 
   float IrradianceStep = 0.04908738521; // pi / 64
   unsigned int IrradianceSize = 256;
-  vtkOpenGLTexture* InputCubeMap = nullptr;
+  vtkOpenGLTexture* InputTexture = nullptr;
   bool ConvertToLinear = false;
 
 private:

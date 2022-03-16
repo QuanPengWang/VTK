@@ -50,6 +50,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkTesting.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <adios2.h>
@@ -117,7 +118,7 @@ void WriteBP(const std::string& fileName)
   fs.write("vertices", vertices.data(), {}, {}, { 45, 3 });
   fs.write("sol", sol.data(), {}, {}, { 45 });
 
-    const std::string vtuXML = R"(
+  const std::string vtuXML = R"(
   <VTKFile type="UnstructuredGrid">
     <UnstructuredGrid>
       <Piece>
@@ -135,8 +136,8 @@ void WriteBP(const std::string& fileName)
     </UnstructuredGrid>
   </VTKFile>)";
 
-    fs.write_attribute("vtk.xml", vtuXML);
-    fs.close();
+  fs.write_attribute("vtk.xml", vtuXML);
+  fs.close();
 }
 
 } // end empty namespace
@@ -148,7 +149,9 @@ int TestIOADIOS2VTX_VTU3DRendering(int argc, char* argv[])
   vtkMultiProcessController::SetGlobalController(mpiController);
   const int rank = MPIGetRank();
 
-  const std::string fileName = "testVTU.bp";
+  vtkNew<vtkTesting> testing;
+  const std::string rootDirectory(testing->GetTempDirectory());
+  const std::string fileName = rootDirectory + "/testVTU3D.bp";
   if (rank == 0)
   {
     WriteBP(fileName);

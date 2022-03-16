@@ -23,30 +23,25 @@
  * the size of the cache frees all previously held contents.
  *
  * This class is internal.
-*/
+ */
 
 #ifndef vtkOSPRayCache_h
 #define vtkOSPRayCache_h
 
 #include "vtkRenderingRayTracingModule.h" // For export macro
-#include "vtkSystemIncludes.h" //dll warning suppression
-#include <map> // for stl
+#include "vtkSystemIncludes.h"            //dll warning suppression
+#include <map>                            // for stl
 #include <memory>
 
 #include "RTWrapper/RTWrapper.h" // for handle types
 
 template <class T>
-class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayCache {
+class VTKRENDERINGRAYTRACING_EXPORT vtkOSPRayCache
+{
 public:
-  vtkOSPRayCache()
-  {
-    this->Size = 0;
-  }
+  vtkOSPRayCache() { this->Size = 0; }
 
-  ~vtkOSPRayCache()
-  {
-    this->Empty();
-  }
+  ~vtkOSPRayCache() { this->Empty(); }
 
   /**
    * Insert a new object into the cache.
@@ -74,7 +69,7 @@ public:
     return nullptr;
   }
 
-  //@{
+  ///@{
   /**
    * Set/Get the number of slots available in the cache.
    * Default is 0.
@@ -91,30 +86,20 @@ public:
     }
     this->Size = sz;
   }
-  size_t GetSize()
-  {
-    return this->Size;
-  }
-  //@}
+  size_t GetSize() { return this->Size; }
+  ///@}
 
   /**
    * Query whether cache contains tstep
    */
-  bool Contains(double tstep)
-  {
-    return this->Get(tstep) != nullptr;
-  }
+  bool Contains(double tstep) { return this->Get(tstep) != nullptr; }
 
   /**
-  * Check if the cache has space left.
-  */
-  bool HasRoom()
-  {
-    return this->Contents.size() < this->Size;
-  }
+   * Check if the cache has space left.
+   */
+  bool HasRoom() { return this->Contents.size() < this->Size; }
 
 private:
-
   // deletes all of the content in the cache
   void Empty()
   {
@@ -124,24 +109,22 @@ private:
 
   size_t Size;
 
-  std::map<double, std::shared_ptr<T> > Contents;
+  std::map<double, std::shared_ptr<T>> Contents;
 };
 
 class vtkOSPRayCacheItemObject
 {
 public:
-  vtkOSPRayCacheItemObject(RTW::Backend* be, OSPObject obj) : backend(be)
+  vtkOSPRayCacheItemObject(RTW::Backend* be, OSPObject obj)
+    : backend(be)
   {
     object = obj;
   }
-  ~vtkOSPRayCacheItemObject()
-  {
-    ospRelease(object);
-  }
-  OSPObject object{nullptr};
-  size_t size{0};
+  ~vtkOSPRayCacheItemObject() { ospRelease(object); }
+  OSPObject object{ nullptr };
+  size_t size{ 0 };
   RTW::Backend* backend = nullptr;
 };
 
-#endif //vtkOSPRayCache_h
+#endif // vtkOSPRayCache_h
 // VTK-HeaderTest-Exclude: vtkOSPRayCache.h

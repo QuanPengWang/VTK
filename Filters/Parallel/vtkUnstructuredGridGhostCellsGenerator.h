@@ -27,11 +27,12 @@
  * vtkPUnstructuredGridGhostCellsGenerator
  *
  *
-*/
+ */
 
 #ifndef vtkUnstructuredGridGhostCellsGenerator_h
 #define vtkUnstructuredGridGhostCellsGenerator_h
 
+#include "vtkDeprecation.h"           // For VTK_DEPRECATED_IN_9_1_0
 #include "vtkFiltersParallelModule.h" // For export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
@@ -39,17 +40,17 @@ class vtkMultiProcessController;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridBase;
 
-class VTKFILTERSPARALLEL_EXPORT vtkUnstructuredGridGhostCellsGenerator:
-  public vtkUnstructuredGridAlgorithm
+class VTK_DEPRECATED_IN_9_1_0("Use vtkGhostCellsGenerator instead") VTKFILTERSPARALLEL_EXPORT
+  vtkUnstructuredGridGhostCellsGenerator : public vtkUnstructuredGridAlgorithm
 {
   vtkTypeMacro(vtkUnstructuredGridGhostCellsGenerator, vtkUnstructuredGridAlgorithm);
 
 public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkUnstructuredGridGhostCellsGenerator *New();
+  static vtkUnstructuredGridGhostCellsGenerator* New();
 
-  //@{
+  ///@{
   /**
    * Specify if the filter must take benefit of global point ids if they exist.
    * If false, point coordinates are used. Default is TRUE.
@@ -57,18 +58,18 @@ public:
   vtkSetMacro(UseGlobalPointIds, bool);
   vtkGetMacro(UseGlobalPointIds, bool);
   vtkBooleanMacro(UseGlobalPointIds, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the name of the global point ids data array if the GlobalIds
    * attribute array is not set. Default is "GlobalNodeIds".
    */
   vtkSetStringMacro(GlobalPointIdsArrayName);
   vtkGetStringMacro(GlobalPointIdsArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if the data has global cell ids.
    * If more than one layer of ghost cells is needed, global cell ids are
@@ -80,18 +81,18 @@ public:
   vtkSetMacro(HasGlobalCellIds, bool);
   vtkGetMacro(HasGlobalCellIds, bool);
   vtkBooleanMacro(HasGlobalCellIds, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the name of the global cell ids data array if the GlobalIds
    * attribute array is not set. Default is "GlobalNodeIds".
    */
   vtkSetStringMacro(GlobalCellIdsArrayName);
   vtkGetStringMacro(GlobalCellIdsArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if the filter must generate the ghost cells only if required by
    * the pipeline.
@@ -101,9 +102,9 @@ public:
   vtkSetMacro(BuildIfRequired, bool);
   vtkGetMacro(BuildIfRequired, bool);
   vtkBooleanMacro(BuildIfRequired, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When BuildIfRequired is `false`, this can be used to set the minimum number
    * of ghost levels to generate. Note, if the downstream pipeline requests more
@@ -113,23 +114,20 @@ public:
    */
   vtkSetClampMacro(MinimumNumberOfGhostLevels, int, 1, VTK_INT_MAX);
   vtkGetMacro(MinimumNumberOfGhostLevels, int);
-  //@}
+  ///@}
 
 protected:
   vtkUnstructuredGridGhostCellsGenerator();
   ~vtkUnstructuredGridGhostCellsGenerator() override;
 
-  int RequestUpdateExtent(
-    vtkInformation*,
-    vtkInformationVector** inputVector,
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-    vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  char *GlobalPointIdsArrayName;
+  char* GlobalPointIdsArrayName;
   bool UseGlobalPointIds;
-  char *GlobalCellIdsArrayName;
+  char* GlobalCellIdsArrayName;
   bool HasGlobalCellIds;
   bool BuildIfRequired;
   int MinimumNumberOfGhostLevels;
@@ -140,3 +138,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkUnstructuredGridGhostCellsGenerator.h

@@ -15,14 +15,16 @@ if (VTK_ENABLE_OSPRAY)
     TestOSPRayMultiBlockPartialArrayFieldData.cxx
     TestOSPRayOrthographic.cxx
     TestOSPRayPass.cxx
+    TestOSPRayPointGaussianMapper.cxx
     TestOSPRayRenderMesh.cxx
     TestOSPRayRotatedNormals.cxx
     TestOSPRayScalarBar.cxx
-    TestOSPRayTetrahedraMapper.cxx
-    TestOSPRayTetrahedraMapperMixedCells.cxx
     TestOSPRayTime.cxx
+    TestOSPRayUnstructuredVolumeMapper.cxx
+    TestOSPRayUnstructuredVolumeMapperMixedCells.cxx
     TestOSPRayWindow.cxx
     TestOSPRayStereo.cxx
+    TestRayTracedMolecules.cxx
     # Volume rendering tests
     TestGPURayCastCameraInside.cxx
     TestGPURayCastCellData.cxx
@@ -37,11 +39,13 @@ if (VTK_ENABLE_OSPRAY)
     TestGPURayCastVolumeUpdate.cxx
     TestGPUVolumeRayCastMapper.cxx
     TestOSPRayVolumeRenderer.cxx
+    TestOSPRayVolumeRendererCrop.cxx
     TestSmartVolumeMapper.cxx
     # Path tracer tests
     TestCategoricalMaterials.cxx
     TestCategoricalMultiBlock.cxx
     TestPathTracerBackground.cxx
+    TestPathTracerGLTFImporter.cxx DATA{../Data/WaterBottle.glb}
     TestPathTracerLuminous.cxx
     TestPathTracerMaterialLibrary.cxx,NO_VALID
     TestPathTracerMaterials.cxx
@@ -49,6 +53,12 @@ if (VTK_ENABLE_OSPRAY)
     # Miscellaneous tests
     TestOSPRayCache.cxx
     TestOSPRayTiling.cxx
+    # Widgets tests
+    TestOSPRayBoxWidget2.cxx
+    TestOSPRayImplicitPlaneWidget2.cxx
+    TestOSPRayPointCloudWidget.cxx
+    TestOSPRayPointHandleRepresentation3D.cxx
+    TestOSPRaySplineWidget2.cxx
   )
 endif()
 
@@ -74,13 +84,13 @@ if (VTK_ENABLE_VISRTX)
     TestOSPRayWindow
     TestOSPRayStereo
     TestCategoricalMaterials
-    TestCategoricalMultiBlock
+    # TestCategoricalMultiBlock #Disabled because of unknown instability after OSPRay 2 upgrade. Could not reproduce on NV side.
     TestPathTracerBackground
     TestPathTracerLuminous
-    TestPathTracerMaterials
+    #TestPathTracerMaterials #Disabled because of unknown instability after OSPRay 2 upgrade. Could not reproduce on NV side.
     TestPathTracerShadows
     TestOSPRayCache
-    TestOSPRayTiling
+    #TestOSPRayTiling #Disabled because of unknown instability after OSPRay 2 upgrade. Could not reproduce on NV side.
     )
 
   set(testname_suffix "OptiX")
@@ -104,6 +114,7 @@ endif ()
 
 set(all_tests ${tests} ${tests_optix} ${tests_combined})
 vtk_test_cxx_executable(vtkRenderingRayTracingCxxTests all_tests RENDERING_FACTORY
+  DISABLE_FLOATING_POINT_EXCEPTIONS
   vtkOSPRayTestInteractor.cxx
   )
 

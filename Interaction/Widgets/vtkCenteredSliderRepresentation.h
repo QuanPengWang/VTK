@@ -31,14 +31,14 @@
  *
  * @sa
  * vtkSliderWidget
-*/
+ */
 
 #ifndef vtkCenteredSliderRepresentation_h
 #define vtkCenteredSliderRepresentation_h
 
+#include "vtkCoordinate.h"               // For vtkViewportCoordinateMacro
 #include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkSliderRepresentation.h"
-#include "vtkCoordinate.h" // For vtkViewportCoordinateMacro
 
 class vtkPoints;
 class vtkCellArray;
@@ -56,23 +56,21 @@ class vtkTextProperty;
 class vtkTextMapper;
 class vtkTextActor;
 
-
 class VTKINTERACTIONWIDGETS_EXPORT vtkCenteredSliderRepresentation : public vtkSliderRepresentation
 {
 public:
   /**
    * Instantiate the class.
    */
-  static vtkCenteredSliderRepresentation *New();
+  static vtkCenteredSliderRepresentation* New();
 
-  //@{
+  ///@{
   /**
    * Standard methods for the class.
    */
-  vtkTypeMacro(vtkCenteredSliderRepresentation,
-                       vtkSliderRepresentation);
+  vtkTypeMacro(vtkCenteredSliderRepresentation, vtkSliderRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Position the first end point of the slider. Note that this point is an
@@ -82,7 +80,7 @@ public:
    * then invoke the necessary methods to put it into the correct coordinate
    * system and set the correct initial value.
    */
-  vtkCoordinate *GetPoint1Coordinate();
+  vtkCoordinate* GetPoint1Coordinate();
 
   /**
    * Position the second end point of the slider. Note that this point is an
@@ -92,41 +90,41 @@ public:
    * then invoke the necessary methods to put it into the correct coordinate
    * system and set the correct initial value.
    */
-  vtkCoordinate *GetPoint2Coordinate();
+  vtkCoordinate* GetPoint2Coordinate();
 
-  //@{
+  ///@{
   /**
    * Specify the label text for this widget. If the value is not set, or set
    * to the empty string "", then the label text is not displayed.
    */
   void SetTitleText(const char*) override;
   const char* GetTitleText() override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the properties for the tube and slider
    */
-  vtkGetObjectMacro(TubeProperty,vtkProperty2D);
-  vtkGetObjectMacro(SliderProperty,vtkProperty2D);
-  //@}
+  vtkGetObjectMacro(TubeProperty, vtkProperty2D);
+  vtkGetObjectMacro(SliderProperty, vtkProperty2D);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the selection property. This property is used to modify the
    * appearance of selected objects (e.g., the slider).
    */
-  vtkGetObjectMacro(SelectedProperty,vtkProperty2D);
-  //@}
+  vtkGetObjectMacro(SelectedProperty, vtkProperty2D);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the properties for the label and title text.
    */
-  vtkGetObjectMacro(LabelProperty,vtkTextProperty);
-  //@}
+  vtkGetObjectMacro(LabelProperty, vtkTextProperty);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to interface with the vtkSliderWidget. The PlaceWidget() method
    * assumes that the parameter bounds[6] specifies the location in display
@@ -135,12 +133,12 @@ public:
   void PlaceWidget(double bounds[6]) override;
   void BuildRepresentation() override;
   void StartWidgetInteraction(double eventPos[2]) override;
-  int ComputeInteractionState(int X, int Y, int modify=0) override;
+  int ComputeInteractionState(int X, int Y, int modify = 0) override;
   void WidgetInteraction(double eventPos[2]) override;
   void Highlight(int) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods supporting the rendering process.
    */
@@ -148,49 +146,48 @@ public:
   void ReleaseGraphicsResources(vtkWindow*) override;
   int RenderOverlay(vtkViewport*) override;
   int RenderOpaqueGeometry(vtkViewport*) override;
-  //@}
+  ///@}
 
 protected:
   vtkCenteredSliderRepresentation();
   ~vtkCenteredSliderRepresentation() override;
 
   // Positioning the widget
-  vtkCoordinate *Point1Coordinate;
-  vtkCoordinate *Point2Coordinate;
+  vtkCoordinate* Point1Coordinate;
+  vtkCoordinate* Point2Coordinate;
 
   // Determine the parameter t along the slider
   virtual double ComputePickPosition(double x, double y);
 
   // Define the geometry. It is constructed in canaonical position
   // along the x-axis and then rotated into position.
-  vtkTransform        *XForm;
-  vtkPoints           *Points;
+  vtkTransform* XForm;
+  vtkPoints* Points;
 
-  vtkCellArray        *SliderCells;
-  vtkPolyData         *Slider;
-  vtkTransformPolyDataFilter *SliderXForm;
-  vtkPolyDataMapper2D *SliderMapper;
-  vtkActor2D          *SliderActor;
-  vtkProperty2D       *SliderProperty;
+  vtkCellArray* SliderCells;
+  vtkPolyData* Slider;
+  vtkTransformPolyDataFilter* SliderXForm;
+  vtkPolyDataMapper2D* SliderMapper;
+  vtkActor2D* SliderActor;
+  vtkProperty2D* SliderProperty;
 
-  vtkCellArray        *TubeCells;
-  vtkPolyData         *Tube;
-  vtkTransformPolyDataFilter *TubeXForm;
-  vtkPolyDataMapper2D *TubeMapper;
-  vtkActor2D          *TubeActor;
-  vtkProperty2D       *TubeProperty;
+  vtkCellArray* TubeCells;
+  vtkPolyData* Tube;
+  vtkTransformPolyDataFilter* TubeXForm;
+  vtkPolyDataMapper2D* TubeMapper;
+  vtkActor2D* TubeActor;
+  vtkProperty2D* TubeProperty;
 
-  vtkTextProperty     *LabelProperty;
-  vtkTextActor        *LabelActor;
+  vtkTextProperty* LabelProperty;
+  vtkTextActor* LabelActor;
 
-  vtkProperty2D       *SelectedProperty;
+  vtkProperty2D* SelectedProperty;
   int HighlightState;
 
   // build the tube geometry
   void BuildTube();
 
 private:
-
   // how many points along the tube
   int ArcCount;
   double ArcStart;
@@ -198,8 +195,7 @@ private:
   double ButtonSize;
   double TubeSize;
 
-  vtkCenteredSliderRepresentation
-    (const vtkCenteredSliderRepresentation&) = delete;
+  vtkCenteredSliderRepresentation(const vtkCenteredSliderRepresentation&) = delete;
   void operator=(const vtkCenteredSliderRepresentation&) = delete;
 };
 

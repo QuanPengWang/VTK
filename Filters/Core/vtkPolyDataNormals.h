@@ -29,7 +29,7 @@
  * or with
  * vtkArrayDownCast<vtkFloatArray>(output->GetPointData()->GetArray("Normals"))
  *
- * The filter can reorder polygons to insure consistent
+ * The filter can reorder polygons to ensure consistent
  * orientation across polygon neighbors. Sharp edges can be split and points
  * duplicated with separate normals to give crisp (rendered) surface definition.
  * It is also possible to globally flip the normal orientation.
@@ -52,7 +52,7 @@
  * if you know that you have a triangle mesh which does not require splitting
  * nor consistency check on the cell orientations.
  *
-*/
+ */
 
 #ifndef vtkPolyDataNormals_h
 #define vtkPolyDataNormals_h
@@ -67,7 +67,7 @@ class vtkPolyData;
 class VTKFILTERSCORE_EXPORT vtkPolyDataNormals : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkPolyDataNormals,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPolyDataNormals, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -75,37 +75,37 @@ public:
    * flipNormals turned off, and non-manifold traversal turned on.
    * ComputePointNormals is on and ComputeCellNormals is off.
    */
-  static vtkPolyDataNormals *New();
+  static vtkPolyDataNormals* New();
 
-  //@{
+  ///@{
   /**
    * Specify the angle that defines a sharp edge. If the difference in
    * angle across neighboring polygons is greater than this value, the
    * shared edge is considered "sharp".
    */
-  vtkSetClampMacro(FeatureAngle,double,0.0,180.0);
-  vtkGetMacro(FeatureAngle,double);
-  //@}
+  vtkSetClampMacro(FeatureAngle, double, 0.0, 180.0);
+  vtkGetMacro(FeatureAngle, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the splitting of sharp edges.
    */
-  vtkSetMacro(Splitting,vtkTypeBool);
-  vtkGetMacro(Splitting,vtkTypeBool);
-  vtkBooleanMacro(Splitting,vtkTypeBool);
-  //@}
+  vtkSetMacro(Splitting, vtkTypeBool);
+  vtkGetMacro(Splitting, vtkTypeBool);
+  vtkBooleanMacro(Splitting, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the enforcement of consistent polygon ordering.
    */
-  vtkSetMacro(Consistency,vtkTypeBool);
-  vtkGetMacro(Consistency,vtkTypeBool);
-  vtkBooleanMacro(Consistency,vtkTypeBool);
-  //@}
+  vtkSetMacro(Consistency, vtkTypeBool);
+  vtkGetMacro(Consistency, vtkTypeBool);
+  vtkBooleanMacro(Consistency, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the automatic determination of correct normal
    * orientation. NOTE: This assumes a completely closed surface
@@ -120,50 +120,50 @@ public:
   vtkSetMacro(AutoOrientNormals, vtkTypeBool);
   vtkGetMacro(AutoOrientNormals, vtkTypeBool);
   vtkBooleanMacro(AutoOrientNormals, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the computation of point normals.
    */
-  vtkSetMacro(ComputePointNormals,vtkTypeBool);
-  vtkGetMacro(ComputePointNormals,vtkTypeBool);
-  vtkBooleanMacro(ComputePointNormals,vtkTypeBool);
-  //@}
+  vtkSetMacro(ComputePointNormals, vtkTypeBool);
+  vtkGetMacro(ComputePointNormals, vtkTypeBool);
+  vtkBooleanMacro(ComputePointNormals, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the computation of cell normals.
    */
-  vtkSetMacro(ComputeCellNormals,vtkTypeBool);
-  vtkGetMacro(ComputeCellNormals,vtkTypeBool);
-  vtkBooleanMacro(ComputeCellNormals,vtkTypeBool);
-  //@}
+  vtkSetMacro(ComputeCellNormals, vtkTypeBool);
+  vtkGetMacro(ComputeCellNormals, vtkTypeBool);
+  vtkBooleanMacro(ComputeCellNormals, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off the global flipping of normal orientation. Flipping
    * reverves the meaning of front and back for Frontface and Backface
    * culling in vtkProperty.  Flipping modifies both the normal
    * direction and the order of a cell's points.
    */
-  vtkSetMacro(FlipNormals,vtkTypeBool);
-  vtkGetMacro(FlipNormals,vtkTypeBool);
-  vtkBooleanMacro(FlipNormals,vtkTypeBool);
-  //@}
+  vtkSetMacro(FlipNormals, vtkTypeBool);
+  vtkGetMacro(FlipNormals, vtkTypeBool);
+  vtkBooleanMacro(FlipNormals, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turn on/off traversal across non-manifold edges. This will prevent
    * problems where the consistency of polygonal ordering is corrupted due
    * to topological loops.
    */
-  vtkSetMacro(NonManifoldTraversal,vtkTypeBool);
-  vtkGetMacro(NonManifoldTraversal,vtkTypeBool);
-  vtkBooleanMacro(NonManifoldTraversal,vtkTypeBool);
-  //@}
+  vtkSetMacro(NonManifoldTraversal, vtkTypeBool);
+  vtkGetMacro(NonManifoldTraversal, vtkTypeBool);
+  vtkBooleanMacro(NonManifoldTraversal, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the desired precision for the output types. See the documentation
    * for the vtkAlgorithm::DesiredOutputPrecision enum for an explanation of
@@ -171,14 +171,14 @@ public:
    */
   vtkSetClampMacro(OutputPointsPrecision, int, SINGLE_PRECISION, DEFAULT_PRECISION);
   vtkGetMacro(OutputPointsPrecision, int);
-  //@}
+  ///@}
 
 protected:
   vtkPolyDataNormals();
-  ~vtkPolyDataNormals() override {}
+  ~vtkPolyDataNormals() override = default;
 
   // Usual data generation method
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   double FeatureAngle;
   vtkTypeBool Splitting;
@@ -192,14 +192,16 @@ protected:
   int OutputPointsPrecision;
 
 private:
-  vtkIdList *Wave;
-  vtkIdList *Wave2;
-  vtkIdList *CellIds;
-  vtkIdList *Map;
-  vtkPolyData *OldMesh;
-  vtkPolyData *NewMesh;
-  int *Visited;
-  vtkFloatArray *PolyNormals;
+  vtkIdList* Wave;
+  vtkIdList* Wave2;
+  vtkIdList* CellIds;
+  vtkIdList* CellPoints;
+  vtkIdList* NeighborPoints;
+  vtkIdList* Map;
+  vtkPolyData* OldMesh;
+  vtkPolyData* NewMesh;
+  int* Visited;
+  vtkFloatArray* PolyNormals;
   double CosAngle;
 
   // Uses the list of cell ids (this->Wave) to propagate a wave of

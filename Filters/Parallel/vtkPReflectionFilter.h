@@ -18,7 +18,7 @@
  *
  * vtkPReflectionFilter is a parallel version of vtkReflectionFilter which takes
  * into consideration the full dataset bounds for performing the reflection.
-*/
+ */
 
 #ifndef vtkPReflectionFilter_h
 #define vtkPReflectionFilter_h
@@ -35,13 +35,13 @@ public:
   vtkTypeMacro(vtkPReflectionFilter, vtkReflectionFilter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the parallel controller.
    */
   void SetController(vtkMultiProcessController*);
-  vtkGetObjectMacro (Controller, vtkMultiProcessController);
-  //@}
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  ///@}
 
 protected:
   vtkPReflectionFilter();
@@ -53,12 +53,10 @@ protected:
   int ComputeBounds(vtkDataObject* input, double bounds[6]) override;
 
   vtkMultiProcessController* Controller;
+
 private:
   vtkPReflectionFilter(const vtkPReflectionFilter&) = delete;
   void operator=(const vtkPReflectionFilter&) = delete;
-
 };
 
 #endif
-
-

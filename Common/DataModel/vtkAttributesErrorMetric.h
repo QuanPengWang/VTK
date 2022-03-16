@@ -23,7 +23,7 @@
  *
  * @sa
  * vtkGenericCellTessellator vtkGenericSubdivisionErrorMetric
-*/
+ */
 
 #ifndef vtkAttributesErrorMetric_h
 #define vtkAttributesErrorMetric_h
@@ -41,17 +41,17 @@ public:
    * Construct the error metric with a default relative attribute accuracy
    * equal to 0.1.
    */
-  static vtkAttributesErrorMetric *New();
+  static vtkAttributesErrorMetric* New();
 
-  //@{
+  ///@{
   /**
    * Standard VTK type and error macros.
    */
-  vtkTypeMacro(vtkAttributesErrorMetric,vtkGenericSubdivisionErrorMetric);
+  vtkTypeMacro(vtkAttributesErrorMetric, vtkGenericSubdivisionErrorMetric);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Absolute tolerance of the active scalar (attribute+component).
    * Subdivision is required if the square distance between the real attribute
@@ -61,7 +61,7 @@ public:
    * 0.01 will give better result than 0.1.
    */
   vtkGetMacro(AbsoluteAttributeTolerance, double);
-  //@}
+  ///@}
 
   /**
    * Set the absolute attribute accuracy to `value'. See
@@ -75,7 +75,7 @@ public:
    */
   void SetAbsoluteAttributeTolerance(double value);
 
-  //@{
+  ///@{
   /**
    * Relative tolerance of the active scalar (attribute+component).
    * Subdivision is required if the square distance between the real attribute
@@ -85,7 +85,7 @@ public:
    * 0.01 will give better result than 0.1.
    */
   vtkGetMacro(AttributeTolerance, double);
-  //@}
+  ///@}
 
   /**
    * Set the relative attribute accuracy to `value'. See
@@ -113,8 +113,8 @@ public:
    * \pre valid_size: sizeof(leftPoint)=sizeof(midPoint)=sizeof(rightPoint)
    * =GetAttributeCollection()->GetNumberOfPointCenteredComponents()+6
    */
-  int RequiresEdgeSubdivision(double *leftPoint, double *midPoint, double *rightPoint,
-                              double alpha) override;
+  int RequiresEdgeSubdivision(
+    double* leftPoint, double* midPoint, double* rightPoint, double alpha) override;
 
   /**
    * Return the error at the mid-point. The type of error depends on the state
@@ -129,8 +129,7 @@ public:
    * =GetAttributeCollection()->GetNumberOfPointCenteredComponents()+6
    * \post positive_result: result>=0
    */
-  double GetError(double *leftPoint, double *midPoint,
-                  double *rightPoint, double alpha) override;
+  double GetError(double* leftPoint, double* midPoint, double* rightPoint, double alpha) override;
 
 protected:
   vtkAttributesErrorMetric();
@@ -154,7 +153,7 @@ protected:
 
   double Range; // cached value computed from active attribute/component
 
-  vtkGenericAttributeCollection *AttributeCollection;
+  vtkGenericAttributeCollection* AttributeCollection;
 
 private:
   vtkAttributesErrorMetric(const vtkAttributesErrorMetric&) = delete;
@@ -162,4 +161,3 @@ private:
 };
 
 #endif
-

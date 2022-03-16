@@ -1,20 +1,20 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 
-#include "QVTKOpenGLWidget.h"
+#include "QVTKRenderWidget.h"
 #include "QtVTKTouchscreenRenderWindows.h"
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
   // Needed to ensure appropriate OpenGL context is created for VTK rendering.
-  QSurfaceFormat format = QVTKOpenGLWidget::defaultFormat();
+  QSurfaceFormat format = QVTKRenderWidget::defaultFormat();
 #if _WINDOWS
   format.setProfile(QSurfaceFormat::CompatibilityProfile);
 #endif
   QSurfaceFormat::setDefaultFormat(format);
 
   // QT Stuff
-  QApplication app( argc, argv );
+  QApplication app(argc, argv);
 
   QtVTKTouchscreenRenderWindows myQtVTKTouchscreenRenderWindows(argc, argv);
   myQtVTKTouchscreenRenderWindows.show();

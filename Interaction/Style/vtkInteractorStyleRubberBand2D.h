@@ -35,7 +35,7 @@
  * Right mouse - Zoom.
  * Middle mouse - Pan.
  * Scroll wheel - Zoom.
-*/
+ */
 
 #ifndef vtkInteractorStyleRubberBand2D_h
 #define vtkInteractorStyleRubberBand2D_h
@@ -48,7 +48,7 @@ class vtkUnsignedCharArray;
 class VTKINTERACTIONSTYLE_EXPORT vtkInteractorStyleRubberBand2D : public vtkInteractorStyle
 {
 public:
-  static vtkInteractorStyleRubberBand2D *New();
+  static vtkInteractorStyleRubberBand2D* New();
   vtkTypeMacro(vtkInteractorStyleRubberBand2D, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -62,14 +62,14 @@ public:
   void OnMouseWheelForward() override;
   void OnMouseWheelBackward() override;
 
-  //@{
+  ///@{
   /**
    * Whether to invoke a render when the mouse moves.
    */
   vtkSetMacro(RenderOnMouseMove, bool);
   vtkGetMacro(RenderOnMouseMove, bool);
   vtkBooleanMacro(RenderOnMouseMove, bool);
-  //@}
+  ///@}
 
   /**
    * Selection types
@@ -80,12 +80,12 @@ public:
     SELECT_UNION = 1
   };
 
-  //@{
+  ///@{
   /**
    * Current interaction state
    */
   vtkGetMacro(Interaction, int);
-  //@}
+  ///@}
 
   enum
   {
@@ -95,15 +95,15 @@ public:
     SELECTING
   };
 
-  //@{
+  ///@{
   /**
    * Access to the start and end positions (display coordinates) of the rubber
    * band pick area. This is a convenience method for the wrapped languages
    * since the event callData is lost when using those wrappings.
    */
-  vtkGetVector2Macro(StartPosition,int);
-  vtkGetVector2Macro(EndPosition,int);
-  //@}
+  vtkGetVector2Macro(StartPosition, int);
+  vtkGetVector2Macro(EndPosition, int);
+  ///@}
 
 protected:
   vtkInteractorStyleRubberBand2D();

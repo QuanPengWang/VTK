@@ -38,13 +38,13 @@
  *
  * @sa
  * vtkHoverWidget vtkHardwareSelector
-*/
+ */
 
 #ifndef vtkScenePicker_h
 #define vtkScenePicker_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkObject.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
 class vtkRenderer;
 class vtkProp;
@@ -63,13 +63,13 @@ public:
   vtkTypeMacro(vtkScenePicker, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the renderer. Scene picks are restricted to the viewport.
    */
   virtual void SetRenderer(vtkRenderer*);
   vtkGetObjectMacro(Renderer, vtkRenderer);
-  //@}
+  ///@}
 
   /**
    * Get cell id at the pick position.
@@ -92,7 +92,7 @@ public:
    */
   vtkProp* GetViewProp(int displayPos[2]);
 
-  //@{
+  ///@{
   /**
    * Vertex picking (using the method GetVertexId()), required
    * additional resources and can slow down still render time by
@@ -101,7 +101,7 @@ public:
   vtkSetMacro(EnableVertexPicking, vtkTypeBool);
   vtkGetMacro(EnableVertexPicking, vtkTypeBool);
   vtkBooleanMacro(EnableVertexPicking, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkScenePicker();
@@ -120,7 +120,7 @@ protected:
   // The RenderWindowInteractor must be set, so that avoid scene picks (which
   // involve extra renders) during interaction. This is done by observing the
   // RenderWindowInteractor for start and end interaction events.
-  void SetInteractor(vtkRenderWindowInteractor *);
+  void SetInteractor(vtkRenderWindowInteractor*);
 
   vtkTypeBool EnableVertexPicking;
   vtkHardwareSelector* Selector;
@@ -134,6 +134,7 @@ protected:
   vtkScenePickerSelectionRenderCommand* SelectionRenderCommand;
 
   vtkTimeStamp PickRenderTime;
+
 private:
   vtkScenePicker(const vtkScenePicker&) = delete;
   void operator=(const vtkScenePicker&) = delete;

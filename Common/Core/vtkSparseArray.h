@@ -61,7 +61,7 @@
  *
  * @par Thanks:
  * Developed by Timothy M. Shead (tshead@sandia.gov) at Sandia National Laboratories.
-*/
+ */
 
 #ifndef vtkSparseArray_h
 #define vtkSparseArray_h
@@ -71,13 +71,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkTypedArray.h"
 
-template<typename T>
+template <typename T>
 class vtkSparseArray : public vtkTypedArray<T>
 {
 public:
-  vtkTemplateTypeMacro(vtkSparseArray<T>, vtkTypedArray<T>)
+  vtkTemplateTypeMacro(vtkSparseArray<T>, vtkTypedArray<T>);
   static vtkSparseArray<T>* New();
-  void PrintSelf(ostream &os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   typedef typename vtkArray::CoordinateT CoordinateT;
   typedef typename vtkArray::DimensionT DimensionT;
@@ -186,7 +186,7 @@ public:
    */
   void SetExtents(const vtkArrayExtents& extents);
 
-  //@{
+  ///@{
   /**
    * Adds a new non-null element to the array.  Does not test to see if an element with
    * matching coordinates already exists.  Useful for providing fast initialization of the
@@ -197,7 +197,7 @@ public:
   inline void AddValue(CoordinateT i, CoordinateT j, const T& value);
   inline void AddValue(CoordinateT i, CoordinateT j, CoordinateT k, const T& value);
   void AddValue(const vtkArrayCoordinates& coordinates, const T& value);
-  //@}
+  ///@}
 
   /**
    * Validate the contents of the array, returning false if there are any problems.
@@ -238,21 +238,21 @@ private:
    * Stores the coordinates of each non-null element within the array,
    * using one contiguous array to store the coordinates for each dimension.
    */
-  std::vector<std::vector<CoordinateT> > Coordinates;
+  std::vector<std::vector<CoordinateT>> Coordinates;
 
   /**
    * Stores the value of each non-null element within the array
    */
   std::vector<T> Values;
 
-  //@{
+  ///@{
   /**
    * Stores the value that will be returned when accessing nullptr areas
    * of the array.
    */
   T NullValue;
+  ///@}
 };
-  //@}
 
 #include "vtkSparseArray.txx"
 

@@ -22,7 +22,7 @@
  * and is therefore much faster.
  * @sa
  * vtkCleanPolyData
-*/
+ */
 
 #ifndef vtkMergePoints_h
 #define vtkMergePoints_h
@@ -33,11 +33,11 @@
 class VTKCOMMONDATAMODEL_EXPORT vtkMergePoints : public vtkPointLocator
 {
 public:
-  static vtkMergePoints *New();
-  vtkTypeMacro(vtkMergePoints,vtkPointLocator);
+  static vtkMergePoints* New();
+  vtkTypeMacro(vtkMergePoints, vtkPointLocator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Determine whether point given by x[3] has been inserted into points list.
    * Return id of previously inserted point if this is true, otherwise return
@@ -45,8 +45,10 @@ public:
    */
   vtkIdType IsInsertedPoint(const double x[3]) override;
   vtkIdType IsInsertedPoint(double x, double y, double z) override
-    {return this->vtkPointLocator::IsInsertedPoint(x, y, z); };
-  //@}
+  {
+    return this->vtkPointLocator::IsInsertedPoint(x, y, z);
+  }
+  ///@}
 
   /**
    * Determine whether point given by x[3] has been inserted into points list.
@@ -56,11 +58,11 @@ public:
    * Note this combines the functionality of IsInsertedPoint() followed
    * by a call to InsertNextPoint().
    */
-  int InsertUniquePoint(const double x[3], vtkIdType &ptId) override;
+  int InsertUniquePoint(const double x[3], vtkIdType& ptId) override;
 
 protected:
-  vtkMergePoints() {}
-  ~vtkMergePoints() override {}
+  vtkMergePoints() = default;
+  ~vtkMergePoints() override = default;
 
 private:
   vtkMergePoints(const vtkMergePoints&) = delete;
@@ -68,5 +70,3 @@ private:
 };
 
 #endif
-
-

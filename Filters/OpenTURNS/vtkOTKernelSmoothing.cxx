@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkOTKernelSmoothing);
 
 using namespace OT;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkOTKernelSmoothing::vtkOTKernelSmoothing()
 {
   this->PointNumber = 129;
@@ -33,12 +33,10 @@ vtkOTKernelSmoothing::vtkOTKernelSmoothing()
   this->BoundaryCorrection = false;
 }
 
-//-----------------------------------------------------------------------------
-vtkOTKernelSmoothing::~vtkOTKernelSmoothing()
-{
-}
+//------------------------------------------------------------------------------
+vtkOTKernelSmoothing::~vtkOTKernelSmoothing() = default;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkOTKernelSmoothing::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -49,7 +47,7 @@ void vtkOTKernelSmoothing::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BoundaryCorrection: " << this->BoundaryCorrection << endl;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkOTKernelSmoothing::Process(Sample* input)
 {
   double range[2] = { input->getMin()[0], input->getMax()[0] };
@@ -80,11 +78,9 @@ int vtkOTKernelSmoothing::Process(Sample* input)
   return 1;
 }
 
-//-----------------------------------------------------------------------------
-void vtkOTKernelSmoothing::ComputePDF(Sample* input,
-  KernelSmoothing* ks,
-  double* range,
-  const char* pdfName)
+//------------------------------------------------------------------------------
+void vtkOTKernelSmoothing::ComputePDF(
+  Sample* input, KernelSmoothing* ks, double* range, const char* pdfName)
 {
   ks->setBoundaryCorrection(this->BoundaryCorrection);
 

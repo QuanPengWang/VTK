@@ -19,7 +19,7 @@
  * vtkX3DExporterWriter is the definition for
  * classes that implement a encoding for the
  * X3D exporter
-*/
+ */
 
 #ifndef vtkX3DExporterWriter_h
 #define vtkX3DExporterWriter_h
@@ -49,35 +49,35 @@ public:
    */
   virtual int OpenStream() = 0;
 
-  //@{
+  ///@{
   /**
    * Enable writing to an OutputString instead of the default, a file.
    */
-  vtkSetMacro(WriteToOutputString,vtkTypeBool);
-  vtkGetMacro(WriteToOutputString,vtkTypeBool);
-  vtkBooleanMacro(WriteToOutputString,vtkTypeBool);
-  //@}
+  vtkSetMacro(WriteToOutputString, vtkTypeBool);
+  vtkGetMacro(WriteToOutputString, vtkTypeBool);
+  vtkBooleanMacro(WriteToOutputString, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When WriteToOutputString in on, then a string is allocated, written to,
    * and can be retrieved with these methods.  The string is deleted during
    * the next call to write ...
    */
-  vtkGetMacro(OutputStringLength, int);
+  vtkGetMacro(OutputStringLength, vtkIdType);
   vtkGetStringMacro(OutputString);
-  unsigned char *GetBinaryOutputString()
+  unsigned char* GetBinaryOutputString()
   {
-      return reinterpret_cast<unsigned char *>(this->OutputString);
+    return reinterpret_cast<unsigned char*>(this->OutputString);
   }
-  //@}
+  ///@}
 
   /**
    * This convenience method returns the string, sets the IVAR to nullptr,
    * so that the user is responsible for deleting the string.
    * I am not sure what the name should be, so it may change in the future.
    */
-  char *RegisterAndGetOutputString();
+  char* RegisterAndGetOutputString();
 
   // Closes the file if open
   virtual void CloseFile() = 0;
@@ -98,7 +98,7 @@ public:
    */
   virtual void EndDocument() = 0;
 
-  //@{
+  ///@{
   /**
    * Starts/ends a new X3D node specified via nodeID. The list of
    * nodeIds can be found in vtkX3DExportWriterSymbols.h. The EndNode
@@ -107,7 +107,7 @@ public:
    */
   virtual void StartNode(int nodeID) = 0;
   virtual void EndNode() = 0;
-  //@}
+  ///@}
 
   /**
    * Sets the field specified with attributeID
@@ -191,8 +191,8 @@ protected:
   vtkX3DExporterWriter();
   ~vtkX3DExporterWriter() override;
 
-  char *OutputString;
-  int OutputStringLength;
+  char* OutputString;
+  vtkIdType OutputStringLength;
   vtkTypeBool WriteToOutputString;
 
 private:
@@ -200,4 +200,3 @@ private:
   void operator=(const vtkX3DExporterWriter&) = delete;
 };
 #endif
-

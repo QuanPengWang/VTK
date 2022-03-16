@@ -37,7 +37,7 @@
  *
  * @sa
  * vtkFunctionSet vtkGenericStreamTracer
-*/
+ */
 
 #ifndef vtkGenericInterpolatedVelocityField_h
 #define vtkGenericInterpolatedVelocityField_h
@@ -54,14 +54,14 @@ class vtkGenericInterpolatedVelocityFieldDataSetsType;
 class VTKCOMMONDATAMODEL_EXPORT vtkGenericInterpolatedVelocityField : public vtkFunctionSet
 {
 public:
-  vtkTypeMacro(vtkGenericInterpolatedVelocityField,vtkFunctionSet);
+  vtkTypeMacro(vtkGenericInterpolatedVelocityField, vtkFunctionSet);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Construct a vtkGenericInterpolatedVelocityField with no initial data set.
    * Caching is on. LastCellId is set to -1.
    */
-  static vtkGenericInterpolatedVelocityField *New();
+  static vtkGenericInterpolatedVelocityField* New();
 
   using Superclass::FunctionValues;
   /**
@@ -88,7 +88,7 @@ public:
   /**
    * Return the cell cached from last evaluation.
    */
-  vtkGenericAdaptorCell *GetLastCell();
+  vtkGenericAdaptorCell* GetLastCell();
 
   /**
    * Returns the interpolation weights cached from last evaluation
@@ -97,35 +97,34 @@ public:
    */
   int GetLastLocalCoordinates(double pcoords[3]);
 
-  //@{
+  ///@{
   /**
    * Turn caching on/off.
    */
   vtkGetMacro(Caching, vtkTypeBool);
   vtkSetMacro(Caching, vtkTypeBool);
   vtkBooleanMacro(Caching, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Caching statistics.
    */
   vtkGetMacro(CacheHit, int);
   vtkGetMacro(CacheMiss, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If you want to work with an arbitrary vector array, then set its name
    * here. By default this in nullptr and the filter will use the active vector
    * array.
    */
   vtkGetStringMacro(VectorsSelection);
-  void SelectVectors(const char *fieldName)
-    {this->SetVectorsSelection(fieldName);}
-  //@}
+  void SelectVectors(const char* fieldName) { this->SetVectorsSelection(fieldName); }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the last dataset that was visited. Can be used
    * as a first guess as to where the next point will be as
@@ -133,7 +132,7 @@ public:
    * more information about the point.
    */
   vtkGetObjectMacro(LastDataSet, vtkGenericDataSet);
-  //@}
+  ///@}
 
   /**
    * Copy the user set parameters from source. This copies
@@ -146,7 +145,7 @@ protected:
   vtkGenericInterpolatedVelocityField();
   ~vtkGenericInterpolatedVelocityField() override;
 
-  vtkGenericCellIterator *GenCell; // last cell
+  vtkGenericCellIterator* GenCell; // last cell
 
   double LastPCoords[3]; // last local coordinates
   int CacheHit;
@@ -156,11 +155,11 @@ protected:
   vtkGenericDataSet* LastDataSet;
 
   vtkSetStringMacro(VectorsSelection);
-  char *VectorsSelection;
+  char* VectorsSelection;
 
   vtkGenericInterpolatedVelocityFieldDataSetsType* DataSets;
 
-  int FunctionValues(vtkGenericDataSet* ds, double* x, double* f);
+  int FunctionValues(vtkGenericDataSet* dataset, double* x, double* f);
 
   static const double TOLERANCE_SCALE;
 

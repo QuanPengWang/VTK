@@ -1,12 +1,12 @@
 import sys
+import vtk.test.Testing
 
 try:
     import numpy
 except ImportError:
     print("Numpy (http://numpy.scipy.org) not found.")
     print("This test requires numpy!")
-    from vtk.test import Testing
-    Testing.skip()
+    vtk.test.Testing.skip()
 
 import vtk
 import vtk.numpy_interface.dataset_adapter as dsa
@@ -98,6 +98,8 @@ compare(randomVec[dsa.VTKCompositeDataArray([(slice(None, None, None), slice(0,2
 # Test ufunc
 compare(algs.cos(randomVec) - numpy.cos(npa), 1E-7)
 assert algs.cos(randomVec).DataSet is randomVec.DataSet
+
+assert algs.in1d(elev, [0,1]) == [item in [0, 1] for item in elev]
 
 # Various numerical ops implemented in VTK
 g = algs.gradient(elev)
@@ -272,3 +274,10 @@ original_arrays = pdw.PointData.GetNumberOfArrays()
 pdw.PointData.append(12, "twelve")
 pdw.PointData.append(12.12, "twelve-point-twelve")
 assert pdw.PointData.GetNumberOfArrays() == (2 + original_arrays)
+
+# create a table
+table = dsa.WrapDataObject(vtk.vtkTable())
+table.RowData.append(numpy.ones(5), "ones")
+table.RowData.append(2*numpy.ones(5), "twos")
+assert table.GetNumberOfRows() == 5
+assert table.GetNumberOfColumns() == 2

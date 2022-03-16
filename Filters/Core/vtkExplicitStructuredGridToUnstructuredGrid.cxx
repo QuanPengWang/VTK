@@ -29,10 +29,15 @@
 
 vtkStandardNewMacro(vtkExplicitStructuredGridToUnstructuredGrid);
 
-//----------------------------------------------------------------------------
-int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(vtkInformation*,
-                               vtkInformationVector** inputVector,
-                               vtkInformationVector* outputVector)
+//------------------------------------------------------------------------------
+void vtkExplicitStructuredGridToUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//------------------------------------------------------------------------------
+int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Retrieve input and output
   vtkExplicitStructuredGrid* input = vtkExplicitStructuredGrid::GetData(inputVector[0], 0);
@@ -42,10 +47,8 @@ int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(vtkInformation*,
   output->GetFieldData()->ShallowCopy(input->GetFieldData());
 
   // Copy input point data to output
-  vtkDataSetAttributes* inPointData =
-    static_cast<vtkDataSetAttributes*>(input->GetPointData());
-  vtkDataSetAttributes* outPointData =
-    static_cast<vtkDataSetAttributes*>(output->GetPointData());
+  vtkDataSetAttributes* inPointData = static_cast<vtkDataSetAttributes*>(input->GetPointData());
+  vtkDataSetAttributes* outPointData = static_cast<vtkDataSetAttributes*>(output->GetPointData());
   if (outPointData && inPointData)
   {
     outPointData->DeepCopy(inPointData);
@@ -54,10 +57,8 @@ int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(vtkInformation*,
   output->SetPoints(input->GetPoints());
 
   // Initialize output cell data
-  vtkDataSetAttributes* inCellData =
-    static_cast<vtkDataSetAttributes*>(input->GetCellData());
-  vtkDataSetAttributes* outCellData =
-    static_cast<vtkDataSetAttributes*>(output->GetCellData());
+  vtkDataSetAttributes* inCellData = static_cast<vtkDataSetAttributes*>(input->GetCellData());
+  vtkDataSetAttributes* outCellData = static_cast<vtkDataSetAttributes*>(output->GetCellData());
   outCellData->CopyAllocate(inCellData);
 
   vtkIdType nbCells = input->GetNumberOfCells();
@@ -84,7 +85,7 @@ int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(vtkInformation*,
   kArray->Allocate(nbCells);
 
   vtkNew<vtkCellArray> cells;
-  cells->Allocate(nbCells);
+  cells->AllocateEstimate(nbCells, 8);
   int i, j, k;
   for (vtkIdType cellId = 0; cellId < nbCells; cellId++)
   {
@@ -116,7 +117,7 @@ int vtkExplicitStructuredGridToUnstructuredGrid::RequestData(vtkInformation*,
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkExplicitStructuredGridToUnstructuredGrid::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {

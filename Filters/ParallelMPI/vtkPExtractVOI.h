@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPExtractVOI.cxx
+  Module:    vtkPExtractVOI.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -26,13 +26,13 @@
  *
  * @sa
  *  vtkExtractVOI
-*/
+ */
 
 #ifndef vtkPExtractVOI_h
 #define vtkPExtractVOI_h
 
-#include "vtkFiltersParallelMPIModule.h" // For export macro
 #include "vtkExtractVOI.h"
+#include "vtkFiltersParallelMPIModule.h" // For export macro
 
 // Forward Declarations
 class vtkInformation;
@@ -43,21 +43,19 @@ class VTKFILTERSPARALLELMPI_EXPORT vtkPExtractVOI : public vtkExtractVOI
 {
 public:
   static vtkPExtractVOI* New();
-  vtkTypeMacro(vtkPExtractVOI,vtkExtractVOI);
+  vtkTypeMacro(vtkPExtractVOI, vtkExtractVOI);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPExtractVOI();
-  virtual ~vtkPExtractVOI();
+  ~vtkPExtractVOI() override;
 
   // Standard VTK Pipeline methods
-  virtual int RequestData(
-      vtkInformation*, vtkInformationVector**,vtkInformationVector*) override;
-  virtual int RequestInformation(
-      vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  virtual int RequestUpdateExtent(
-      vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
+  void SetController(vtkMPIController*);
   vtkMPIController* Controller;
 
 private:

@@ -25,74 +25,58 @@
  * @par Thanks:
  * Developed by Simon Drouin (sdrouin2@bwh.harvard.edu) at Brigham and Women's Hospital.
  *
-*/
+ */
 
 #ifndef vtkOpenGLShaderProperty_h
 #define vtkOpenGLShaderProperty_h
 
+#include "vtkRenderingOpenGL2Module.h" // For export macro
+#include "vtkShader.h"                 // For methods (shader types)
 #include "vtkShaderProperty.h"
-#include "vtkRenderingOpenGL2Module.h"  // For export macro
-#include "vtkShader.h"                  // For methods (shader types)
-#include <map>                          // used for ivar
+#include <map> // used for ivar
 
 class vtkOpenGLUniforms;
 
 class VTKRENDERINGOPENGL2_EXPORT vtkOpenGLShaderProperty : public vtkShaderProperty
 {
 public:
-  vtkTypeMacro(vtkOpenGLShaderProperty,vtkShaderProperty);
+  vtkTypeMacro(vtkOpenGLShaderProperty, vtkShaderProperty);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Construct object with no shader replacements
    */
-  static vtkOpenGLShaderProperty *New();
+  static vtkOpenGLShaderProperty* New();
 
   /**
    * Assign one property to another.
    */
-  void DeepCopy(vtkOpenGLShaderProperty *p);
+  void DeepCopy(vtkOpenGLShaderProperty* p);
 
-  virtual void AddVertexShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst,  // do this replacement before the default
-      const std::string& replacementValue,
-      bool replaceAll) override;
-  virtual void AddFragmentShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst,  // do this replacement before the default
-      const std::string& replacementValue,
-      bool replaceAll) override;
-  virtual void AddGeometryShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst,  // do this replacement before the default
-      const std::string& replacementValue,
-      bool replaceAll) override;
+  void AddVertexShaderReplacement(const std::string& originalValue,
+    bool replaceFirst, // do this replacement before the default
+    const std::string& replacementValue, bool replaceAll) override;
+  void AddFragmentShaderReplacement(const std::string& originalValue,
+    bool replaceFirst, // do this replacement before the default
+    const std::string& replacementValue, bool replaceAll) override;
+  void AddGeometryShaderReplacement(const std::string& originalValue,
+    bool replaceFirst, // do this replacement before the default
+    const std::string& replacementValue, bool replaceAll) override;
 
-  virtual int GetNumberOfShaderReplacements() override;
-  virtual std::string GetNthShaderReplacementTypeAsString( vtkIdType index ) override;
-  virtual void GetNthShaderReplacement(
-      vtkIdType index,
-      std::string & name,
-      bool & replaceFirst,
-      std::string & replacementValue,
-      bool & replaceAll ) override;
+  int GetNumberOfShaderReplacements() override;
+  std::string GetNthShaderReplacementTypeAsString(vtkIdType index) override;
+  void GetNthShaderReplacement(vtkIdType index, std::string& name, bool& replaceFirst,
+    std::string& replacementValue, bool& replaceAll) override;
 
-  virtual void ClearVertexShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst) override;
-  virtual void ClearFragmentShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst) override;
-  virtual void ClearGeometryShaderReplacement(
-      const std::string& originalValue,
-      bool replaceFirst) override;
-  virtual void ClearAllVertexShaderReplacements() override;
-  virtual void ClearAllFragmentShaderReplacements() override;
-  virtual void ClearAllGeometryShaderReplacements() override;
-  virtual void ClearAllShaderReplacements() override;
+  void ClearVertexShaderReplacement(const std::string& originalValue, bool replaceFirst) override;
+  void ClearFragmentShaderReplacement(const std::string& originalValue, bool replaceFirst) override;
+  void ClearGeometryShaderReplacement(const std::string& originalValue, bool replaceFirst) override;
+  void ClearAllVertexShaderReplacements() override;
+  void ClearAllFragmentShaderReplacements() override;
+  void ClearAllGeometryShaderReplacements() override;
+  void ClearAllShaderReplacements() override;
 
-  //@{
+  ///@{
   /**
    * This function enables you to apply your own substitutions
    * to the shader creation process. The shader code in this class
@@ -100,18 +84,14 @@ public:
    * shader template. Using this function you can apply your
    * own string replacements to add features you desire.
    */
-  void AddShaderReplacement(
-      vtkShader::Type shaderType, // vertex, fragment, etc
-      const std::string& originalValue,
-      bool replaceFirst,  // do this replacement before the default
-      const std::string& replacementValue,
-      bool replaceAll);
-  void ClearShaderReplacement(
-      vtkShader::Type shaderType, // vertex, fragment, etc
-      const std::string& originalValue,
-      bool replaceFirst);
+  void AddShaderReplacement(vtkShader::Type shaderType, // vertex, fragment, etc
+    const std::string& originalValue,
+    bool replaceFirst, // do this replacement before the default
+    const std::string& replacementValue, bool replaceAll);
+  void ClearShaderReplacement(vtkShader::Type shaderType, // vertex, fragment, etc
+    const std::string& originalValue, bool replaceFirst);
   void ClearAllShaderReplacements(vtkShader::Type shaderType);
-  //@}
+  ///@}
 
   /**
    * @brief GetAllShaderReplacements returns all user-specified shader
@@ -119,8 +99,8 @@ public:
    * and is mainly used by mappers when building the shaders.
    * @return const reference to internal map holding all replacements
    */
-  typedef std::map<const vtkShader::ReplacementSpec, vtkShader::ReplacementValue> ReplacementMap;
-  const ReplacementMap & GetAllShaderReplacements() { return this->UserShaderReplacements; }
+  typedef std::map<vtkShader::ReplacementSpec, vtkShader::ReplacementValue> ReplacementMap;
+  const ReplacementMap& GetAllShaderReplacements() { return this->UserShaderReplacements; }
 
 protected:
   vtkOpenGLShaderProperty();

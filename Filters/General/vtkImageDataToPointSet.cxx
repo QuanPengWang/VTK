@@ -31,19 +31,18 @@
 
 vtkStandardNewMacro(vtkImageDataToPointSet);
 
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkImageDataToPointSet::vtkImageDataToPointSet() = default;
 
 vtkImageDataToPointSet::~vtkImageDataToPointSet() = default;
 
-void vtkImageDataToPointSet::PrintSelf(ostream &os, vtkIndent indent)
+void vtkImageDataToPointSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
-//-------------------------------------------------------------------------
-int vtkImageDataToPointSet::FillInputPortInformation(int port,
-                                                     vtkInformation *info)
+//------------------------------------------------------------------------------
+int vtkImageDataToPointSet::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (!this->Superclass::FillInputPortInformation(port, info))
   {
@@ -53,14 +52,13 @@ int vtkImageDataToPointSet::FillInputPortInformation(int port,
   return 1;
 }
 
-//-------------------------------------------------------------------------
-int vtkImageDataToPointSet::RequestData(vtkInformation *vtkNotUsed(request),
-                                        vtkInformationVector **inputVector,
-                                        vtkInformationVector *outputVector)
+//------------------------------------------------------------------------------
+int vtkImageDataToPointSet::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Retrieve input and output
-  vtkImageData *inData = vtkImageData::GetData(inputVector[0]);
-  vtkStructuredGrid *outData = vtkStructuredGrid::GetData(outputVector);
+  vtkImageData* inData = vtkImageData::GetData(inputVector[0]);
+  vtkStructuredGrid* outData = vtkStructuredGrid::GetData(outputVector);
 
   if (inData == nullptr)
   {

@@ -1,22 +1,44 @@
 include(vtkOpenGLOptions)
 
-set(opengl_components OpenGL)
-set(opengl_optional_components)
-if (WIN32)
-  set(opengl_targets OpenGL::GL)
+if (OpenGL_GL_PREFERENCE STREQUAL "LEGACY")
+  set(use_legacy ON)
 else ()
-  set(opengl_targets OpenGL::OpenGL)
+  if (POLICY CMP0072)
+    cmake_policy(GET CMP0072 opengl_policy)
+    if (opengl_policy STREQUAL "NEW")
+      set(use_legacy OFF)
+    endif ()
+  else ()
+    # Without the policy, only legacy is availale.
+    set(use_legacy ON)
+  endif ()
 endif ()
+
+set(opengl_components)
+set(opengl_optional_components)
 if (VTK_USE_X)
   # XXX(nvidia): It seems that on some Ubuntu installations with manually
   # installed nVidia drivers, GLX is not found. Investigation is necessary.
 
-  list(APPEND opengl_optional_components GLX)
-  list(APPEND opengl_targets OpenGL::GLX)
+  if (NOT use_legacy)
+    list(APPEND opengl_optional_components GLX)
+    list(APPEND opengl_targets OpenGL::GLX)
+  endif ()
 endif ()
 if (VTK_OPENGL_USE_GLES)
   list(APPEND opengl_components GLES3)
   list(APPEND opengl_targets OpenGL::GLES3)
+else ()
+  list(APPEND opengl_components OpenGL)
+  if (WIN32)
+    list(APPEND opengl_targets OpenGL::GL)
+  else ()
+    if (use_legacy)
+      list(APPEND opengl_targets OpenGL::GL)
+    else ()
+      list(APPEND opengl_targets OpenGL::OpenGL)
+    endif ()
+  endif ()
 endif ()
 if (VTK_OPENGL_HAS_EGL)
   list(APPEND opengl_components EGL)
@@ -43,6 +65,26 @@ else ()
 
   cmake_policy(POP)
 
+  if ("OpenGL::OpenGL" IN_LIST opengl_targets AND
+      NOT TARGET OpenGL::OpenGL AND
+      "OpenGL::GLX" IN_LIST opengl_targets AND
+      TARGET OpenGL::GLX)
+    message(FATAL_ERROR
+      "It appears as though OpenGL was found, but a GLVND-based install was "
+      "expected and it was not found. Please install GLVND libraries.")
+  endif ()
+
+  if (TARGET OpenGL::OpenGL)
+    set(opengl_preference "GLVND")
+  elseif (UNIX AND TARGET OpenGL::GL)
+    set(opengl_preference "LEGACY")
+  else ()
+    set(opengl_preference "")
+  endif ()
+  set_property(GLOBAL
+    PROPERTY
+      _vtk_opengl_preference "${opengl_preference}")
+
   if (APPLE)
     vtk_module_definitions(VTK::opengl
       INTERFACE
@@ -51,10 +93,10 @@ else ()
 
   if (VTK_USE_OPENGL_DELAYED_LOAD)
     vtk_module_link(VTK::opengl
-      PRIVATE
+      INTERFACE
         delayimp.lib)
     vtk_module_link_options(VTK::opengl
-      PUBLIC
+      INTERFACE
         "/DELAYLOAD:opengl32.dll")
   endif ()
 endif ()

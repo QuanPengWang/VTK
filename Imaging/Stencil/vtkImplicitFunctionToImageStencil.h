@@ -21,39 +21,38 @@
  * that apply a stencil to an image.
  * @sa
  * vtkImplicitFunction vtkImageStencil vtkPolyDataToImageStencil
-*/
+ */
 
 #ifndef vtkImplicitFunctionToImageStencil_h
 #define vtkImplicitFunctionToImageStencil_h
 
-
-#include "vtkImagingStencilModule.h" // For export macro
 #include "vtkImageStencilSource.h"
+#include "vtkImagingStencilModule.h" // For export macro
 
 class vtkImplicitFunction;
 
 class VTKIMAGINGSTENCIL_EXPORT vtkImplicitFunctionToImageStencil : public vtkImageStencilSource
 {
 public:
-  static vtkImplicitFunctionToImageStencil *New();
+  static vtkImplicitFunctionToImageStencil* New();
   vtkTypeMacro(vtkImplicitFunctionToImageStencil, vtkImageStencilSource);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify the implicit function to convert into a stencil.
    */
   virtual void SetInput(vtkImplicitFunction*);
   vtkGetObjectMacro(Input, vtkImplicitFunction);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the threshold value for the implicit function.
    */
   vtkSetMacro(Threshold, double);
   vtkGetMacro(Threshold, double);
-  //@}
+  ///@}
 
   /**
    * Override GetMTime() to account for the implicit function.
@@ -64,10 +63,9 @@ protected:
   vtkImplicitFunctionToImageStencil();
   ~vtkImplicitFunctionToImageStencil() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  vtkImplicitFunction *Input;
+  vtkImplicitFunction* Input;
   double Threshold;
 
 private:
@@ -76,4 +74,3 @@ private:
 };
 
 #endif
-

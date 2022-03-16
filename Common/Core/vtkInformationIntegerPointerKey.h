@@ -18,7 +18,7 @@
  *
  * vtkInformationIntegerPointerKey is used to represent keys for pointer
  * to integer values in vtkInformation.h
-*/
+ */
 
 #ifndef vtkInformationIntegerPointerKey_h
 #define vtkInformationIntegerPointerKey_h
@@ -31,14 +31,13 @@
 class VTKCOMMONCORE_EXPORT vtkInformationIntegerPointerKey : public vtkInformationKey
 {
 public:
-  vtkTypeMacro(vtkInformationIntegerPointerKey,vtkInformationKey);
+  vtkTypeMacro(vtkInformationIntegerPointerKey, vtkInformationKey);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkInformationIntegerPointerKey(const char* name, const char* location,
-                                 int length=-1);
+  vtkInformationIntegerPointerKey(const char* name, const char* location, int length = -1);
   ~vtkInformationIntegerPointerKey() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the value associated with this key in the given
    * information object.
@@ -47,7 +46,7 @@ public:
   int* Get(vtkInformation* info);
   void Get(vtkInformation* info, int* value);
   int Length(vtkInformation* info);
-  //@}
+  ///@}
 
   /**
    * Copy the entry associated with this key from one information

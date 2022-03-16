@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkOpenGLPropItem.h
+  Module:    vtkOpenGLPropItem.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -16,16 +16,21 @@
 #include "vtkOpenGLPropItem.h"
 
 #include "vtkCamera.h"
-#include "vtkProp3D.h"
 #include "vtkContext2D.h"
 #include "vtkContextScene.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLContextDevice2D.h"
+#include "vtkProp3D.h"
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkStandardNewMacro(vtkOpenGLPropItem)
+vtkStandardNewMacro(vtkOpenGLPropItem);
+
+void vtkOpenGLPropItem::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
 
 vtkOpenGLPropItem::vtkOpenGLPropItem() = default;
 
@@ -33,17 +38,17 @@ vtkOpenGLPropItem::~vtkOpenGLPropItem() = default;
 
 void vtkOpenGLPropItem::UpdateTransforms()
 {
-  vtkContextDevice2D *dev = this->Painter->GetDevice();
-  vtkOpenGLContextDevice2D *glDev = vtkOpenGLContextDevice2D::SafeDownCast(dev);
+  vtkContextDevice2D* dev = this->Painter->GetDevice();
+  vtkOpenGLContextDevice2D* glDev = vtkOpenGLContextDevice2D::SafeDownCast(dev);
   if (!glDev)
   {
-    vtkErrorMacro(<<"Context device is not vtkOpenGLContextDevice2D.");
+    vtkErrorMacro(<< "Context device is not vtkOpenGLContextDevice2D.");
     return;
   }
 
   // Get the active camera:
-  vtkRenderer *ren = this->Scene->GetRenderer();
-  vtkCamera *activeCamera = ren->GetActiveCamera();
+  vtkRenderer* ren = this->Scene->GetRenderer();
+  vtkCamera* activeCamera = ren->GetActiveCamera();
 
   // Cache the current state:
   this->CameraCache->DeepCopy(activeCamera);
@@ -58,7 +63,7 @@ void vtkOpenGLPropItem::UpdateTransforms()
 
   // Update the camera model matrix with the current context2D modelview matrix:
   double mv[16];
-  double *glMv = glDev->GetModelMatrix()->Element[0];
+  double* glMv = glDev->GetModelMatrix()->Element[0];
   std::copy(glMv, glMv + 16, mv);
   activeCamera->SetModelTransformMatrix(mv);
 
@@ -111,18 +116,17 @@ void vtkOpenGLPropItem::UpdateTransforms()
 
   // Collect the parameters to compute the projection matrix:
   // (see vtkOpenGLCamera::Render)
-  int  lowerLeft[2];
+  int lowerLeft[2];
   int usize, vsize;
   double aspect1[2];
   double aspect2[2];
   vtkRecti vp = glDev->GetViewportRect();
-  ren->GetTiledSizeAndOrigin(&usize, &vsize, lowerLeft, lowerLeft+1);
+  ren->GetTiledSizeAndOrigin(&usize, &vsize, lowerLeft, lowerLeft + 1);
   ren->ComputeAspect();
   ren->GetAspect(aspect1);
   ren->vtkViewport::ComputeAspect();
   ren->vtkViewport::GetAspect(aspect2);
-  double aspectModification = (aspect1[0] * aspect2[1]) /
-                              (aspect1[1] * aspect2[0]);
+  double aspectModification = (aspect1[0] * aspect2[1]) / (aspect1[1] * aspect2[0]);
 
   // Set the variables for the equations:
   double a = aspectModification * usize / vsize;
@@ -147,11 +151,11 @@ void vtkOpenGLPropItem::UpdateTransforms()
 void vtkOpenGLPropItem::ResetTransforms()
 {
   // Reset the active camera:
-  vtkCamera *activeCamera = this->Scene->GetRenderer()->GetActiveCamera();
+  vtkCamera* activeCamera = this->Scene->GetRenderer()->GetActiveCamera();
   activeCamera->DeepCopy(this->CameraCache);
 }
 
-bool vtkOpenGLPropItem::Paint(vtkContext2D *painter)
+bool vtkOpenGLPropItem::Paint(vtkContext2D* painter)
 {
   this->Painter = painter;
   bool result = this->Superclass::Paint(painter);

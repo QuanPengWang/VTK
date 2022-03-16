@@ -28,7 +28,7 @@
  * @par Thanks:
  * Thanks to Philippe Pebay, David Thompson and Janine Bennett from
  * Sandia National Laboratories for implementing this class.
-*/
+ */
 
 #ifndef vtkPPCAStatistics_h
 #define vtkPPCAStatistics_h
@@ -45,15 +45,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPPCAStatistics* New();
 
-  //@{
+  ///@{
   /**
    * Get/Set the multiprocess controller. If no controller is set,
    * single process is assumed.
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
-
+  ///@}
 
 protected:
   vtkPPCAStatistics();
@@ -62,17 +61,13 @@ protected:
   vtkMultiProcessController* Controller;
 
   // Execute the parallel calculations required by the Learn option.
-  void Learn( vtkTable* inData,
-              vtkTable* inParameters,
-              vtkMultiBlockDataSet* outMeta ) override;
+  void Learn(vtkTable* inData, vtkTable* inParameters, vtkMultiBlockDataSet* outMeta) override;
 
   /**
    * Execute the calculations required by the Test option.
    * NB: Not implemented for more than 1 processor
    */
-  void Test( vtkTable*,
-             vtkMultiBlockDataSet*,
-             vtkTable* ) override;
+  void Test(vtkTable*, vtkMultiBlockDataSet*, vtkTable*) override;
 
   vtkOrderStatistics* CreateOrderStatisticsInstance() override;
 

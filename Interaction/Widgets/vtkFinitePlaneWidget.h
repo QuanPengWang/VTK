@@ -64,13 +64,14 @@
  * </pre>
  * @sa
  * vtkFinitePlaneRepresentation
-*/
+ */
 
 #ifndef vtkFinitePlaneWidget_h
 #define vtkFinitePlaneWidget_h
 
-#include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkAbstractWidget.h"
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
+#include "vtkInteractionWidgetsModule.h" // For export macro
 
 class vtkFinitePlaneRepresentation;
 class vtkHandleWidget;
@@ -81,22 +82,22 @@ public:
   /**
    * Instantiate the object.
    */
-  static vtkFinitePlaneWidget *New();
+  static vtkFinitePlaneWidget* New();
 
-  //@{
+  ///@{
   /**
    * Standard vtkObject methods
    */
-  vtkTypeMacro(vtkFinitePlaneWidget,vtkAbstractWidget);
+  vtkTypeMacro(vtkFinitePlaneWidget, vtkAbstractWidget);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Specify an instance of vtkWidgetRepresentation used to represent this
    * widget in the scene. Note that the representation is a subclass of vtkProp
    * so it can be added to the renderer independent of the widget.
    */
-  void SetRepresentation(vtkFinitePlaneRepresentation *r);
+  void SetRepresentation(vtkFinitePlaneRepresentation* r);
 
   /**
    * Create the default widget representation if one is not set. By default,
@@ -109,7 +110,15 @@ protected:
   ~vtkFinitePlaneWidget() override;
 
   int WidgetState;
-  enum _WidgetState {Start = 0, Active};
+  enum WidgetStateType
+  {
+    Start = 0,
+    Active
+  };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef WidgetStateType _WidgetState;
+#endif
 
   // These methods handle events
   static void SelectAction(vtkAbstractWidget*);
@@ -120,7 +129,7 @@ protected:
    * Update the cursor shape based on the interaction state. Returns 1
    * if the cursor shape requested is different from the existing one.
    */
-  int UpdateCursorShape( int interactionState );
+  int UpdateCursorShape(int interactionState);
 
 private:
   vtkFinitePlaneWidget(const vtkFinitePlaneWidget&) = delete;

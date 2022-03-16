@@ -28,7 +28,7 @@
  *
  * @par Thanks:
  * Developed by Timothy M. Shead (tshead@sandia.gov) at Sandia National Laboratories.
-*/
+ */
 
 #ifndef vtkAdjacencyMatrixToEdgeTable_h
 #define vtkAdjacencyMatrixToEdgeTable_h
@@ -43,34 +43,34 @@ public:
   vtkTypeMacro(vtkAdjacencyMatrixToEdgeTable, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specifies whether rows or columns become the "source" in the output edge table.
    * 0 = rows, 1 = columns.  Default: 0
    */
   vtkGetMacro(SourceDimension, vtkIdType);
   vtkSetMacro(SourceDimension, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controls the name of the output table column that contains edge weights.
    * Default: "value"
    */
   vtkGetStringMacro(ValueArrayName);
   vtkSetStringMacro(ValueArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specifies the minimum number of adjacent edges to include for each source vertex.
    * Default: 0
    */
   vtkGetMacro(MinimumCount, vtkIdType);
   vtkSetMacro(MinimumCount, vtkIdType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specifies a minimum threshold that an edge weight must exceed to be included in
    * the output.
@@ -78,7 +78,7 @@ public:
    */
   vtkGetMacro(MinimumThreshold, double);
   vtkSetMacro(MinimumThreshold, double);
-  //@}
+  ///@}
 
 protected:
   vtkAdjacencyMatrixToEdgeTable();
@@ -86,10 +86,7 @@ protected:
 
   int FillInputPortInformation(int, vtkInformation*) override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkIdType SourceDimension;
   char* ValueArrayName;
@@ -102,4 +99,3 @@ private:
 };
 
 #endif
-

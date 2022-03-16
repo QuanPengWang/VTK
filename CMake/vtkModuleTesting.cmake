@@ -20,9 +20,9 @@ get_filename_component(_vtkModuleTesting_dir "${CMAKE_CURRENT_LIST_FILE}" DIRECT
 
 Data may be downloaded manually using this function:
 
-```
+~~~
 vtk_module_test_data(<PATHSPEC>...)
-```
+~~~
 
 This will download data inside of the input data directory for the modules
 being built at that time (see the `TEST_INPUT_DATA_DIRECTORY` argument of
@@ -57,9 +57,9 @@ This function creates an executable from the list of sources passed to it. It
 is automatically linked to the module the tests are intended for as well as any
 declared test dependencies of the module.
 
-```
+~~~
 vtk_module_test_executable(<NAME> <SOURCE>...)
-```
+~~~
 
 This function is not usually used directly, but instead through the other
 convenience functions.
@@ -75,14 +75,17 @@ function (vtk_module_test_executable name)
     if (TARGET "${test_optional_depend}")
       list(APPEND test_depends
         "${test_optional_depend}")
-      set(test_optional_depend_flag "1")
-    else ()
-      set(test_optional_depend_flag "0")
     endif ()
     string(REPLACE "::" "_" safe_test_optional_depend "${test_optional_depend}")
     list(APPEND optional_depends_flags
-      "VTK_MODULE_ENABLE_${safe_test_optional_depend}=${test_optional_depend_flag}")
+      "VTK_MODULE_ENABLE_${safe_test_optional_depend}=$<TARGET_EXISTS:${test_optional_depend}>")
   endforeach ()
+
+  if (_vtk_build_UTILITY_TARGET)
+    target_link_libraries("${name}"
+      PRIVATE
+        "${_vtk_build_UTILITY_TARGET}")
+  endif ()
 
   target_link_libraries("${name}"
     PRIVATE
@@ -120,20 +123,28 @@ setting `vtk_test_prefix`, the test name will instead be
 
 #[==[.md INTERNAL
 This function parses the name from a testspec. The calling scope has
-`test_name` and `test_file` variables set in it.
+`test_name`, `test_arg`, and `test_file` variables set in it.
 
-```
+~~~
 _vtk_test_parse_name(<TESTSPEC>)
-```
+~~~
 #]==]
-function (_vtk_test_parse_name name)
+function (_vtk_test_parse_name name ext)
   if (name AND name MATCHES "^([^,]*),(.*)$")
-    set(test_name "${CMAKE_MATCH_1}" PARENT_SCOPE)
-    set(test_file "${CMAKE_MATCH_2}" PARENT_SCOPE)
+    set(test_name "${CMAKE_MATCH_1}")
+    set(test_file "${CMAKE_MATCH_2}")
   else ()
-    set(test_name "${name}" PARENT_SCOPE)
-    set(test_file "${name}" PARENT_SCOPE)
+    # Strip the extension from the test name.
+    string(REPLACE ".${ext}" "" test_name "${name}")
+    set(test_name "${test_name}")
+    set(test_file "${name}")
   endif ()
+
+  string(REPLACE ".${ext}" "" test_arg "${test_file}")
+
+  set(test_name "${test_name}" PARENT_SCOPE)
+  set(test_file "${test_file}" PARENT_SCOPE)
+  set(test_arg "${test_arg}" PARENT_SCOPE)
 endfunction ()
 
 #[==[.md
@@ -160,9 +171,9 @@ variables:
     `_vtk_test_parse_name`.
   - `_<NAME>_options`: Options specific to a certain test.
 
-```
+~~~
 _vtk_test_parse_args(<OPTIONS> <SOURCE_EXT> <ARG>...)
-```
+~~~
 
 In order to be recognized as a source file, the `SOURCE_EXT` must be used.
 Without it, all non-option arguments are placed into `args`. Each test is
@@ -184,7 +195,7 @@ function (_vtk_test_parse_args options source_ext)
     endforeach ()
     if (handled)
       # Do nothing.
-    elseif (source_ext AND arg MATCHES "^([^.]*)\\.${source_ext},?(.*)$")
+    elseif (source_ext AND arg MATCHES "^([^.]*\\.${source_ext}),?(.*)$")
       set(name "${CMAKE_MATCH_1}")
       string(REPLACE "," ";" "_${name}_options" "${CMAKE_MATCH_2}")
       list(APPEND names "${name}")
@@ -210,9 +221,9 @@ For handling global option settings, this function sets variables in the
 calling scoped named `<PREFIX><OPTION>` to either `0` or `1` if the option is
 present in the remaining argument list.
 
-```
+~~~
 _vtk_test_set_options(<OPTIONS> <PREFIX> <ARG>...)
-```
+~~~
 
 Additionally, a non-`0` default for a given option may be specified by a
 variable with the same name as the option and specifying a prefix for the
@@ -253,9 +264,9 @@ set_property(CACHE VTK_MPI_NUMPROCS
 This function declares C++ tests. Source files are required to use the `cxx`
 extension.
 
-```
+~~~
 vtk_add_test_cxx(<EXENAME> <VARNAME> <ARG>...)
-```
+~~~
 
 Each argument should be either an option, a test specification, or it is passed
 as flags to all tests declared in the group. The list of tests is set in the
@@ -285,11 +296,23 @@ function (vtk_add_test_cxx exename _tests)
   _vtk_test_parse_args("${cxx_options}" "cxx" ${ARGN})
   _vtk_test_set_options("${cxx_options}" "" ${options})
 
-  set(_vtk_fail_regex "(\n|^)ERROR: " "instance(s)? still around")
+  set(_vtk_fail_regex
+    # vtkLogger
+    "(\n|^)ERROR: "
+    "ERR\\|"
+    # vtkDebugLeaks
+    "instance(s)? still around"
+    # vtkTesting
+    "Failed Image Test"
+    "DartMeasurement name=.ImageNotFound")
+
+  set(_vtk_skip_regex
+    # Insufficient graphics resources.
+    "Attempt to use a texture buffer exceeding your hardware's limits")
 
   foreach (name IN LISTS names)
     _vtk_test_set_options("${cxx_options}" "local_" ${_${name}_options})
-    _vtk_test_parse_name("${name}")
+    _vtk_test_parse_name("${name}" "cxx")
 
     set(_D "")
     if (NOT local_NO_DATA)
@@ -306,21 +329,36 @@ function (vtk_add_test_cxx exename _tests)
       set(_V -V "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${test_name}.png,:}")
     endif ()
 
+    if (VTK_USE_MPI AND
+        VTK_SERIAL_TESTS_USE_MPIEXEC)
+      set(_vtk_test_cxx_pre_args
+        "${MPIEXEC_EXECUTABLE}"
+        "${MPIEXEC_NUMPROC_FLAG}" "1"
+        ${MPIEXEC_PREFLAGS})
+    endif()
+
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
       NAME    "${_vtk_build_test}Cxx-${vtk_test_prefix}${test_name}"
-      COMMAND "${exename}"
-              "${test_file}"
+      COMMAND "${_vtk_test_cxx_pre_args}" "$<TARGET_FILE:${exename}>"
+              "${test_arg}"
               ${args}
               ${${_vtk_build_test}_ARGS}
-              ${${name}_ARGS}
+              ${${test_name}_ARGS}
               ${_D} ${_T} ${_V})
     set_tests_properties("${_vtk_build_test}Cxx-${vtk_test_prefix}${test_name}"
       PROPERTIES
         LABELS "${_vtk_build_test_labels}"
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
-        # This must match VTK_SKIP_RETURN_CODE in vtkTestingObjectFactory.h
+        SKIP_REGULAR_EXPRESSION "${_vtk_skip_regex}"
+        # This must match VTK_SKIP_RETURN_CODE in vtkTesting.h
         SKIP_RETURN_CODE 125
       )
+
+    if (_vtk_testing_ld_preload)
+      set_property(TEST "${_vtk_build_test}Cxx-${vtk_test_prefix}${test_name}" APPEND
+        PROPERTY
+          ENVIRONMENT "LD_PRELOAD=${_vtk_testing_ld_preload}")
+    endif ()
 
     list(APPEND ${_tests} "${test_file}")
   endforeach ()
@@ -334,9 +372,9 @@ endfunction ()
 This function declares C++ tests which should be run under an MPI environment.
 Source files are required to use the `cxx` extension.
 
-```
+~~~
 vtk_add_test_mpi(<EXENAME> <VARNAME> <ARG>...)
-```
+~~~
 
 Each argument should be either an option, a test specification, or it is passed
 as flags to all tests declared in the group. The list of tests is set in the
@@ -369,7 +407,11 @@ function (vtk_add_test_mpi exename _tests)
   _vtk_test_parse_args("${mpi_options}" "cxx" ${ARGN})
   _vtk_test_set_options("${mpi_options}" "" ${options})
 
-  set(_vtk_fail_regex "(\n|^)ERROR: " "instance(s)? still around")
+  set(_vtk_fail_regex "(\n|^)ERROR: " "ERR\\|" "instance(s)? still around")
+
+  set(_vtk_skip_regex
+    # Insufficient graphics resources.
+    "Attempt to use a texture buffer exceeding your hardware's limits")
 
   set(default_numprocs ${VTK_MPI_NUMPROCS})
   if (${exename}_NUMPROCS)
@@ -378,7 +420,7 @@ function (vtk_add_test_mpi exename _tests)
 
   foreach (name IN LISTS names)
     _vtk_test_set_options("${mpi_options}" "local_" ${_${name}_options})
-    _vtk_test_parse_name(${name})
+    _vtk_test_parse_name(${name} "cxx")
 
     set(_D "")
     set(_T "")
@@ -388,13 +430,13 @@ function (vtk_add_test_mpi exename _tests)
       set(_T -T "${_vtk_build_TEST_OUTPUT_DIRECTORY}")
       set(_V "")
       if (NOT local_NO_VALID)
-        set(_V -V "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${name}.png,:}")
+        set(_V -V "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${test_name}.png,:}")
       endif ()
     endif ()
 
     set(numprocs ${default_numprocs})
-    if (${name}_NUMPROCS)
-      set(numprocs "${${name}_NUMPROCS}")
+    if (${test_name}_NUMPROCS)
+      set(numprocs "${${test_name}_NUMPROCS}")
     endif ()
 
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
@@ -403,20 +445,28 @@ function (vtk_add_test_mpi exename _tests)
               "${MPIEXEC_NUMPROC_FLAG}" "${numprocs}"
               ${MPIEXEC_PREFLAGS}
               "$<TARGET_FILE:${exename}>"
-              "${test_file}"
+              "${test_arg}"
               ${_D} ${_T} ${_V}
               ${args}
               ${${_vtk_build_test}_ARGS}
-              ${${name}_ARGS}
+              ${${test_name}_ARGS}
               ${MPIEXEC_POSTFLAGS})
     set_tests_properties("${_vtk_build_test}Cxx-MPI-${vtk_test_prefix}${test_name}"
       PROPERTIES
         LABELS "${_vtk_build_test_labels}"
         PROCESSORS "${numprocs}"
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
-        # This must match VTK_SKIP_RETURN_CODE in vtkTestingObjectFactory.h"
+        SKIP_REGULAR_EXPRESSION "${_vtk_skip_regex}"
+        # This must match VTK_SKIP_RETURN_CODE in vtkTesting.h"
         SKIP_RETURN_CODE 125
       )
+
+    if (_vtk_testing_ld_preload)
+      set_property(TEST "${_vtk_build_test}Cxx-MPI-${vtk_test_prefix}${test_name}" APPEND
+        PROPERTY
+          ENVIRONMENT "LD_PRELOAD=${_vtk_testing_ld_preload}")
+    endif ()
+
     set_property(TEST "${_vtk_build_test}Cxx-MPI-${vtk_test_prefix}${test_name}" APPEND
       PROPERTY
         REQUIRED_FILES "$<TARGET_FILE:${exename}>")
@@ -429,9 +479,9 @@ endfunction ()
 #[==[.md
 ### C++ test executable
 
-```
+~~~
 vtk_test_cxx_executable(<EXENAME> <VARNAME> [RENDERING_FACTORY] [<SRC>...])
-```
+~~~
 
 Creates an executable named `EXENAME` which contains the tests listed in the
 variable named in the `VARNAME` argument. The `EXENAME` must match the
@@ -440,11 +490,18 @@ variable named in the `VARNAME` argument. The `EXENAME` must match the
 If `RENDERING_FACTORY` is provided, VTK's rendering factories are initialized
 during the test.
 
+By default, VTK's rendering tests enable FP exceptions to find floating point
+errors in debug builds. If `DISABLE_FLOATING_POINT_EXCEPTIONS` is provided,
+FP exceptions are not enabled for the test. This is useful when testing against
+external libraries to ignore exceptions in third-party code.
+
 Any additional arguments are added as additional sources for the executable.
 #]==]
 function (vtk_test_cxx_executable exename _tests)
   set(exe_options
-    RENDERING_FACTORY)
+    RENDERING_FACTORY
+    DISABLE_FLOATING_POINT_EXCEPTIONS
+    )
   _vtk_test_parse_args("${exe_options}" "" ${ARGN})
   _vtk_test_set_options("${exe_options}" "" ${options})
 
@@ -491,9 +548,9 @@ endfunction ()
 This function declares Python tests. Test files are required to use the `py`
 extension.
 
-```
+~~~
 vtk_add_test_python(<EXENAME> <VARNAME> <ARG>...)
-```
+~~~
 #]==]
 
 #[==[.md INTERNAL
@@ -526,8 +583,10 @@ Options:
     current source directory. If alternate baseline images are required,
     `<NAME>` may be suffixed by `_1`, `_2`, etc. The valid image is passed via
     the `-V` flag.
-  - `NO_RT`: If `NO_RT` is specified, `-B` is passed instead of `-V` assuming
-    `NO_VALID` is not specified.
+  - `NO_RT`: If `NO_RT` is specified, `-B` is passed instead of `-V`, only
+     providing a baseline dir, assuming `NO_VALID` is not specified.
+  - `DIRECT_DATA` : If `DIRECT_DATA` is specified, the baseline path will be provided
+     as is, without the use of ExternalData_add_test.
   - `JUST_VALID`: Only applies when both `NO_VALID` and `NO_RT` are not
     present. If it is not specified, `-A` is passed with path to the directory
     of the `vtkTclTest2Py` Python package and the test is run via the
@@ -550,16 +609,21 @@ function (vtk_add_test_python)
     NO_VALID
     NO_OUTPUT
     NO_RT
+    DIRECT_DATA
     JUST_VALID
     )
   _vtk_test_parse_args("${python_options}" "py" ${ARGN})
   _vtk_test_set_options("${python_options}" "" ${options})
 
-  set(_vtk_fail_regex "(\n|^)ERROR: " "instance(s)? still around")
+  set(_vtk_fail_regex "(\n|^)ERROR: " "ERR\\|" "instance(s)? still around")
+
+  set(_vtk_skip_regex
+    # Insufficient graphics resources.
+    "Attempt to use a texture buffer exceeding your hardware's limits")
 
   foreach (name IN LISTS names)
     _vtk_test_set_options("${python_options}" "local_" ${_${name}_options})
-    _vtk_test_parse_name(${name})
+    _vtk_test_parse_name(${name} "py")
 
     set(_D "")
     if (NOT local_NO_DATA)
@@ -572,9 +636,17 @@ function (vtk_add_test_python)
     set(_A "")
     if (NOT local_NO_VALID)
       if (local_NO_RT)
-        set(_B -B "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/,REGEX:${test_name}(-.*)?(_[0-9]+)?.png}")
+        if (local_DIRECT_DATA)
+          set(_B -B "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/")
+        else ()
+          set(_B -B "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/,REGEX:${test_name}(-.*)?(_[0-9]+)?.png}")
+        endif()
       else ()
-        set(_V -V "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${test_name}.png,:}")
+        if (local_DIRECT_DATA)
+          set(_V -V "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/${test_name}.png")
+        else ()
+          set(_V -V "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${test_name}.png,:}")
+        endif()
         if (NOT local_JUST_VALID)
           # TODO: This should be fixed to also work from an installed VTK.
           set(rtImageTest "${VTK_SOURCE_DIR}/Utilities/vtkTclTest2Py/rtImageTest.py")
@@ -588,23 +660,55 @@ function (vtk_add_test_python)
       set(_T -T "${_vtk_build_TEST_OUTPUT_DIRECTORY}")
     endif ()
 
-    ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
-      NAME    "${_vtk_build_test}Python${_vtk_test_python_suffix}-${vtk_test_prefix}${test_name}"
-      COMMAND ${_vtk_test_python_pre_args}
-              "${_vtk_testing_python_exe}" --enable-bt
-              ${rtImageTest}
-              "${CMAKE_CURRENT_SOURCE_DIR}/${test_file}.py"
-              ${args}
-              ${${_vtk_build_test}_ARGS}
-              ${${name}_ARGS}
-              ${_D} ${_B} ${_T} ${_V} ${_A})
+    if (NOT _vtk_build_TEST_FILE_DIRECTORY)
+      set(_vtk_build_TEST_FILE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+
+    if (VTK_USE_MPI AND
+        VTK_SERIAL_TESTS_USE_MPIEXEC AND
+        NOT DEFINED _vtk_test_python_pre_args)
+      set(_vtk_test_python_pre_args
+        "${MPIEXEC_EXECUTABLE}"
+        "${MPIEXEC_NUMPROC_FLAG}" "1"
+        ${MPIEXEC_PREFLAGS})
+    endif()
+    set(testArgs NAME "${_vtk_build_test}Python${_vtk_test_python_suffix}-${vtk_test_prefix}${test_name}"
+                 COMMAND ${_vtk_test_python_pre_args}
+                         "${_vtk_testing_python_exe}" ${_vtk_test_python_args} --enable-bt
+                         ${rtImageTest}
+                         "${_vtk_build_TEST_FILE_DIRECTORY}/${test_file}"
+                         ${args}
+                         ${${_vtk_build_test}_ARGS}
+                         ${${test_name}_ARGS}
+                         ${_D} ${_B} ${_T} ${_V} ${_A})
+
+    if (local_DIRECT_DATA)
+      add_test(${testArgs})
+    else ()
+      ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" ${testArgs})
+    endif()
+
+    if (_vtk_testing_ld_preload)
+      set_property(TEST "${_vtk_build_test}Python${_vtk_test_python_suffix}-${vtk_test_prefix}${test_name}"
+        APPEND
+        PROPERTY
+          ENVIRONMENT "LD_PRELOAD=${_vtk_testing_ld_preload}")
+    endif ()
+
     set_tests_properties("${_vtk_build_test}Python${_vtk_test_python_suffix}-${vtk_test_prefix}${test_name}"
       PROPERTIES
         LABELS "${_vtk_build_test_labels}"
         FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
+        SKIP_REGULAR_EXPRESSION "${_vtk_skip_regex}"
         # This must match the skip() function in vtk/test/Testing.py"
         SKIP_RETURN_CODE 125
       )
+
+    if (numprocs)
+      set_tests_properties("${_vtk_build_test}Python${_vtk_test_python_suffix}-${vtk_test_prefix}${test_name}"
+        PROPERTIES
+          PROCESSORS "${numprocs}")
+    endif ()
   endforeach ()
 endfunction ()
 

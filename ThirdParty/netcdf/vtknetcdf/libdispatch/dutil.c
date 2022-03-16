@@ -22,10 +22,9 @@
 #include "netcdf.h"
 #include "ncuri.h"
 #include "ncbytes.h"
+#include "nclist.h"
 #include "nclog.h"
-#include "ncwinpath.h"
-
-extern int mkstemp(char *template);
+#include "ncpathmgr.h"
 
 #define NC_MAX_PATH 4096
 
@@ -45,7 +44,7 @@ NC__testurl(const char* path, char** basenamep)
 {
     NCURI* uri;
     int ok = NC_NOERR;
-    if(ncuriparse(path,&uri) != NCU_OK)
+    if(ncuriparse(path,&uri))
 	ok = NC_EURL;
     else {
 	char* slash = (uri->path == NULL ? NULL : strrchr(uri->path, '/'));
@@ -163,6 +162,37 @@ NC_entityescape(const char* s)
     return escaped;
 }
 
+char*
+/*
+Depending on the platform, the shell will sometimes
+pass an escaped octotherpe character without removing
+the backslash. So this function is appropriate to be called
+on possible url paths to unescape such cases. See e.g. ncgen.
+*/
+NC_shellUnescape(const char* esc)
+{
+    size_t len;
+    char* s;
+    const char* p;
+    char* q;
+
+    if(esc == NULL) return NULL;
+    len = strlen(esc);
+    s = (char*)malloc(len+1);
+    if(s == NULL) return NULL;
+    for(p=esc,q=s;*p;) {
+	switch (*p) {
+	case '\\':
+	     if(p[1] == '#')
+	         p++;
+	     /* fall thru */
+	default: *q++ = *p++; break;
+	}
+    }
+    *q = '\0';
+    return s;
+}
+
 /**
 Wrap mktmp and return the generated path,
 or null if failed.
@@ -174,58 +204,23 @@ Return the generated path.
 char*
 NC_mktmp(const char* base)
 {
-    int fd;
-    char* cvtpath = NULL;
-    char tmp[NC_MAX_PATH];
-#ifdef HAVE_MKSTEMP
-    mode_t mask;
-#endif
+    int fd = -1;
+    char* tmp = NULL;
+    size_t len;
 
-    /* Make sure that this path conversion has been applied */
-    cvtpath = NCpathcvt(base);
-    strncpy(tmp,cvtpath,sizeof(tmp));
-    nullfree(cvtpath);
-	strncat(tmp, "XXXXXX", sizeof(tmp) - strlen(tmp) - 1);
-
-#ifdef HAVE_MKSTEMP
-    /* Note Potential problem: old versions of this function
-       leave the file in mode 0666 instead of 0600 */
-    mask=umask(0077);
-    fd = mkstemp(tmp);
-    (void)umask(mask);
-#else /* !HAVE_MKSTEMP */
-    {
-#ifdef HAVE_MKTEMP
-#ifdef _MSC_VER
-        /* Use _mktemp_s */
-	_mktemp_s(tmp,sizeof(tmp)-1);
-#else /*!_MSC_VER*/
-        mktemp(tmp);
-	tmo[sizeof[tmp]-1] = '\0';
-#endif
-#else /* !HAVE_MKTEMP */
-	/* Need to simulate by using some kind of pseudo-random number */
-	{
-	    int rno = rand();
-	    char spid[7];
-	    if(rno < 0) rno = -rno;
-            snprintf(spid,sizeof(spid),"%06d",rno);
-            strncat(tmp,spid,sizeof(tmp) - strlen(tmp) - 1);
-	}
-#endif /* HAVE_MKTEMP */
-#ifdef _MSC_VER
-        fd=NCopen3(tmp,O_RDWR|O_BINARY|O_CREAT, _S_IREAD|_S_IWRITE);
-#else
-        fd=NCopen3(tmp,O_RDWR|O_CREAT|O_EXCL, S_IRWXU);
-#endif
-    }
-#endif /* !HAVE_MKSTEMP */
+    len = strlen(base)+6+1;
+    if((tmp = (char*)malloc(len))==NULL)
+        goto done;
+    strncpy(tmp,base,len);
+    strlcat(tmp, "XXXXXX", len);
+    fd = NCmkstemp(tmp);
     if(fd < 0) {
        nclog(NCLOGERR, "Could not create temp file: %s",tmp);
-       return NULL;
-    } else
-	close(fd);
-    return strdup(tmp);
+       goto done;
+    }
+done:
+    if(fd >= 0) close(fd);
+    return tmp;
 }
 
 int
@@ -280,4 +275,93 @@ done:
     if(stream) fclose(stream);
     return ret;
 }
+
+/*
+Parse a path as a url and extract the modelist.
+If the path is not a URL, then return a NULL list.
+If a URL, but modelist is empty or does not exist,
+then return empty list.
+*/
+int
+NC_getmodelist(const char* path, NClist** modelistp)
+{
+    int stat=NC_NOERR;
+    NClist* modelist = NULL;
+    NCURI* uri = NULL;
+    const char* modestr = NULL;
+    const char* p = NULL;
+    const char* endp = NULL;
+
+    ncuriparse(path,&uri);
+    if(uri == NULL) goto done; /* not a uri */
+
+    /* Get the mode= arg from the fragment */
+    modelist = nclistnew();    
+    modestr = ncurifragmentlookup(uri,"mode");
+    if(modestr == NULL || strlen(modestr) == 0) goto done;
+    /* Parse the mode string at the commas or EOL */
+    p = modestr;
+    for(;;) {
+	char* s;
+	ptrdiff_t slen;
+	endp = strchr(p,',');
+	if(endp == NULL) endp = p + strlen(p);
+	slen = (endp - p);
+	if((s = malloc(slen+1)) == NULL) {stat = NC_ENOMEM; goto done;}
+	memcpy(s,p,slen);
+	s[slen] = '\0';
+	nclistpush(modelist,s);
+	if(*endp == '\0') break;
+	p = endp+1;
+    }
+
+done:
+    if(stat == NC_NOERR) {
+	if(modelistp) {*modelistp = modelist; modelist = NULL;}
+    }
+    ncurifree(uri);
+    nclistfree(modelist);
+    return stat;
+}
+
+/*
+Check "mode=" list for a path and return 1 if present, 0 otherwise.
+*/
+int
+NC_testmode(const char* path, const char* tag)
+{
+    int stat = NC_NOERR;
+    int found = 0;
+    int i;
+    NClist* modelist = NULL;
+
+    if((stat = NC_getmodelist(path, &modelist))) goto done;
+    for(i=0;i<nclistlength(modelist);i++) {
+	const char* value = nclistget(modelist,i);
+	if(strcasecmp(tag,value)==0) {found = 1; break;}
+    }        
+    
+done:
+    nclistfreeall(modelist);
+    return found;
+}
+
+#ifdef __APPLE__
+int isinf(double x)
+{
+    union { unsigned long long u; double f; } ieee754;
+    ieee754.f = x;
+    return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) == 0x7ff00000 &&
+           ( (unsigned)ieee754.u == 0 );
+}
+
+int isnan(double x)
+{
+    union { unsigned long long u; double f; } ieee754;
+    ieee754.f = x;
+    return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) +
+           ( (unsigned)ieee754.u != 0 ) > 0x7ff00000;
+}
+
+#endif /*APPLE*/
 

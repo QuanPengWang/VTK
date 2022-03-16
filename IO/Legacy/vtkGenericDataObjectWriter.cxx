@@ -40,7 +40,7 @@
 
 vtkStandardNewMacro(vtkGenericDataObjectWriter);
 
-template<typename WriterT>
+template <typename WriterT>
 vtkDataWriter* CreateWriter(vtkAlgorithmOutput* input)
 {
   WriterT* const writer = WriterT::New();
@@ -54,12 +54,12 @@ vtkGenericDataObjectWriter::~vtkGenericDataObjectWriter() = default;
 
 void vtkGenericDataObjectWriter::WriteData()
 {
-  vtkDebugMacro(<<"Writing vtk data object ...");
+  vtkDebugMacro(<< "Writing vtk data object ...");
 
   vtkDataWriter* writer = nullptr;
 
   vtkAlgorithmOutput* input = this->GetInputConnection(0, 0);
-  switch(this->GetInput()->GetDataObjectType())
+  switch (this->GetInput()->GetDataObjectType())
   {
     case VTK_COMPOSITE_DATA_SET:
       vtkErrorMacro(<< "Cannot write composite data set");
@@ -129,12 +129,13 @@ void vtkGenericDataObjectWriter::WriteData()
     case VTK_UNIFORM_GRID:
       vtkErrorMacro(<< "Cannot write uniform grid");
       return;
+    case VTK_UNSTRUCTURED_GRID_BASE:
     case VTK_UNSTRUCTURED_GRID:
       writer = CreateWriter<vtkUnstructuredGridWriter>(input);
       break;
   }
 
-  if(!writer)
+  if (!writer)
   {
     vtkErrorMacro(<< "null data object writer");
     return;
@@ -159,14 +160,14 @@ void vtkGenericDataObjectWriter::WriteData()
   }
   if (this->WriteToOutputString)
   {
-    delete [] this->OutputString;
+    delete[] this->OutputString;
     this->OutputStringLength = writer->GetOutputStringLength();
     this->OutputString = writer->RegisterAndGetOutputString();
   }
   writer->Delete();
 }
 
-int vtkGenericDataObjectWriter::FillInputPortInformation(int, vtkInformation *info)
+int vtkGenericDataObjectWriter::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
@@ -174,5 +175,5 @@ int vtkGenericDataObjectWriter::FillInputPortInformation(int, vtkInformation *in
 
 void vtkGenericDataObjectWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

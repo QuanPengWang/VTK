@@ -23,7 +23,7 @@
  * in vtkContextScene, vtkAbstractContextItem and friends.
  *
  * \internal
-*/
+ */
 
 #ifndef vtkContextScenePrivate_h
 #define vtkContextScenePrivate_h
@@ -44,37 +44,33 @@ public:
    * Default constructor.
    */
   vtkContextScenePrivate(vtkAbstractContextItem* item)
-    : std::vector<vtkAbstractContextItem*>(), Scene(nullptr), Item(item)
+    : std::vector<vtkAbstractContextItem*>()
+    , Scene(nullptr)
+    , Item(item)
   {
   }
 
   /**
    * Destructor.
    */
-  ~vtkContextScenePrivate()
-  {
-    this->Clear();
-  }
+  ~vtkContextScenePrivate() { this->Clear(); }
 
-  //@{
+  ///@{
   /**
    * A few standard defines
    */
-  typedef std::vector<vtkAbstractContextItem*>::const_iterator
-    const_iterator;
+  typedef std::vector<vtkAbstractContextItem*>::const_iterator const_iterator;
   typedef std::vector<vtkAbstractContextItem*>::iterator iterator;
-  typedef std::vector<vtkAbstractContextItem*>::const_reverse_iterator
-    const_reverse_iterator;
-  typedef std::vector<vtkAbstractContextItem*>::reverse_iterator
-    reverse_iterator;
-  //@}
+  typedef std::vector<vtkAbstractContextItem*>::const_reverse_iterator const_reverse_iterator;
+  typedef std::vector<vtkAbstractContextItem*>::reverse_iterator reverse_iterator;
+  ///@}
 
   /**
    * Paint all items in the list.
    */
   void PaintItems(vtkContext2D* context)
   {
-    for(const_iterator it = this->begin(); it != this->end(); ++it)
+    for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
       if ((*it)->GetVisible())
       {
@@ -83,7 +79,7 @@ public:
     }
   }
 
-  //@{
+  ///@{
   /**
    * Add an item to the list - ensure it is not already in the list.
    */
@@ -92,19 +88,19 @@ public:
     item->Register(this->Scene);
     item->SetScene(this->Scene);
     item->SetParent(this->Item);
-  //@}
+    ///@}
 
     this->push_back(item);
-    return static_cast<unsigned int>(this->size()-1);
+    return static_cast<unsigned int>(this->size() - 1);
   }
 
-  //@{
+  ///@{
   /**
    * Remove an item from the list.
    */
   bool RemoveItem(vtkAbstractContextItem* item)
   {
-    for(iterator it = this->begin(); it != this->end(); ++it)
+    for (iterator it = this->begin(); it != this->end(); ++it)
     {
       if (item == *it)
       {
@@ -117,9 +113,9 @@ public:
     }
     return false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Remove an item from the list.
    */
@@ -131,15 +127,15 @@ public:
     }
     return false;
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Clear all items from the list - unregister.
    */
   void Clear()
   {
-    for(const_iterator it = this->begin(); it != this->end(); ++it)
+    for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
       (*it)->SetParent(nullptr);
       (*it)->SetScene(nullptr);
@@ -147,9 +143,9 @@ public:
     }
     this->clear();
   }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the scene for the instance (and its items).
    */
@@ -160,26 +156,26 @@ public:
       return;
     }
     this->Scene = scene;
-    for(const_iterator it = this->begin(); it != this->end(); ++it)
+    for (const_iterator it = this->begin(); it != this->end(); ++it)
     {
-        (*it)->SetScene(scene);
+      (*it)->SetScene(scene);
     }
   }
-  //@}
+  ///@}
 
   /**
    * Store a reference to the scene.
    */
   vtkContextScene* Scene;
 
-  //@{
+  ///@{
   /**
    * Store a reference to the item that these children are part of.
    * May be NULL for items in the scene itself.
    */
   vtkAbstractContextItem* Item;
+  ///@}
 };
-  //@}
 
-#endif //vtkContextScenePrivate_h
+#endif // vtkContextScenePrivate_h
 // VTK-HeaderTest-Exclude: vtkContextScenePrivate.h

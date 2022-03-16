@@ -5,6 +5,13 @@
  *   $Header$
  *********************************************************************/
 
+/*
+ * In order to use any of the netcdf_XXX.h files, it is necessary
+ * to include netcdf.h followed by any netcdf_XXX.h files.
+ * Various things (like EXTERNL) are defined in netcdf.h
+ * to make them available for use by the netcdf_XXX.h files.
+*/
+
 #ifndef NCAUX_H
 #define NCAUX_H
 
@@ -46,6 +53,26 @@ EXTERNL size_t ncaux_type_alignment(int xtype, int ncid);
 
 /* Takes type classes only */
 EXTERNL size_t ncaux_class_alignment(int ncclass);
+
+/**************************************************/
+/* Capture the id and parameters for a filter
+   using the HDF5 unsigned int format
+*/
+typedef struct NC_H5_Filterspec {
+    unsigned int filterid; /**< ID for arbitrary filter. */
+    size_t nparams;        /**< nparams for arbitrary filter. */
+    unsigned int* params;  /**< Params for arbitrary filter. */
+} NC_H5_Filterspec;
+
+EXTERNL int ncaux_h5filterspec_parse(const char* txt, unsigned int* idp, size_t* nparamsp, unsigned int** paramsp);
+EXTERNL int ncaux_h5filterspec_parselist(const char* txt0, int* formatp, size_t* nspecsp, struct NC_H5_Filterspec*** vectorp);
+EXTERNL void ncaux_h5filterspec_free(struct NC_H5_Filterspec* f);
+EXTERNL void ncaux_h5filterspec_fix8(unsigned char* mem, int decode);
+	    
+/* Wrappers to export selected functions from libnetcdf */
+
+EXTERNL int ncaux_readfile(const char* filename, size_t* sizep, void** content);
+EXTERNL int ncaux_writefile(const char* filename, size_t size, void* content);
 
 #if defined(__cplusplus)
 }

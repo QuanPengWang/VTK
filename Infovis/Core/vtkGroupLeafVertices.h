@@ -24,7 +24,7 @@
  *
  * Use SetInputArrayToProcess(0, ...) to set the array to group on.
  * Currently this array must be a vtkStringArray.
-*/
+ */
 
 #ifndef vtkGroupLeafVertices_h
 #define vtkGroupLeafVertices_h
@@ -36,10 +36,10 @@ class VTKINFOVISCORE_EXPORT vtkGroupLeafVertices : public vtkTreeAlgorithm
 {
 public:
   static vtkGroupLeafVertices* New();
-  vtkTypeMacro(vtkGroupLeafVertices,vtkTreeAlgorithm);
+  vtkTypeMacro(vtkGroupLeafVertices, vtkTreeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The name of the domain that non-leaf vertices will be assigned to.
    * If the input graph already contains vertices in this domain:
@@ -50,16 +50,13 @@ public:
    */
   vtkSetStringMacro(GroupDomain);
   vtkGetStringMacro(GroupDomain);
-  //@}
+  ///@}
 
 protected:
   vtkGroupLeafVertices();
   ~vtkGroupLeafVertices() override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   char* GroupDomain;
 
@@ -69,4 +66,3 @@ private:
 };
 
 #endif
-

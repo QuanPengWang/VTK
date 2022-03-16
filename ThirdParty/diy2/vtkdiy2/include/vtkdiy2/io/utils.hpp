@@ -82,7 +82,8 @@ namespace utils
       _close(fd);
     }
 #else
-    ::truncate(filename.c_str(), static_cast<off_t>(length));
+    int error = ::truncate(filename.c_str(), static_cast<off_t>(length));
+    DIY_UNUSED(error);
 #endif
   }
 
@@ -114,7 +115,7 @@ namespace utils
     s_template[filename.size()] = 0;
 
     int handle = -1;
-#if defined(__MACH__)
+#if defined(__MACH__) || defined(__ANDROID_API__)
     // TODO: figure out how to open with O_SYNC
     handle = ::mkstemp(s_template.get());
 #else

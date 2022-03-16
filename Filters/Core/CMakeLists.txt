@@ -1,4 +1,5 @@
 set(classes
+  vtk3DLinearGridCrinkleExtractor
   vtk3DLinearGridPlaneCutter
   vtkAppendArcLength
   vtkAppendCompositeDataLeaves
@@ -7,9 +8,12 @@ set(classes
   vtkAppendPolyData
   vtkAppendSelection
   vtkArrayCalculator
+  vtkArrayRename
   vtkAssignAttribute
   vtkAttributeDataToFieldDataFilter
   vtkBinCellDataFilter
+  vtkBinnedDecimation
+  vtkCellCenters
   vtkCellDataToPointData
   vtkCenterOfMass
   vtkCleanPolyData
@@ -21,7 +25,9 @@ set(classes
   vtkContourFilter
   vtkContourGrid
   vtkContourHelper
-  vtk3DLinearGridCrinkleExtractor
+  vtkConvertToMultiBlockDataSet
+  vtkConvertToPartitionedDataSetCollection
+  vtkConvertToPolyhedra
   vtkCutter
   vtkDataObjectGenerator
   vtkDataObjectToDataSetFilter
@@ -36,6 +42,7 @@ set(classes
   vtkExecutionTimer
   vtkExplicitStructuredGridCrop
   vtkExplicitStructuredGridToUnstructuredGrid
+  vtkExtractCellsAlongPolyLine
   vtkFeatureEdges
   vtkFieldDataToAttributeDataFilter
   vtkFlyingEdges2D
@@ -47,9 +54,10 @@ set(classes
   vtkHedgeHog
   vtkHull
   vtkIdFilter
-  vtkImageDataToExplicitStructuredGrid
   vtkImageAppend
+  vtkImageDataToExplicitStructuredGrid
   vtkImplicitPolyDataDistance
+  vtkImplicitProjectOnPlaneDistance
   vtkMarchingCubes
   vtkMarchingSquares
   vtkMaskFields
@@ -61,10 +69,13 @@ set(classes
   vtkMergeFilter
   vtkMoleculeAppend
   vtkMultiObjectMassProperties
+  vtkPassThrough
   vtkPlaneCutter
   vtkPointDataToCellData
   vtkPolyDataConnectivityFilter
+  vtkPolyDataEdgeConnectivityFilter
   vtkPolyDataNormals
+  vtkPolyDataPlaneClipper
   vtkPolyDataTangents
   vtkProbeFilter
   vtkQuadricClustering
@@ -72,6 +83,7 @@ set(classes
   vtkRearrangeFields
   vtkRectilinearSynchronizedTemplates
   vtkRemoveDuplicatePolys
+  vtkRemoveUnusedPoints
   vtkResampleToImage
   vtkResampleWithDataSet
   vtkReverseSense
@@ -79,6 +91,7 @@ set(classes
   vtkSmoothPolyDataFilter
   vtkSphereTreeFilter
   vtkStaticCleanPolyData
+  vtkStaticCleanUnstructuredGrid
   vtkStreamerBase
   vtkStreamingTessellator
   vtkStripper
@@ -93,6 +106,7 @@ set(classes
   vtkTransposeTable
   vtkTriangleFilter
   vtkTriangleMeshPointNormals
+  vtkTubeBender
   vtkTubeFilter
   vtkUnstructuredGridQuadricDecimation
   vtkUnstructuredGridToExplicitStructuredGrid

@@ -21,7 +21,7 @@
 #include "vtk_glew.h"
 
 vtkOpenGLQuadHelper::vtkOpenGLQuadHelper(
-  vtkOpenGLRenderWindow* renWin, const char* vs, const char* fs, const char* gs)
+  vtkOpenGLRenderWindow* renWin, const char* vs, const char* fs, const char* gs, bool flipY)
   : Program(nullptr)
   , VAO(nullptr)
   , ResourceCallback(new vtkOpenGLResourceFreeCallback<vtkOpenGLQuadHelper>(
@@ -35,29 +35,35 @@ vtkOpenGLQuadHelper::vtkOpenGLQuadHelper(
 
   this->ResourceCallback->RegisterGraphicsResources(renWin);
 
-  static const char *defaultVS = "//VTK::System::Dec\n"
-         "in vec4 ndCoordIn;\n"
-         "in vec2 texCoordIn;\n"
-         "out vec2 texCoord;\n"
-         "void main()\n"
-         "{\n"
-         "  gl_Position = ndCoordIn;\n"
-         "  texCoord = texCoordIn;\n"
-         "}\n";
+  static const char* defaultVS = "//VTK::System::Dec\n"
+                                 "in vec4 ndCoordIn;\n"
+                                 "in vec2 texCoordIn;\n"
+                                 "out vec2 texCoord;\n"
+                                 "void main()\n"
+                                 "{\n"
+                                 "  gl_Position = ndCoordIn;\n"
+                                 "  texCoord = texCoordIn;\n"
+                                 "  //VTK::TCoord::Flip\n"
+                                 "}\n";
 
-  this->Program = renWin->GetShaderCache()->ReadyShaderProgram(
-    (vs ? vs : defaultVS),
-    fs,
-    (gs ? gs : ""));
+  std::string VS = (vs ? vs : defaultVS);
+
+  if (flipY)
+  {
+    vtkShaderProgram::Substitute(
+      VS, "//VTK::TCoord::Flip\n", "texCoord.y = 1.0 - texCoord.y;\n", true);
+  }
+
+  this->Program = renWin->GetShaderCache()->ReadyShaderProgram(VS.c_str(), fs, (gs ? gs : ""));
 
   this->VAO = vtkOpenGLVertexArrayObject::New();
   this->ShaderChangeValue = 0;
 
   this->VAO->Bind();
 
-  vtkOpenGLBufferObject *vertBuf = renWin->GetTQuad2DVBO();
-  bool res = this->VAO->AddAttributeArray(this->Program, vertBuf, "ndCoordIn", 0, 4 * sizeof(float),
-                               VTK_FLOAT, 2, false);
+  vtkOpenGLBufferObject* vertBuf = renWin->GetTQuad2DVBO();
+  bool res = this->VAO->AddAttributeArray(
+    this->Program, vertBuf, "ndCoordIn", 0, 4 * sizeof(float), VTK_FLOAT, 2, false);
   if (!res)
   {
     this->VAO->Release();
@@ -66,11 +72,11 @@ vtkOpenGLQuadHelper::vtkOpenGLQuadHelper(
   }
 
   res = this->VAO->AddAttributeArray(this->Program, vertBuf, "texCoordIn", 2 * sizeof(float),
-                               4 * sizeof(float), VTK_FLOAT, 2, false);
+    4 * sizeof(float), VTK_FLOAT, 2, false);
   if (!res)
   {
     this->VAO->Release();
-    vtkGenericWarningMacro("Error binding texCoords to VAO.");
+    vtkGenericWarningMacro("Error binding texCoordIn to VAO.");
     return;
   }
 

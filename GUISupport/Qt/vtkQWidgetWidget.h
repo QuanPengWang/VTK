@@ -24,9 +24,10 @@
 #ifndef vtkQWidgetWidget_h
 #define vtkQWidgetWidget_h
 
-#include "vtkGUISupportQtModule.h" // For export macro
 #include "vtkAbstractWidget.h"
-#include <QPointF> // for ivar
+#include "vtkDeprecation.h"        // For VTK_DEPRECATED_IN_9_2_0
+#include "vtkGUISupportQtModule.h" // For export macro
+#include <QPointF>                 // for ivar
 
 class QWidget;
 class vtkQWidgetRepresentation;
@@ -39,22 +40,22 @@ public:
   /**
    * Instantiate the object.
    */
-  static vtkQWidgetWidget *New();
+  static vtkQWidgetWidget* New();
 
-  //@{
+  ///@{
   /**
    * Standard vtkObject methods
    */
-  vtkTypeMacro(vtkQWidgetWidget,vtkAbstractWidget);
+  vtkTypeMacro(vtkQWidgetWidget, vtkAbstractWidget);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Specify an instance of vtkQWidgetRepresentation used to represent this
    * widget in the scene. Note that the representation is a subclass of vtkProp
    * so it can be added to the renderer independent of the widget.
    */
-  void SetRepresentation( vtkQWidgetRepresentation *rep );
+  void SetRepresentation(vtkQWidgetRepresentation* rep);
 
   // Description:
   // Disable/Enable the widget if needed.
@@ -64,7 +65,7 @@ public:
   /**
    * Return the representation as a vtkQWidgetRepresentation
    */
-  vtkQWidgetRepresentation *GetQWidgetRepresentation();
+  vtkQWidgetRepresentation* GetQWidgetRepresentation();
 
   /**
    * Create the default widget representation if one is not set.
@@ -74,7 +75,8 @@ public:
   /**
    * Set the QWidget that will receive the events.
    */
-  void SetWidget(QWidget *w);
+  void SetWidget(QWidget* w);
+  QWidget* GetWidget() { return this->Widget; }
 
 protected:
   vtkQWidgetWidget();
@@ -82,10 +84,20 @@ protected:
 
   // Manage the state of the widget
   int WidgetState;
-  enum _WidgetState {Start=0,Active};
+  enum WidgetStateType
+  {
+    Start = 0,
+    Active
+  };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef WidgetStateType _WidgetState;
+#endif
 
-  QWidget *Widget;
+  QWidget* Widget;
   QPointF LastWidgetCoordinates;
+  QPointF SteadyWidgetCoordinates;
+  double SelectStartTime;
 
   // These methods handle events
   static void SelectAction3D(vtkAbstractWidget*);

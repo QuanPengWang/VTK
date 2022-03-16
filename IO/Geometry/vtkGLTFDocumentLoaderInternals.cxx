@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkGLTFDocumentLoader.h
+  Module:    vtkGLTFDocumentLoaderInternals.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -17,14 +17,16 @@
 
 #include "vtkGLTFUtils.h"
 #include "vtkMath.h"
-#include "vtkTransform.h"
+#include "vtkMathUtilities.h"
+#include "vtkMatrix4x4.h"
 #include "vtk_jsoncpp.h"
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include <algorithm>
 #include <sstream>
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadBuffer(
   const Json::Value& root, std::vector<char>& buffer, const std::string& glTFFileName)
 {
@@ -35,9 +37,9 @@ bool vtkGLTFDocumentLoaderInternals::LoadBuffer(
   }
 
   int byteLength = 0;
-  ifstream fin;
+  vtksys::ifstream fin;
 
-  std::string name = "";
+  std::string name;
   vtkGLTFUtils::GetStringValue(root["name"], name);
 
   if (!vtkGLTFUtils::GetIntValue(root["byteLength"], byteLength))
@@ -61,7 +63,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadBuffer(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadBuffers(bool firstBufferIsGLB)
 {
   Json::Value bufferRoot;
@@ -99,7 +101,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadBuffers(bool firstBufferIsGLB)
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadFileMetaData(
   const std::string& fileName, Json::Value& gltfRoot)
 {
@@ -113,7 +115,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadFileMetaData(
   }
 
   std::stringstream JSONstream;
-  std::ifstream fin;
+  vtksys::ifstream fin;
   if (extension == ".glb")
   {
     // Get base information
@@ -133,7 +135,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadFileMetaData(
     }
 
     // Open the file in binary mode
-    fin.open(fileName, std::ios::binary | std::ios::in);
+    fin.open(fileName.c_str(), std::ios::binary | std::ios::in);
     if (!fin.is_open())
     {
       vtkErrorWithObjectMacro(this->Self, "Error opening file " << fileName);
@@ -151,7 +153,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadFileMetaData(
   else
   {
     // Copy whole file into string
-    fin.open(fileName);
+    fin.open(fileName.c_str());
     if (!fin.is_open())
     {
       vtkErrorWithObjectMacro(this->Self, "Error opening file " << fileName);
@@ -170,7 +172,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadFileMetaData(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadAccessor(
   const Json::Value& root, vtkGLTFDocumentLoader::Accessor& accessor)
 {
@@ -281,7 +283,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadAccessor(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadAccessorBounds(
   const Json::Value& root, vtkGLTFDocumentLoader::Accessor& accessor)
 {
@@ -322,7 +324,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadAccessorBounds(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadAnimation(
   const Json::Value& root, vtkGLTFDocumentLoader::Animation& animation)
 {
@@ -453,7 +455,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadAnimation(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadBufferView(
   const Json::Value& root, vtkGLTFDocumentLoader::BufferView& bufferView)
 {
@@ -495,7 +497,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadBufferView(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadCamera(
   const Json::Value& root, vtkGLTFDocumentLoader::Camera& camera)
 {
@@ -593,7 +595,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadCamera(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadImage(
   const Json::Value& root, vtkGLTFDocumentLoader::Image& image)
 {
@@ -640,7 +642,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadImage(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadMaterial(
   const Json::Value& root, vtkGLTFDocumentLoader::Material& material)
 {
@@ -742,10 +744,18 @@ bool vtkGLTFDocumentLoaderInternals::LoadMaterial(
   material.Name = "";
   vtkGLTFUtils::GetStringValue(root["name"], material.Name);
 
+  material.Unlit = false;
+
+  const auto& extRoot = root["extensions"];
+  if (!extRoot.empty())
+  {
+    material.Unlit = extRoot.isMember("KHR_materials_unlit");
+  }
+
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadMesh(
   const Json::Value& root, vtkGLTFDocumentLoader::Mesh& mesh)
 {
@@ -777,7 +787,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadMesh(
   return true;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadNode(
   const Json::Value& root, vtkGLTFDocumentLoader::Node& node)
 {
@@ -852,14 +862,19 @@ bool vtkGLTFDocumentLoaderInternals::LoadNode(
     }
     if (vtkGLTFUtils::GetFloatArray(root["rotation"], node.InitialRotation))
     {
+      float rotationLengthSquared = 0;
       for (float rotationValue : node.InitialRotation)
       {
-        if (rotationValue < -1 || rotationValue > 1)
+        rotationLengthSquared += rotationValue * rotationValue;
+      }
+      if (!vtkMathUtilities::NearlyEqual<float>(rotationLengthSquared, 1.f, 1e-4f))
+      {
+        vtkWarningWithObjectMacro(this->Self,
+          "Invalid node.rotation value. Using normalized rotation for node " << node.Name);
+        float rotationLength = sqrt(rotationLengthSquared);
+        for (float& rotationValue : node.InitialRotation)
         {
-          vtkWarningWithObjectMacro(this->Self,
-            "Invalid node.rotation value. Using default rotation for node " << node.Name);
-          node.InitialRotation.clear();
-          break;
+          rotationValue /= rotationLength;
         }
       }
       if (node.InitialRotation.size() !=
@@ -879,7 +894,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadNode(
     node.TRSLoaded = true;
   }
 
-  node.Transform = vtkSmartPointer<vtkTransform>::New();
+  node.Transform = vtkSmartPointer<vtkMatrix4x4>::New();
   // Update the node with its initial transform values
   node.UpdateTransform();
 
@@ -899,7 +914,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadNode(
   return true;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadSampler(
   const Json::Value& root, vtkGLTFDocumentLoader::Sampler& sampler)
 {
@@ -910,7 +925,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadSampler(
     return false;
   }
 
-  if (root.size() == 0)
+  if (root.empty())
   {
     sampler.MagFilter = Sampler::FilterType::LINEAR_MIPMAP_LINEAR;
     sampler.MinFilter = Sampler::FilterType::LINEAR_MIPMAP_LINEAR;
@@ -1004,7 +1019,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadSampler(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadPrimitive(
   const Json::Value& root, vtkGLTFDocumentLoader::Primitive& primitive)
 {
@@ -1073,7 +1088,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadPrimitive(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadScene(
   const Json::Value& root, vtkGLTFDocumentLoader::Scene& scene)
 {
@@ -1093,7 +1108,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadScene(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadSkin(
   const Json::Value& root, vtkGLTFDocumentLoader::Skin& skin)
 {
@@ -1120,7 +1135,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadSkin(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadSparse(
   const Json::Value& root, vtkGLTFDocumentLoader::Accessor::Sparse& sparse)
 {
@@ -1179,7 +1194,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadSparse(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadTexture(
   const Json::Value& root, vtkGLTFDocumentLoader::Texture& texture)
 {
@@ -1204,7 +1219,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadTexture(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadTextureInfo(
   const Json::Value& root, vtkGLTFDocumentLoader::TextureInfo& textureInfo)
 {
@@ -1231,7 +1246,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadTextureInfo(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadModelMetaDataFromFile(
   std::string& fileName, std::vector<std::string>& extensionsUsedByLoader)
 {
@@ -1249,14 +1264,14 @@ bool vtkGLTFDocumentLoaderInternals::LoadModelMetaDataFromFile(
   if (glTFAsset.empty() || !glTFAsset.isObject())
   {
     vtkErrorWithObjectMacro(this->Self, "Invalid asset value");
-    return 0;
+    return false;
   }
 
   // check minversion and version
   if (!vtkGLTFUtils::CheckVersion(glTFAsset))
   {
     vtkErrorWithObjectMacro(this->Self, "Unsupported or invalid glTF version");
-    return 0;
+    return false;
   }
 
   // Check for extensions
@@ -1275,10 +1290,11 @@ bool vtkGLTFDocumentLoaderInternals::LoadModelMetaDataFromFile(
           [&extensionRequiredByModel](
             const std::string& value) { return value == extensionRequiredByModel.asString(); }))
     {
-      vtkWarningWithObjectMacro(this->Self,
-        "glTF extension " << extensionRequiredByModel.asString()
-                          << " is required in this model, but not supported by this loader. The "
-                             "extension will be ignored.");
+      vtkErrorWithObjectMacro(this->Self,
+        "glTF extension "
+          << extensionRequiredByModel.asString()
+          << " is required in this model, but not supported by this loader. Aborting");
+      return false;
     }
   }
   for (const auto& extensionUsedByModel : root["extensionsUsed"])
@@ -1463,7 +1479,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadModelMetaDataFromFile(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualNodeExtension(const Json::Value& root,
   vtkGLTFDocumentLoader::Node::Extensions::KHRLightsPunctual& lightsExtension)
 {
@@ -1480,7 +1496,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualNodeExtension(const Js
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualExtension(
   const Json::Value& root, vtkGLTFDocumentLoader::Extensions::KHRLightsPunctual& lightsExtension)
 {
@@ -1496,7 +1512,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualExtension(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualExtensionLight(
   const Json::Value& root, vtkGLTFDocumentLoader::Extensions::KHRLightsPunctual::Light& light)
 {
@@ -1594,7 +1610,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadKHRLightsPunctualExtensionLight(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadNodeExtensions(
   const Json::Value& root, vtkGLTFDocumentLoader::Node::Extensions& nodeExtensions)
 {
@@ -1610,7 +1626,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadNodeExtensions(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkGLTFDocumentLoaderInternals::LoadExtensions(
   const Json::Value& root, vtkGLTFDocumentLoader::Extensions& extensions)
 {
@@ -1625,7 +1641,7 @@ bool vtkGLTFDocumentLoaderInternals::LoadExtensions(
   return true;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkGLTFDocumentLoader::AccessorType vtkGLTFDocumentLoaderInternals::AccessorTypeStringToEnum(
   std::string typeName)
 {
@@ -1663,7 +1679,7 @@ vtkGLTFDocumentLoader::AccessorType vtkGLTFDocumentLoaderInternals::AccessorType
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkGLTFDocumentLoader::Material::AlphaModeType
 vtkGLTFDocumentLoaderInternals::MaterialAlphaModeStringToEnum(std::string alphaModeString)
 {

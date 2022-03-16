@@ -16,6 +16,10 @@
  * @class   vtkReaderExecutive
  * @brief   Executive that works with vtkReaderAlgorithm and subclasses.
  *
+ * @deprecated VTK 9.1.0. This is no longer needed. vtkReaderAlgorithm can now
+ * work with standard executive and hence this can be removed. Follows docs are
+ * no longer relevant and left for historical reasons.
+ *
  * vtkReaderExecutive is an executive that supports simplified API readers
  * that are written by subclassing from the vtkReaderAlgorithm hierarchy.
  * Currently, its main functionality is to call the basic reader API instead
@@ -24,29 +28,22 @@
  * vtkReaderAlgorithm for the API.
  *
  * Note that this executive assumes that the reader has one output port.
-*/
+ */
 
 #ifndef vtkReaderExecutive_h
 #define vtkReaderExecutive_h
 
 #include "vtkCommonExecutionModelModule.h" // For export macro
+#include "vtkDeprecation.h"                // for deprecation macros
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-class VTKCOMMONEXECUTIONMODEL_EXPORT vtkReaderExecutive :
-  public vtkStreamingDemandDrivenPipeline
+VTK_DEPRECATED_IN_9_1_0("no longer needed")
+class VTKCOMMONEXECUTIONMODEL_EXPORT vtkReaderExecutive : public vtkStreamingDemandDrivenPipeline
 {
 public:
   static vtkReaderExecutive* New();
-  vtkTypeMacro(vtkReaderExecutive,vtkStreamingDemandDrivenPipeline);
+  vtkTypeMacro(vtkReaderExecutive, vtkStreamingDemandDrivenPipeline);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  /**
-   * Overwritten to call the vtkReaderAlgorithm API instead of
-   * ProcessRequest().
-   */
-  virtual int CallAlgorithm(vtkInformation* request, int direction,
-                            vtkInformationVector** inInfo,
-                            vtkInformationVector* outInfo) override;
 
 protected:
   vtkReaderExecutive();

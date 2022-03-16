@@ -21,20 +21,19 @@
  * Neighborhoods can be no more than 3 dimensional.  Setting one
  * axis of the neighborhood kernelSize to 1 changes the filter
  * into a 2D median.
-*/
+ */
 
 #ifndef vtkImageMedian3D_h
 #define vtkImageMedian3D_h
 
-
-#include "vtkImagingGeneralModule.h" // For export macro
 #include "vtkImageSpatialAlgorithm.h"
+#include "vtkImagingGeneralModule.h" // For export macro
 
 class VTKIMAGINGGENERAL_EXPORT vtkImageMedian3D : public vtkImageSpatialAlgorithm
 {
 public:
-  static vtkImageMedian3D *New();
-  vtkTypeMacro(vtkImageMedian3D,vtkImageSpatialAlgorithm);
+  static vtkImageMedian3D* New();
+  vtkTypeMacro(vtkImageMedian3D, vtkImageSpatialAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -43,12 +42,12 @@ public:
    */
   void SetKernelSize(int size0, int size1, int size2);
 
-  //@{
+  ///@{
   /**
    * Return the number of elements in the median mask
    */
-  vtkGetMacro(NumberOfElements,int);
-  //@}
+  vtkGetMacro(NumberOfElements, int);
+  ///@}
 
 protected:
   vtkImageMedian3D();
@@ -56,11 +55,9 @@ protected:
 
   int NumberOfElements;
 
-  void ThreadedRequestData(vtkInformation *request,
-                           vtkInformationVector **inputVector,
-                           vtkInformationVector *outputVector,
-                           vtkImageData ***inData, vtkImageData **outData,
-                           int extent[6], int id) override;
+  void ThreadedRequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector, vtkImageData*** inData, vtkImageData** outData,
+    int outExt[6], int id) override;
 
 private:
   vtkImageMedian3D(const vtkImageMedian3D&) = delete;

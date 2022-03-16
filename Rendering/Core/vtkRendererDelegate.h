@@ -24,28 +24,28 @@
  *
  * @sa
  * vtkRenderer
-*/
+ */
 
 #ifndef vtkRendererDelegate_h
 #define vtkRendererDelegate_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkObject.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
 class vtkRenderer;
 
 class VTKRENDERINGCORE_EXPORT vtkRendererDelegate : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkRendererDelegate,vtkObject);
+  vtkTypeMacro(vtkRendererDelegate, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Render the props of vtkRenderer if Used is on.
    */
-  virtual void Render(vtkRenderer *r)=0;
+  virtual void Render(vtkRenderer* r) = 0;
 
-  //@{
+  ///@{
   /**
    * Tells if the delegate has to be used by the renderer or not.
    * Initial value is off.
@@ -53,7 +53,7 @@ public:
   vtkSetMacro(Used, bool);
   vtkGetMacro(Used, bool);
   vtkBooleanMacro(Used, bool);
-  //@}
+  ///@}
 
 protected:
   vtkRendererDelegate();

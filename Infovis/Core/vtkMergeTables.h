@@ -34,7 +34,7 @@
  * You may set the FirstTablePrefix and SecondTablePrefix to define how
  * the columns named are modified.  One of these prefixes may be the empty
  * string, but they must be different.
-*/
+ */
 
 #ifndef vtkMergeTables_h
 #define vtkMergeTables_h
@@ -46,28 +46,28 @@ class VTKINFOVISCORE_EXPORT vtkMergeTables : public vtkTableAlgorithm
 {
 public:
   static vtkMergeTables* New();
-  vtkTypeMacro(vtkMergeTables,vtkTableAlgorithm);
+  vtkTypeMacro(vtkMergeTables, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The prefix to give to same-named fields from the first table.
    * Default is "Table1.".
    */
   vtkSetStringMacro(FirstTablePrefix);
   vtkGetStringMacro(FirstTablePrefix);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The prefix to give to same-named fields from the second table.
    * Default is "Table2.".
    */
   vtkSetStringMacro(SecondTablePrefix);
   vtkGetStringMacro(SecondTablePrefix);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If on, merges columns with the same name.
    * If off, keeps both columns, but calls one
@@ -77,9 +77,9 @@ public:
   vtkSetMacro(MergeColumnsByName, bool);
   vtkGetMacro(MergeColumnsByName, bool);
   vtkBooleanMacro(MergeColumnsByName, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If on, all columns will have prefixes except merged columns.
    * If off, only unmerged columns with the same name will have prefixes.
@@ -88,7 +88,7 @@ public:
   vtkSetMacro(PrefixAllButMerged, bool);
   vtkGetMacro(PrefixAllButMerged, bool);
   vtkBooleanMacro(PrefixAllButMerged, bool);
-  //@}
+  ///@}
 
 protected:
   vtkMergeTables();
@@ -99,10 +99,7 @@ protected:
   char* FirstTablePrefix;
   char* SecondTablePrefix;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkMergeTables(const vtkMergeTables&) = delete;
@@ -110,4 +107,3 @@ private:
 };
 
 #endif
-

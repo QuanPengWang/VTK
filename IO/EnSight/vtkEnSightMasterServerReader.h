@@ -15,13 +15,13 @@
 /**
  * @class   vtkEnSightMasterServerReader
  * @brief   reader for compound EnSight files
-*/
+ */
 
 #ifndef vtkEnSightMasterServerReader_h
 #define vtkEnSightMasterServerReader_h
 
-#include "vtkIOEnSightModule.h" // For export macro
 #include "vtkGenericEnSightReader.h"
+#include "vtkIOEnSightModule.h" // For export macro
 
 class vtkCollection;
 
@@ -38,33 +38,31 @@ public:
    */
   int DetermineFileName(int piece);
 
-  //@{
+  ///@{
   /**
    * Get the file name that will be read.
    */
-  vtkGetStringMacro(PieceCaseFileName);
-  //@}
+  vtkGetFilePathMacro(PieceCaseFileName);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set or get the current piece.
    */
   vtkSetMacro(CurrentPiece, int);
   vtkGetMacro(CurrentPiece, int);
-  //@}
+  ///@}
 
-  int CanReadFile(const char *fname) override;
+  int CanReadFile(VTK_FILEPATH const char* fname) override;
 
 protected:
   vtkEnSightMasterServerReader();
   ~vtkEnSightMasterServerReader() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
-  int RequestInformation(vtkInformation *, vtkInformationVector **,
-                                 vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  vtkSetStringMacro(PieceCaseFileName);
+  vtkSetFilePathMacro(PieceCaseFileName);
   char* PieceCaseFileName;
   int MaxNumberOfPieces;
   int CurrentPiece;

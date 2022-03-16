@@ -20,7 +20,7 @@
  * a uniform grid. It internally uses vtkProbeFilter to do the probing.
  * @sa
  * vtkResampleToImage vtkProbeFilter
-*/
+ */
 
 #ifndef vtkPResampleToImage_h
 #define vtkPResampleToImage_h
@@ -38,25 +38,24 @@ public:
   vtkTypeMacro(vtkPResampleToImage, vtkResampleToImage);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkPResampleToImage *New();
+  static vtkPResampleToImage* New();
 
-  //@{
+  ///@{
   /**
    * By default this filter uses the global controller,
    * but this method can be used to set another instead.
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
 protected:
   vtkPResampleToImage();
-  ~vtkPResampleToImage();
+  ~vtkPResampleToImage() override;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkPResampleToImage(const vtkPResampleToImage&) = delete;

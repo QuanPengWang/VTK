@@ -28,13 +28,13 @@
  * @sa
  * vtkUnstructuredGridVolumeRayCastFunction
  *
-*/
+ */
 
 #ifndef vtkUnstructuredGridVolumeRayCastIterator_h
 #define vtkUnstructuredGridVolumeRayCastIterator_h
 
-#include "vtkRenderingVolumeModule.h" // For export macro
 #include "vtkObject.h"
+#include "vtkRenderingVolumeModule.h" // For export macro
 
 class vtkIdList;
 class vtkDoubleArray;
@@ -44,7 +44,7 @@ class VTKRENDERINGVOLUME_EXPORT vtkUnstructuredGridVolumeRayCastIterator : publi
 {
 public:
   vtkTypeMacro(vtkUnstructuredGridVolumeRayCastIterator, vtkObject);
-  void PrintSelf(ostream &os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Initializes the iteration to the start of the ray at the given screen
@@ -63,20 +63,18 @@ public:
    * returned.  0 is returned if and only if no more intersections are to
    * be found.
    */
-  virtual vtkIdType GetNextIntersections(vtkIdList *intersectedCells,
-                                         vtkDoubleArray *intersectionLengths,
-                                         vtkDataArray *scalars,
-                                         vtkDataArray *nearIntersections,
-                                         vtkDataArray *farIntersections) = 0;
+  virtual vtkIdType GetNextIntersections(vtkIdList* intersectedCells,
+    vtkDoubleArray* intersectionLengths, vtkDataArray* scalars, vtkDataArray* nearIntersections,
+    vtkDataArray* farIntersections) = 0;
 
-  //@{
+  ///@{
   /**
    * Set/get the bounds of the cast ray (in viewing coordinates).  By
    * default the range is [0,1].
    */
   vtkSetVector2Macro(Bounds, double);
   vtkGetVector2Macro(Bounds, double);
-  //@}
+  ///@}
 
   // Descrption:
   // Set/get the maximum number of intersections returned with a call to
@@ -93,9 +91,9 @@ protected:
   vtkIdType MaxNumberOfIntersections;
 
 private:
-  vtkUnstructuredGridVolumeRayCastIterator(const vtkUnstructuredGridVolumeRayCastIterator&) = delete;
+  vtkUnstructuredGridVolumeRayCastIterator(
+    const vtkUnstructuredGridVolumeRayCastIterator&) = delete;
   void operator=(const vtkUnstructuredGridVolumeRayCastIterator&) = delete;
 };
 
-#endif //vtkUnstructuredGridRayCastIterator_h
-
+#endif // vtkUnstructuredGridRayCastIterator_h

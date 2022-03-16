@@ -9,14 +9,18 @@ GROUPS
   StandAlone
 DEPENDS
   VTK::CommonCore
+  VTK::CommonComputationalGeometry
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::CommonMath
 PRIVATE_DEPENDS
   VTK::FiltersCore
+  VTK::FiltersGeneral
   VTK::FiltersGeometry
+  VTK::FiltersModeling
   VTK::FiltersSources
   VTK::IOCore
+  VTK::eigen
 TEST_DEPENDS
   VTK::FiltersAMR
   VTK::FiltersExtraction

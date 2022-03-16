@@ -16,11 +16,12 @@
  * @class   vtkNamedColors
  * @brief   A class holding colors and their names.
  *
- * For a web page of VTK Named Colors and their RGB values, see:
- * <a href="http://htmlpreview.github.io/?https://github.com/lorensen/VTKExamples/blob/master/src/Python/Visualization/VTKNamedColorPatches.html">VTKNamedColorPatches</a>.
- * Use
- * <a href="https://lorensen.github.io/VTKExamples/site/Python/Visualization/NamedColorPatches/">NamedColorPatches</a>
- * to generate this table.
+ * For a web page showcasing VTK Named Colors and their RGB values, see:
+ * <a
+ * href="https://htmlpreview.github.io/?https://github.com/Kitware/vtk-examples/blob/gh-pages/VTKNamedColorPatches.html">VTKNamedColorPatches</a>;
+ * <a
+ * href="https://kitware.github.io/vtk-examples/site/Python/Visualization/NamedColorPatches/">NamedColorPatches</a>
+ * was used to generate this table.
  *
  * Color names are case insensitive and are stored as lower-case names
  * along with a 4-element array whose elements are red, green, blue and alpha,
@@ -30,25 +31,26 @@
  * lies in the range 0...255 and if the RGBA values are double then each
  * element lies in the range 0...1.
  *
- * The colors and names are those in <a href="http://en.wikipedia.org/wiki/Web_colors">Web colors</a>
- * that are derived from the CSS3 specification:
- * <a href="http://www.w3.org/TR/css3-color/#svg-color">CSS Color Module Level 3</a>
- * In this table common synonyms such as cyan/aqua and
- * magenta/fuchsia are also included.
+ * The colors and names are those in <a href="https://en.wikipedia.org/wiki/Web_colors">Web
+ * colors</a> that are derived from the CSS3 specification: <a
+ * href="https://www.w3.org/TR/css-color-3/">CSS Color Module Level 3</a> In this table
+ * common synonyms such as cyan/aqua and magenta/fuchsia are also included.
  *
  * Also included in this class are names and colors taken from
- * Wrapping/Tcl/vtktesting/colors.tcl and Wrapping/Python/vtk/util/colors.py.
+ * <em>Wrapping/Python/vtkmodules/util/colors.py</em> that were originally taken from
+ * <em>Wrapping/Tcl/vtktesting/colors.tcl</em> (no longer in the VTK source files - deleted
+ * 06-Dec-2017).
  *
- * Web colors and names in <a href="http://en.wikipedia.org/wiki/Web_colors">Web colors</a> take
- * precedence over those in colors.py. One consequence of this
- * is that while colors.py specifies green as equivalent to
+ * Web colors and names in <a href="https://en.wikipedia.org/wiki/Web_colors">Web colors</a> take
+ * precedence over those in <em>colors.py</em>. One consequence of this
+ * is that while <em>colors.py</em> specifies green as equivalent to
  * (0,255,0), the web color standard defines it as (0,128,0).
  *
- * The SetColor methods will overwrite existing colors if the name of the
+ * The \a SetColor methods will overwrite existing colors if the name of the
  * color being set matches an existing color. Note that ColorExists() can be
  * used to test for existence of the color being set.
  *
- * In the case of the GetColor methods returning doubles, alternative versions,
+ * In the case of the \a GetColor methods returning doubles, alternative versions,
  * identified by the letters RGB in the names, are provided.
  * These get functions return just the red, green and blue components of
  * a color.
@@ -56,20 +58,20 @@
  * The class also provides methods for defining a color through an HTML color
  * string. The following formats are supported:
  *
- * - #RGB                  (3-digit hexadecimal number, where #4F2 is a shortcut for #44FF22)
- * - #RRGGBB               (6-digit hexadecimal number)
+ * - \#RGB                 (3-digit hexadecimal number, where #4F2 is a shortcut for #44FF22)
+ * - \#RRGGBB              (6-digit hexadecimal number)
  * - rgb(r, g, b)          (where r, g, b are in 0..255 or percentage values)
  * - rgba(r, g, b, a)      (where r, g, b, are in 0..255 or percentage values, a is in 0.0..1.0)
  * - a CSS3 color name     (e.g. "steelblue")
-*/
+ */
 
 #ifndef vtkNamedColors_h
 #define vtkNamedColors_h
 
+#include "vtkColor.h"             // Needed for vtkColor[34]ub
 #include "vtkCommonColorModule.h" // For export macro
 #include "vtkObject.h"
-#include "vtkColor.h" // Needed for vtkColor[34]ub
-#include "vtkStdString.h" // Needed for arguments
+#include "vtkStdString.h"   // Needed for arguments
 #include "vtkStringArray.h" // For returning color names
 
 class vtkNamedColorsDataStore;
@@ -107,7 +109,7 @@ public:
   /**
    * Return true if the color exists.
    */
-  bool ColorExists(const vtkStdString & name);
+  bool ColorExists(const vtkStdString& name);
 
   /**
    * Get the color by name.
@@ -115,7 +117,7 @@ public:
    * The color is returned as a vtkColor4ub class.
    * The color black is returned if the color is not found.
    */
-  vtkColor4ub GetColor4ub(const vtkStdString & name);
+  vtkColor4ub GetColor4ub(const vtkStdString& name);
 
   /**
    * Get the color by name.
@@ -124,9 +126,8 @@ public:
    * red, green, blue, alpha. The range of each element is 0...255.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name,
-                unsigned char & r, unsigned char & g,
-                unsigned char & b, unsigned char & a);
+  void GetColor(const vtkStdString& name, unsigned char& r, unsigned char& g, unsigned char& b,
+    unsigned char& a);
 
   /**
    * Get the color by name.
@@ -135,7 +136,7 @@ public:
    * [red, green, blue, alpha]. The range of each element is 0...255.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, unsigned char rgba[4]);
+  void GetColor(const vtkStdString& name, unsigned char rgba[4]);
 
   /**
    * Get the color by name.
@@ -143,7 +144,7 @@ public:
    * The color is returned as a vtkColor4ub class.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, vtkColor4ub & rgba);
+  void GetColor(const vtkStdString& name, vtkColor4ub& rgba);
 
   /**
    * Get the color by name.
@@ -151,7 +152,7 @@ public:
    * The color is returned as a vtkColor4d class.
    * The color black is returned if the color is not found.
    */
-  vtkColor4d GetColor4d(const vtkStdString & name);
+  vtkColor4d GetColor4d(const vtkStdString& name);
 
   /**
    * Get the color by name.
@@ -160,8 +161,7 @@ public:
    * red, green, blue, alpha. The range of each element is 0...1.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name,
-                double & r, double & g, double & b, double & a);
+  void GetColor(const vtkStdString& name, double& r, double& g, double& b, double& a);
 
   /**
    * Get the color by name.
@@ -170,7 +170,7 @@ public:
    * [red, green, blue, alpha]. The range of each element is 0...1.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, double rgba[4]);
+  void GetColor(const vtkStdString& name, double rgba[4]);
 
   /**
    * Get the color by name.
@@ -178,7 +178,7 @@ public:
    * The color is returned as a vtkColor4d class.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, vtkColor4d & rgba);
+  void GetColor(const vtkStdString& name, vtkColor4d& rgba);
 
   /**
    * Get the color by name.
@@ -186,7 +186,7 @@ public:
    * The color is returned as a vtkColor3ub class.
    * The color black is returned if the color is not found.
    */
-  vtkColor3ub GetColor3ub(const vtkStdString & name);
+  vtkColor3ub GetColor3ub(const vtkStdString& name);
 
   /**
    * Get the color by name.
@@ -194,7 +194,7 @@ public:
    * The color is returned as a vtkColor3d class.
    * The color black is returned if the color is not found.
    */
-  vtkColor3d GetColor3d(const vtkStdString & name);
+  vtkColor3d GetColor3d(const vtkStdString& name);
 
   /**
    * Get the color by name.
@@ -203,8 +203,7 @@ public:
    * red, green, blue. The range of each element is 0...1.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name,
-                   double & r, double & g, double & b);
+  void GetColor(const vtkStdString& name, double& r, double& g, double& b);
 
   /**
    * Get the color by name.
@@ -213,7 +212,7 @@ public:
    * [red, green, blue]. The range of each element is 0...1.
    * The color black is returned if the color is not found.
    */
-  void GetColorRGB(const vtkStdString & name, double rgb[3]);
+  void GetColorRGB(const vtkStdString& name, double rgb[3]);
 
   /**
    * Get the color by name.
@@ -221,7 +220,7 @@ public:
    * The color is returned as a vtkColor3ub class.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, vtkColor3ub & rgb);
+  void GetColor(const vtkStdString& name, vtkColor3ub& rgb);
 
   /**
    * Get the color by name.
@@ -229,7 +228,7 @@ public:
    * The color is returned as a vtkColor3d class.
    * The color black is returned if the color is not found.
    */
-  void GetColor(const vtkStdString & name, vtkColor3d & rgb);
+  void GetColor(const vtkStdString& name, vtkColor3d& rgb);
 
   /**
    * Set the color by name.
@@ -237,9 +236,8 @@ public:
    * The range of each color is 0...255.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name,
-                const unsigned char & r, const unsigned char & g,
-                const unsigned char & b, const unsigned char & a = 255);
+  virtual void SetColor(const vtkStdString& name, const unsigned char& r, const unsigned char& g,
+    const unsigned char& b, const unsigned char& a = 255);
 
   /**
    * Set the color by name.
@@ -247,9 +245,8 @@ public:
    * The range of each color is 0...1.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name,
-                const double & r, const double & g,
-                const double & b, const double & a = 1);
+  virtual void SetColor(const vtkStdString& name, const double& r, const double& g, const double& b,
+    const double& a = 1);
 
   /**
    * Set the color by name.
@@ -259,7 +256,7 @@ public:
    * The user must ensure that the color array size is 4.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const unsigned char rgba[4]);
+  virtual void SetColor(const vtkStdString& name, const unsigned char rgba[4]);
 
   /**
    * Set the color by name.
@@ -267,7 +264,7 @@ public:
    * The color is a vtkColor4ub class.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const vtkColor4ub & rgba);
+  virtual void SetColor(const vtkStdString& name, const vtkColor4ub& rgba);
 
   /**
    * Set the color by name.
@@ -275,7 +272,7 @@ public:
    * The color is a vtkColor3ub class.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const vtkColor3ub & rgb);
+  virtual void SetColor(const vtkStdString& name, const vtkColor3ub& rgb);
 
   /**
    * Set the color by name.
@@ -284,7 +281,7 @@ public:
    * [red, green, blue, alpha]. The range of each element is 0...1.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const double rgba[4]);
+  virtual void SetColor(const vtkStdString& name, const double rgba[4]);
 
   /**
    * Set the color by name.
@@ -292,7 +289,7 @@ public:
    * The color is a vtkColor4d class.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const vtkColor4d & rgba);
+  virtual void SetColor(const vtkStdString& name, const vtkColor4d& rgba);
 
   /**
    * Set the color by name.
@@ -300,7 +297,7 @@ public:
    * The color is a vtkColor3d class.
    * No color is set if the name is empty.
    */
-  virtual void SetColor(const vtkStdString & name, const vtkColor3d & rgb);
+  virtual void SetColor(const vtkStdString& name, const vtkColor3d& rgb);
 
   /**
    * Remove the color by name.
@@ -308,7 +305,7 @@ public:
    * Examples for parsing are provided in:
    * TestNamedColors.cxx and TestNamedColorsIntegration.py
    */
-  void RemoveColor(const vtkStdString & name);
+  void RemoveColor(const vtkStdString& name);
 
   /**
    * Return a string of color names with each name
@@ -323,7 +320,7 @@ public:
   /**
    * Return a string array of color names.
    */
-  void GetColorNames(vtkStringArray * colorNames);
+  void GetColorNames(vtkStringArray* colorNames);
 
   /**
    * Return a string of synonyms such as
@@ -340,8 +337,8 @@ public:
   /**
    * Return a vtkColor4ub instance from an HTML color string in any of
    * the following formats:
-   * - #RGB
-   * - #RRGGBB
+   * - \#RGB
+   * - \#RRGGBB
    * - rgb(r, g, b)
    * - rgba(r, g, b, a)
    * - a CSS3 color name, e.g. "steelblue"
@@ -354,8 +351,8 @@ public:
   /**
    * Return a vtkColor3ub instance from an HTML color string in any of
    * the following formats:
-   * - #RGB
-   * - #RRGGBB
+   * - \#RGB
+   * - \#RRGGBB
    * - rgb(r, g, b)
    * - rgba(r, g, b, a)
    * - a CSS3 color name, e.g. "steelblue"
@@ -369,13 +366,13 @@ public:
    * Given a vtkColor3ub instance as input color return a valid HTML color
    * string in the `#RRGGBB` format.
    */
-  vtkStdString RGBToHTMLColor(const vtkColor3ub & rgb);
+  vtkStdString RGBToHTMLColor(const vtkColor3ub& rgb);
 
   /**
    * Given a vtkColor4ub instance as input color return a valid HTML color
    * string in the `rgba(r, g, b, a)` format.
    */
-  vtkStdString RGBAToHTMLColor(const vtkColor4ub & rgba);
+  vtkStdString RGBAToHTMLColor(const vtkColor4ub& rgba);
 
   /**
    * Set the color by name.
@@ -384,20 +381,20 @@ public:
    * No color is set if the name is empty or if `htmlString` is not a valid
    * HTML color string.
    */
-  void SetColor(const vtkStdString & name, const vtkStdString & htmlString);
+  void SetColor(const vtkStdString& name, const vtkStdString& htmlString);
 
 protected:
   vtkNamedColors();
   ~vtkNamedColors() override;
 
 private:
-  //@{
+  ///@{
   /**
    * The implementation of the color map and other required methods.
    */
-  vtkNamedColorsDataStore *Colors;
+  vtkNamedColorsDataStore* Colors;
   vtkColorStringParser* Parser;
-  //@}
+  ///@}
 
   vtkNamedColors(const vtkNamedColors&) = delete;
   void operator=(const vtkNamedColors&) = delete;

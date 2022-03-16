@@ -68,14 +68,14 @@
  * the red, green, and blue component of the color are already pre-multiplied
  * by alpha. Also note that the window / level operation leaves the alpha
  * component unchanged - it only adjusts the RGB values.
-*/
+ */
 
 #ifndef vtkSmartVolumeMapper_h
 #define vtkSmartVolumeMapper_h
 
+#include "vtkImageReslice.h"                 // for VTK_RESLICE_NEAREST, VTK_RESLICE_CUBIC
 #include "vtkRenderingVolumeOpenGL2Module.h" // For export macro
 #include "vtkVolumeMapper.h"
-#include "vtkImageReslice.h" // for VTK_RESLICE_NEAREST, VTK_RESLICE_CUBIC
 
 class vtkFixedPointVolumeRayCastMapper;
 class vtkGPUVolumeRayCastMapper;
@@ -90,11 +90,11 @@ class vtkImageMagnitude;
 class VTKRENDERINGVOLUMEOPENGL2_EXPORT vtkSmartVolumeMapper : public vtkVolumeMapper
 {
 public:
-  static vtkSmartVolumeMapper *New();
-  vtkTypeMacro(vtkSmartVolumeMapper,vtkVolumeMapper);
-  void PrintSelf( ostream& os, vtkIndent indent ) override;
+  static vtkSmartVolumeMapper* New();
+  vtkTypeMacro(vtkSmartVolumeMapper, vtkVolumeMapper);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the final color window. This controls the contrast of
    * the image. The default value is 1.0. The Window can be
@@ -105,17 +105,17 @@ public:
    * than or equal to 0.0 will be set to -0.00001.
    * Initial value is 1.0.
    */
-  vtkSetMacro( FinalColorWindow, float );
-  //@}
+  vtkSetMacro(FinalColorWindow, float);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the final color window. Initial value is 1.0.
    */
-  vtkGetMacro( FinalColorWindow, float );
-  //@}
+  vtkGetMacro(FinalColorWindow, float);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the final color level. The level controls the
    * brightness of the image. The final color window will
@@ -123,25 +123,25 @@ public:
    * represent a linear remapping of color values. The
    * default value for the level is 0.5.
    */
-  vtkSetMacro( FinalColorLevel,  float );
-  //@}
+  vtkSetMacro(FinalColorLevel, float);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the final color level.
    */
-  vtkGetMacro( FinalColorLevel,  float );
-  //@}
+  vtkGetMacro(FinalColorLevel, float);
+  ///@}
 
-// The possible values for the default and current render mode ivars
+  // The possible values for the default and current render mode ivars
   enum
   {
-    DefaultRenderMode=0,
-    RayCastRenderMode=1,
-    GPURenderMode=2,
-    OSPRayRenderMode=3,
-    UndefinedRenderMode=4,
-    InvalidRenderMode=5
+    DefaultRenderMode = 0,
+    RayCastRenderMode = 1,
+    GPURenderMode = 2,
+    OSPRayRenderMode = 3,
+    UndefinedRenderMode = 4,
+    InvalidRenderMode = 5
   };
 
   /**
@@ -177,12 +177,12 @@ public:
    */
   void SetRequestedRenderModeToOSPRay();
 
-  //@{
+  ///@{
   /**
    * Get the requested render mode.
    */
-  vtkGetMacro( RequestedRenderMode, int );
-  //@}
+  vtkGetMacro(RequestedRenderMode, int);
+  ///@}
 
   /**
    * This will return the render mode used during the previous call to
@@ -190,7 +190,7 @@ public:
    */
   int GetLastUsedRenderMode();
 
-  //@{
+  ///@{
   /**
    * Value passed to the GPU mapper. Ignored by other mappers.
    * Maximum size of the 3D texture in GPU memory.
@@ -198,67 +198,61 @@ public:
    * card. Can be adjusted by the user.
    * Useful if the automatic detection is defective or missing.
    */
-  vtkSetMacro( MaxMemoryInBytes, vtkIdType );
-  vtkGetMacro( MaxMemoryInBytes, vtkIdType );
-  //@}
+  vtkSetMacro(MaxMemoryInBytes, vtkIdType);
+  vtkGetMacro(MaxMemoryInBytes, vtkIdType);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Value passed to the GPU mapper. Ignored by other mappers.
    * Maximum fraction of the MaxMemoryInBytes that should
    * be used to hold the texture. Valid values are 0.1 to
    * 1.0.
    */
-  vtkSetClampMacro( MaxMemoryFraction, float, 0.1f, 1.0f );
-  vtkGetMacro( MaxMemoryFraction, float );
-  //@}
+  vtkSetClampMacro(MaxMemoryFraction, float, 0.1f, 1.0f);
+  vtkGetMacro(MaxMemoryFraction, float);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set interpolation mode for downsampling (lowres GPU)
    * (initial value: cubic).
    */
-  vtkSetClampMacro(InterpolationMode, int,
-                   VTK_RESLICE_NEAREST, VTK_RESLICE_CUBIC);
+  vtkSetClampMacro(InterpolationMode, int, VTK_RESLICE_NEAREST, VTK_RESLICE_CUBIC);
   vtkGetMacro(InterpolationMode, int);
   void SetInterpolationModeToNearestNeighbor();
   void SetInterpolationModeToLinear();
   void SetInterpolationModeToCubic();
-  //@}
+  ///@}
 
   /**
    * This method can be used to render a representative view of the input data
    * into the supplied image given the supplied blending mode, view direction,
    * and view up vector.
    */
-  void CreateCanonicalView( vtkRenderer *ren,
-                            vtkVolume *volume,
-                            vtkVolume *volume2,
-                            vtkImageData *image,
-                            int blend_mode,
-                            double viewDirection[3],
-                            double viewUp[3] );
+  void CreateCanonicalView(vtkRenderer* ren, vtkVolume* volume, vtkVolume* volume2,
+    vtkImageData* image, int blend_mode, double viewDirection[3], double viewUp[3]);
 
-  //@{
+  ///@{
   /**
    * If the DesiredUpdateRate of the vtkRenderWindow that caused the Render
    * falls at or above this rate, the render is considered interactive and
    * the mapper may be adjusted (depending on the render mode).
    * Initial value is 1.0.
    */
-  vtkSetClampMacro( InteractiveUpdateRate, double, 1.0e-10, 1.0e10 );
-  //@}
+  vtkSetClampMacro(InteractiveUpdateRate, double, 1.0e-10, 1.0e10);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the update rate at or above which this is considered an
    * interactive render.
    * Initial value is 1.0.
    */
-  vtkGetMacro( InteractiveUpdateRate, double );
-  //@}
+  vtkGetMacro(InteractiveUpdateRate, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If the InteractiveAdjustSampleDistances flag is enabled,
    * vtkSmartVolumeMapper interactively sets and resets the
@@ -267,12 +261,12 @@ public:
    * distance based on whether the render is interactive or still.
    * By default, InteractiveAdjustSampleDistances is enabled.
    */
-  vtkSetClampMacro( InteractiveAdjustSampleDistances, vtkTypeBool, 0, 1);
-  vtkGetMacro( InteractiveAdjustSampleDistances, vtkTypeBool);
-  vtkBooleanMacro( InteractiveAdjustSampleDistances, vtkTypeBool);
-  //@}
+  vtkSetClampMacro(InteractiveAdjustSampleDistances, vtkTypeBool, 0, 1);
+  vtkGetMacro(InteractiveAdjustSampleDistances, vtkTypeBool);
+  vtkBooleanMacro(InteractiveAdjustSampleDistances, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If AutoAdjustSampleDistances is on, the ImageSampleDistance
    * will be varied to achieve the allocated render time of this
@@ -282,12 +276,12 @@ public:
    * enabled. To explicitly set and use this flag, one must disable
    * InteractiveAdjustSampleDistances.
    */
-  vtkSetClampMacro( AutoAdjustSampleDistances, vtkTypeBool, 0, 1 );
-  vtkGetMacro( AutoAdjustSampleDistances, vtkTypeBool );
-  vtkBooleanMacro( AutoAdjustSampleDistances, vtkTypeBool );
-  //@}
+  vtkSetClampMacro(AutoAdjustSampleDistances, vtkTypeBool, 0, 1);
+  vtkGetMacro(AutoAdjustSampleDistances, vtkTypeBool);
+  vtkBooleanMacro(AutoAdjustSampleDistances, vtkTypeBool);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the distance between samples used for rendering
    * when AutoAdjustSampleDistances is off, or when this mapper
@@ -295,15 +289,15 @@ public:
    * If SampleDistance is negative, it will be computed based on the dataset
    * spacing. Initial value is -1.0.
    */
-  vtkSetMacro( SampleDistance, float );
-  vtkGetMacro( SampleDistance, float );
-  //@}
+  vtkSetMacro(SampleDistance, float);
+  vtkGetMacro(SampleDistance, float);
+  ///@}
 
   /**
    * WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
    * Initialize rendering for this volume.
    */
-  void Render( vtkRenderer *, vtkVolume * ) override;
+  void Render(vtkRenderer*, vtkVolume*) override;
 
   /**
    * WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
@@ -311,9 +305,9 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow *) override;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
-  //@{
+  ///@{
   /**
    * VectorMode is a special rendering mode for 3-component vectors which makes
    * use of GPURayCastMapper's independent-component capabilities. In this mode,
@@ -333,6 +327,14 @@ public:
 
   vtkSetClampMacro(VectorComponent, int, 0, 3);
   vtkGetMacro(VectorComponent, int);
+  ///@}
+
+  //@{
+  /**
+   * Set/Get the transfer 2D Y axis array
+   */
+  vtkSetStringMacro(Transfer2DYAxisArray);
+  vtkGetStringMacro(Transfer2DYAxisArray);
   //@}
 
 protected:
@@ -344,56 +346,56 @@ protected:
    * internal volume mapper by doing a shallow to avoid memory leaks.
    * \pre m_exists: m!=0
    */
-  void ConnectMapperInput(vtkVolumeMapper *m);
+  void ConnectMapperInput(vtkVolumeMapper* m);
 
   /**
    * Connect input of the vtkSmartVolumeMapper to the input of the
    * internal resample filter by doing a shallow to avoid memory leaks.
    * \pre m_exists: f!=0
    */
-  void ConnectFilterInput(vtkImageResample *f);
+  void ConnectFilterInput(vtkImageResample* f);
 
-  //@{
+  ///@{
   /**
    * Window / level ivars
    */
-  float   FinalColorWindow;
-  float   FinalColorLevel;
-  //@}
+  float FinalColorWindow;
+  float FinalColorLevel;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * GPU mapper-specific memory ivars.
    */
   vtkIdType MaxMemoryInBytes;
   float MaxMemoryFraction;
-  //@}
+  ///@}
 
   /**
    * Used for downsampling.
    */
   int InterpolationMode;
 
-  //@{
+  ///@{
   /**
    * The requested render mode is used to compute the current render mode. Note
    * that the current render mode can be invalid if the requested mode is not
    * supported.
    */
-  int     RequestedRenderMode;
-  int     CurrentRenderMode;
-  //@}
+  int RequestedRenderMode;
+  int CurrentRenderMode;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Initialization variables.
    */
-  int          Initialized;
+  int Initialized;
   vtkTimeStamp SupportStatusCheckTime;
-  int          GPUSupported;
-  int          RayCastSupported;
-  int          LowResGPUNecessary;
-  //@}
+  int GPUSupported;
+  int RayCastSupported;
+  int LowResGPUNecessary;
+  ///@}
 
   /**
    * This is the resample filter that may be used if we need to
@@ -401,7 +403,7 @@ protected:
    */
   vtkImageResample* GPUResampleFilter;
 
-  //@{
+  ///@{
   /**
    * This filter is used to compute the magnitude of 3-component data. MAGNITUDE
    * is one of the supported modes when rendering separately a single independent
@@ -413,21 +415,19 @@ protected:
    */
   vtkImageMagnitude* ImageMagnitude;
   vtkImageData* InputDataMagnitude;
-  //@}
+  ///@}
 
   /**
    * The initialize method. Called from ComputeRenderMode whenever something
    * relevant has changed.
    */
-  void  Initialize(vtkRenderer *ren,
-                   vtkVolume *vol);
+  void Initialize(vtkRenderer* ren, vtkVolume* vol);
 
   /**
    * The method that computes the render mode from the requested render mode
    * based on the support status for each render method.
    */
-  void  ComputeRenderMode(vtkRenderer *ren,
-                          vtkVolume *vol);
+  void ComputeRenderMode(vtkRenderer* ren, vtkVolume* vol);
 
   /**
    * Expose GPU mapper for additional customization.
@@ -435,33 +435,32 @@ protected:
   friend class vtkMultiBlockVolumeMapper;
   vtkGetObjectMacro(GPUMapper, vtkGPUVolumeRayCastMapper);
 
-  //@{
+  ///@{
   /**
    * The three potential mappers
    */
-  vtkGPUVolumeRayCastMapper      *GPULowResMapper;
-  vtkGPUVolumeRayCastMapper      *GPUMapper;
-  vtkFixedPointVolumeRayCastMapper  *RayCastMapper;
-  //@}
-
+  vtkGPUVolumeRayCastMapper* GPULowResMapper;
+  vtkGPUVolumeRayCastMapper* GPUMapper;
+  vtkFixedPointVolumeRayCastMapper* RayCastMapper;
+  ///@}
 
   /**
    * We need to keep track of the blend mode we had when we initialized
    * because we need to reinitialize (and recheck hardware support) if
    * it changes
    */
-  int  InitializedBlendMode;
+  int InitializedBlendMode;
 
   /**
    * The distance between sample points along the ray
    */
-  float  SampleDistance;
+  float SampleDistance;
 
   /**
    * Set whether or not the sample distance should be automatically calculated
    * within the internal volume mapper
    */
-  vtkTypeBool    AutoAdjustSampleDistances;
+  vtkTypeBool AutoAdjustSampleDistances;
 
   /**
    * If the DesiredUpdateRate of the vtkRenderWindow causing the Render is at
@@ -479,7 +478,7 @@ protected:
    */
   vtkTypeBool InteractiveAdjustSampleDistances;
 
-  //@{
+  ///@{
   /**
    * VectorMode is a special rendering mode for 3-component vectors which makes
    * use of GPURayCastMapper's independent-component capabilities. In this mode,
@@ -490,10 +489,26 @@ protected:
   int VectorMode;
   int VectorComponent;
   vtkTimeStamp MagnitudeUploadTime;
-  //@}
+  ///@}
+
+  ///@{
+  /**
+   * Keep a cache of the last input to the mapper so that input data changes can be propogated to
+   * the resample filter and internal mappers.
+   */
+  vtkDataSet* LastInput;
+  vtkDataSet* LastFilterInput;
+  ///@}
+
+  /**
+   * Define the array used for the Y axis of transfer 2D.
+   * This is used when the transfer function  mode is set to 2D. If unset, the
+   * default is to use the gradient of the scalar.
+   */
+  char* Transfer2DYAxisArray;
 
 private:
-  //@{
+  ///@{
   /**
    * Adjust the GPUMapper's parameters (ColorTable, Weights, etc.) to render
    * a single component of a dataset.
@@ -504,14 +519,14 @@ private:
    * array. vtkImageMagnitude can only process point data, so in the case of cell
    * data it is first transformed to points.
    */
-  void ComputeMagnitudeCellData(vtkImageData* input, vtkDataArray* arr);
-  void ComputeMagnitudePointData(vtkImageData* input, vtkDataArray* arr);
-  //@}
+  void ComputeMagnitudeCellData(vtkDataSet* input, vtkDataArray* arr);
+  void ComputeMagnitudePointData(vtkDataSet* input, vtkDataArray* arr);
+  ///@}
 
   vtkSmartVolumeMapper(const vtkSmartVolumeMapper&) = delete;
   void operator=(const vtkSmartVolumeMapper&) = delete;
 
-  vtkOSPRayVolumeInterface *OSPRayMapper;
+  vtkOSPRayVolumeInterface* OSPRayMapper;
 };
 
 #endif

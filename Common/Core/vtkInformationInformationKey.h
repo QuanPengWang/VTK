@@ -18,7 +18,7 @@
  *
  * vtkInformationInformationKey is used to represent keys in vtkInformation
  * for other information objects.
-*/
+ */
 
 #ifndef vtkInformationInformationKey_h
 #define vtkInformationInformationKey_h
@@ -31,7 +31,7 @@
 class VTKCOMMONCORE_EXPORT vtkInformationInformationKey : public vtkInformationKey
 {
 public:
-  vtkTypeMacro(vtkInformationInformationKey,vtkInformationKey);
+  vtkTypeMacro(vtkInformationInformationKey, vtkInformationKey);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkInformationInformationKey(const char* name, const char* location);
@@ -42,19 +42,20 @@ public:
    * name and a location. This method is provided for wrappers. Use the
    * constructor directly from C++ instead.
    */
-  static vtkInformationInformationKey* MakeKey(const char* name, const char* location)
+  static VTK_NEWINSTANCE vtkInformationInformationKey* MakeKey(
+    const char* name, const char* location)
   {
     return new vtkInformationInformationKey(name, location);
   }
 
-  //@{
+  ///@{
   /**
    * Get/Set the value associated with this key in the given
    * information object.
    */
   void Set(vtkInformation* info, vtkInformation*);
   vtkInformation* Get(vtkInformation* info);
-  //@}
+  ///@}
 
   /**
    * Copy the entry associated with this key from one information

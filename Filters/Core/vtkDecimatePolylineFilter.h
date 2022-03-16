@@ -39,79 +39,78 @@
  *
  * @sa
  * vtkDecimate vtkDecimateProp vtkQuadricClustering vtkQuadricDecimation
-*/
+ */
 
 #ifndef vtkDecimatePolylineFilter_h
 #define vtkDecimatePolylineFilter_h
 
 #include "vtkFiltersCoreModule.h" // For export macro
-#include "vtkSmartPointer.h" // Needed for SP ivars
+#include "vtkSmartPointer.h"      // Needed for SP ivars
 
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkPriorityQueue;
 
-
 class VTKFILTERSCORE_EXPORT vtkDecimatePolylineFilter : public vtkPolyDataAlgorithm
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for type information and printing.
    */
-  vtkTypeMacro(vtkDecimatePolylineFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkDecimatePolylineFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Instantiate this object with a target reduction of 0.90.
    */
-  static vtkDecimatePolylineFilter *New();
+  static vtkDecimatePolylineFilter* New();
 
-  //@{
+  ///@{
   /**
    * Specify the desired reduction in the total number of polygons (e.g., if
    * TargetReduction is set to 0.9, this filter will try to reduce the data set
    * to 10% of its original size).
    */
-  vtkSetClampMacro(TargetReduction,double,0.0,1.0);
-  vtkGetMacro(TargetReduction,double);
-  //@}
+  vtkSetClampMacro(TargetReduction, double, 0.0, 1.0);
+  vtkGetMacro(TargetReduction, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the largest decimation error that is allowed during the decimation
    * process. This may limit the maximum reduction that may be achieved. The
    * maximum error is specified as a fraction of the maximum length of
    * the input data bounding box.
    */
-  vtkSetClampMacro(MaximumError,double,0.0,VTK_DOUBLE_MAX);
-  vtkGetMacro(MaximumError,double);
-  //@}
+  vtkSetClampMacro(MaximumError, double, 0.0, VTK_DOUBLE_MAX);
+  vtkGetMacro(MaximumError, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get the desired precision for the output types. See the documentation
    * for the vtkAlgorithm::DesiredOutputPrecision enum for an explanation of
    * the available precision settings.
    */
-  vtkSetMacro(OutputPointsPrecision,int);
-  vtkGetMacro(OutputPointsPrecision,int);
-  //@}
+  vtkSetMacro(OutputPointsPrecision, int);
+  vtkGetMacro(OutputPointsPrecision, int);
+  ///@}
 
 protected:
   vtkDecimatePolylineFilter();
   ~vtkDecimatePolylineFilter() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   class Polyline;
-  double ComputeError( vtkPolyData* input, Polyline* polyline, vtkIdType id );
+  double ComputeError(vtkPolyData* input, Polyline* polyline, vtkIdType id);
 
-  vtkSmartPointer< vtkPriorityQueue >   PriorityQueue;
-  double                                TargetReduction;
-  double                                MaximumError;
-  int                                   OutputPointsPrecision;
+  vtkSmartPointer<vtkPriorityQueue> PriorityQueue;
+  double TargetReduction;
+  double MaximumError;
+  int OutputPointsPrecision;
 
 private:
   vtkDecimatePolylineFilter(const vtkDecimatePolylineFilter&) = delete;

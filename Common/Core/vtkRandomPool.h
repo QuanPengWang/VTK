@@ -48,51 +48,51 @@ class vtkDataArray;
 class VTKCOMMONCORE_EXPORT vtkRandomPool : public vtkObject
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instantiation, type information, and printing.
    */
   static vtkRandomPool* New();
-  vtkTypeMacro(vtkRandomPool,vtkObject);
+  vtkTypeMacro(vtkRandomPool, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the random sequence generator used to produce the random pool.
    * By default vtkMersenneTwister is used.
    */
-  virtual void SetSequence(vtkRandomSequence *seq);
-  vtkGetObjectMacro(Sequence,vtkRandomSequence);
-  //@}
+  virtual void SetSequence(vtkRandomSequence* seq);
+  vtkGetObjectMacro(Sequence, vtkRandomSequence);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to set and get the size of the pool. The size must be specified
    * before invoking GeneratePool(). Note the number of components will
    * affect the total size (allocated memory is Size*NumberOfComponents).
    */
-  vtkSetClampMacro(Size,vtkIdType,1,VTK_ID_MAX);
-  vtkGetMacro(Size,vtkIdType);
-  //@}
+  vtkSetClampMacro(Size, vtkIdType, 1, VTK_ID_MAX);
+  vtkGetMacro(Size, vtkIdType);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to set and get the number of components in the pool. This is a
    * convenience capability and can be used to interface with
    * vtkDataArrays. By default the number of components is =1.
    */
-  vtkSetClampMacro(NumberOfComponents,vtkIdType,1,VTK_INT_MAX);
-  vtkGetMacro(NumberOfComponents,vtkIdType);
-  //@}
+  vtkSetClampMacro(NumberOfComponents, vtkIdType, 1, VTK_INT_MAX);
+  vtkGetMacro(NumberOfComponents, vtkIdType);
+  ///@}
 
   /**
    * This convenience method returns the total size of the memory pool, i.e.,
    * Size*NumberOfComponents.
    */
-  vtkIdType GetTotalSize() {return (this->Size*this->NumberOfComponents);}
+  vtkIdType GetTotalSize() { return (this->Size * this->NumberOfComponents); }
 
-  //@{
+  ///@{
   /**
    * These methods provide access to the raw random pool as a double
    * array. The size of the array is Size*NumberOfComponents. Each x value
@@ -106,13 +106,15 @@ public:
    * methods should only be called after GeneratePool() has been invoked;
    */
   const double* GeneratePool();
-  const double* GetPool() {return this->Pool;}
-  double GetValue(vtkIdType i) {return this->Pool[(i%this->TotalSize)];}
+  const double* GetPool() { return this->Pool; }
+  double GetValue(vtkIdType i) { return this->Pool[(i % this->TotalSize)]; }
   double GetValue(vtkIdType i, int compNum)
-  {return this->Pool[(compNum + this->NumberOfComponents*i) % this->TotalSize];}
-  //@}
+  {
+    return this->Pool[(compNum + this->NumberOfComponents * i) % this->TotalSize];
+  }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods to populate data arrays of various types with values within a
    * specified (min,max) range. Note that compNumber is used to specify the
@@ -125,12 +127,11 @@ public:
    * numbers generated; so the input data array should be pre-allocated with
    * (SetNumberOfComponents, SetNumberOfTuples).
    */
-  void PopulateDataArray(vtkDataArray *da, double minRange, double maxRange);
-  void PopulateDataArray(vtkDataArray *da, int compNumber,
-                         double minRange, double maxRange);
-  //@}
+  void PopulateDataArray(vtkDataArray* da, double minRange, double maxRange);
+  void PopulateDataArray(vtkDataArray* da, int compNumber, double minRange, double maxRange);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the work chunk size at which point multithreading kicks in. For small
    * memory pools < ChunkSize, no threading is used. Larger pools are computed using
@@ -138,7 +139,7 @@ public:
    */
   vtkSetClampMacro(ChunkSize, vtkIdType, 1000, VTK_INT_MAX);
   vtkGetMacro(ChunkSize, vtkIdType);
-  //@}
+  ///@}
 
 protected:
   vtkRandomPool();
@@ -148,14 +149,14 @@ protected:
   vtkTimeStamp GenerateTime;
 
   // Data members to support public API
-  vtkRandomSequence *Sequence;
+  vtkRandomSequence* Sequence;
   vtkIdType Size;
   int NumberOfComponents;
   vtkIdType ChunkSize;
 
   // Internal data members
   vtkIdType TotalSize;
-  double *Pool;
+  double* Pool;
 
 private:
   vtkRandomPool(const vtkRandomPool&) = delete;
@@ -163,4 +164,3 @@ private:
 };
 
 #endif
-// VTK-HeaderTest-Exclude: vtkRandomPool.h

@@ -21,7 +21,7 @@
  * multi-group, multi-block hierarchical and hierarchical box files. XML
  * multi-group data files are meta-files that point to a list of serial VTK
  * XML files.
-*/
+ */
 
 #ifndef vtkXMLPMultiBlockDataWriter_h
 #define vtkXMLPMultiBlockDataWriter_h
@@ -39,23 +39,23 @@ public:
   vtkTypeMacro(vtkXMLPMultiBlockDataWriter, vtkXMLMultiBlockDataWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the number of pieces that are being written in parallel.
    */
   vtkSetMacro(NumberOfPieces, int);
   vtkGetMacro(NumberOfPieces, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get/Set the range of pieces assigned to this writer.
    */
   vtkSetMacro(StartPiece, int);
   vtkGetMacro(StartPiece, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Controller used to communicate data type of blocks.
    * By default, the global controller is used. If you want another
@@ -65,7 +65,7 @@ public:
    */
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
   /**
    * Set whether this instance will write the meta-file. WriteMetaFile
@@ -75,9 +75,8 @@ public:
   void SetWriteMetaFile(int flag) override;
 
   // See the vtkAlgorithm for a description of what these do
-  int ProcessRequest(vtkInformation*,
-                     vtkInformationVector**,
-                     vtkInformationVector*) override;
+  vtkTypeBool ProcessRequest(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkXMLPMultiBlockDataWriter();
@@ -104,8 +103,8 @@ protected:
    * no files were written from compositeData.  Process 0 creates
    * the metadata for all of the processes/files.
    */
-  int WriteComposite(vtkCompositeDataSet* compositeData,
-                             vtkXMLDataElement* parent, int &currentFileIndex) override;
+  int WriteComposite(
+    vtkCompositeDataSet* compositeData, vtkXMLDataElement* parent, int& currentFileIndex) override;
 
   /**
    * Internal method to write a non vtkCompositeDataSet subclass as
@@ -119,16 +118,14 @@ protected:
    * 0 if no file was written.
    */
   int ParallelWriteNonCompositeData(
-    vtkDataObject* dObj, vtkXMLDataElement* parentXML,
-    int currentFileIndex);
+    vtkDataObject* dObj, vtkXMLDataElement* parentXML, int currentFileIndex);
 
   /**
    * Return the name of the file given the currentFileIndex (also the current
    * globally numbered piece index), the procId the file exists on, and
    * the dataSetType.
    */
-  virtual vtkStdString CreatePieceFileName(
-    int currentFileIndex, int procId, int dataSetType);
+  virtual vtkStdString CreatePieceFileName(int currentFileIndex, int procId, int dataSetType);
 
   /**
    * Utility function to remove any already written files
@@ -136,13 +133,13 @@ protected:
    */
   void RemoveWrittenFiles(const char* subDirectory) override;
 
-  //@{
+  ///@{
   /**
    * Piece information.
    */
   int StartPiece;
   int NumberOfPieces;
-  //@}
+  ///@}
 
 private:
   vtkXMLPMultiBlockDataWriter(const vtkXMLPMultiBlockDataWriter&) = delete;

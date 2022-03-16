@@ -60,7 +60,7 @@
  *
  * @par Thanks:
  * Thanks to Colin Myers, University of Leeds for extending this implementation.
-*/
+ */
 
 #ifndef vtkTulipReader_h
 #define vtkTulipReader_h
@@ -71,26 +71,23 @@
 class VTKIOINFOVIS_EXPORT vtkTulipReader : public vtkUndirectedGraphAlgorithm
 {
 public:
-  static vtkTulipReader *New();
+  static vtkTulipReader* New();
   vtkTypeMacro(vtkTulipReader, vtkUndirectedGraphAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The Tulip file name.
    */
-  vtkGetStringMacro(FileName);
-  vtkSetStringMacro(FileName);
-  //@}
+  vtkGetFilePathMacro(FileName);
+  vtkSetFilePathMacro(FileName);
+  ///@}
 
 protected:
   vtkTulipReader();
   ~vtkTulipReader() override;
 
-  int RequestData(
-    vtkInformation *,
-    vtkInformationVector **,
-    vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Set the outputs to vtkUndirectedGraph and vtkAnnotationLayers.

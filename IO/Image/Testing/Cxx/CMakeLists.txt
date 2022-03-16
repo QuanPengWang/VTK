@@ -31,6 +31,14 @@ vtk_add_test_cxx(vtkIOImageCxxTests tests
     "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/masonry.bmp}")
 
 vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestHDRReaderRGBE,TestHDRReader.cxx,NO_OUTPUT
+    "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/spiaggia_di_mondello_1k.hdr}")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestHDRReaderXYZ,TestHDRReader.cxx,NO_OUTPUT
+    "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/gradient_xyz.hdr}")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
   TestSEPReader.cxx,NO_OUTPUT)
 
 vtk_add_test_cxx(vtkIOImageCxxTests tests
@@ -78,13 +86,46 @@ vtk_add_test_cxx(vtkIOImageCxxTests tests
     "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/vtk.png}")
 
 vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestTGAReader.cxx,NO_OUTPUT
+    "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/vtk.tga}")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
   TestPNGReaderReadFromMemory.cxx,NO_OUTPUT
     "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/vtk.png}")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestWriteToUnicodeFileBMP,TestWriteToUnicodeFile.cxx,NO_VALID
+    "image.bmp")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestWriteToUnicodeFilePNG,TestWriteToUnicodeFile.cxx,NO_VALID
+    "image.png")
+
+vtk_add_test_cxx(vtkIOImageCxxTests tests
+  TestWriteToUnicodeFileJPEG,TestWriteToUnicodeFile.cxx,NO_VALID
+    "image.jpg")
 
 if (VTK_USE_LARGE_DATA)
   vtk_add_test_cxx(vtkIOImageCxxTests large_data_tests
     TestMRCReader,TestMRCReader.cxx,NO_OUTPUT
       "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/mrc/emd_1056.mrc}")
+
+  vtk_add_test_cxx(vtkIOImageCxxTests large_data_tests
+    TestOMETIFFReaderTwoChannel,TestOMETIFFReader.cxx,NO_OUTPUT,NO_VALID
+    "--data" "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/ometiff/test_small_TwoChannel_Singleframe.ome.tif}"
+    "--size" "256x256x75"
+    "--physical-size" "0.208x0.208x0.604"
+    "--size_c" "2"
+    "--size_t" "1")
+
+  vtk_add_test_cxx(vtkIOImageCxxTests large_data_tests
+    TestOMETIFFReaderSingleChannel,TestOMETIFFReader.cxx,NO_OUTPUT,NO_VALID
+    "--data" "DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/ometiff/test_small_singleChannel_timeSeries.ome.tif}"
+    "--size" "256x256x75"
+    "--physical-size" "0.208x0.208x0.604"
+    "--size_c" "1"
+    "--size_t" "6")
+
   list(APPEND data_tests ${large_data_tests})
 endif()
 
@@ -92,6 +133,8 @@ set(all_tests
   ${data_tests}
   ${tests}
   )
+
 vtk_test_cxx_executable(vtkIOImageCxxTests all_tests
+  DISABLE_FLOATING_POINT_EXCEPTIONS
   RENDERING_FACTORY
-)
+  )

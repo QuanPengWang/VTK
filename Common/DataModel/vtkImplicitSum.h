@@ -21,7 +21,7 @@
  * The NormalizeByWeight option normalizes the output so that the
  * scalar weights add up to 1. Note that this function gives accurate
  * sums and gradients only if the input functions are linear.
-*/
+ */
 
 #ifndef vtkImplicitSum_h
 #define vtkImplicitSum_h
@@ -35,18 +35,18 @@ class vtkImplicitFunctionCollection;
 class VTKCOMMONDATAMODEL_EXPORT vtkImplicitSum : public vtkImplicitFunction
 {
 public:
-  static vtkImplicitSum *New();
+  static vtkImplicitSum* New();
 
-  vtkTypeMacro(vtkImplicitSum,vtkImplicitFunction);
+  vtkTypeMacro(vtkImplicitSum, vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Evaluate implicit function using current functions and weights.
    */
   using vtkImplicitFunction::EvaluateFunction;
   double EvaluateFunction(double x[3]) override;
-  //@}
+  ///@}
 
   /**
    * Evaluate gradient of the weighted sum of functions.  Input functions
@@ -63,13 +63,13 @@ public:
    * Add another implicit function to the list of functions, along with a
    * weighting factor.
    */
-  void AddFunction(vtkImplicitFunction *in, double weight);
+  void AddFunction(vtkImplicitFunction* in, double weight);
 
   /**
    * Add another implicit function to the list of functions, weighting it by
    * a factor of 1.
    */
-  void AddFunction(vtkImplicitFunction *in) { this->AddFunction(in, 1.0); }
+  void AddFunction(vtkImplicitFunction* in) { this->AddFunction(in, 1.0); }
 
   /**
    * Remove all functions from the list.
@@ -79,9 +79,9 @@ public:
   /**
    * Set the weight (coefficient) of the given function to be weight.
    */
-  void SetFunctionWeight(vtkImplicitFunction *f, double weight);
+  void SetFunctionWeight(vtkImplicitFunction* f, double weight);
 
-  //@{
+  ///@{
   /**
    * When calculating the function and gradient values of the
    * composite function, setting NormalizeByWeight on will divide the
@@ -92,14 +92,14 @@ public:
   vtkSetMacro(NormalizeByWeight, vtkTypeBool);
   vtkGetMacro(NormalizeByWeight, vtkTypeBool);
   vtkBooleanMacro(NormalizeByWeight, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkImplicitSum();
   ~vtkImplicitSum() override;
 
-  vtkImplicitFunctionCollection *FunctionList;
-  vtkDoubleArray *Weights;
+  vtkImplicitFunctionCollection* FunctionList;
+  vtkDoubleArray* Weights;
   double TotalWeight;
 
   void CalculateTotalWeight(void);

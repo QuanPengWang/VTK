@@ -22,7 +22,7 @@
 
 using namespace OT;
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 Sample* vtkOTUtilities::SingleDimArraysToSample(vtkDataArrayCollection* arrays)
 {
   if (arrays == nullptr)
@@ -48,9 +48,8 @@ Sample* vtkOTUtilities::SingleDimArraysToSample(vtkDataArrayCollection* arrays)
     {
       // TODO nullptr Object
       vtkErrorWithObjectMacro(arrays,
-        "An array has not the expected number of tuples. Expecting: " << numTuples << " , got: "
-                                                                      << array->GetNumberOfTuples()
-                                                                      << " , dropping it");
+        "An array has not the expected number of tuples. Expecting: "
+          << numTuples << " , got: " << array->GetNumberOfTuples() << " , dropping it");
       continue;
     }
     for (int i = 0; i < numTuples; ++i)
@@ -63,7 +62,7 @@ Sample* vtkOTUtilities::SingleDimArraysToSample(vtkDataArrayCollection* arrays)
   return ns;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 Sample* vtkOTUtilities::ArrayToSample(vtkDataArray* arr)
 {
   if (arr == nullptr)
@@ -85,7 +84,7 @@ Sample* vtkOTUtilities::ArrayToSample(vtkDataArray* arr)
   return ns;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkDataArray* vtkOTUtilities::SampleToArray(Sample* ns)
 {
   if (ns == nullptr)

@@ -14,9 +14,8 @@
 =========================================================================*/
 #include "vtkOSPRayVolumeNode.h"
 
-#include "vtkActor.h"
-#include "vtkVolume.h"
 #include "vtkAbstractVolumeMapper.h"
+#include "vtkActor.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
@@ -28,7 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPolyData.h"
-#include "vtkViewNodeCollection.h"
+#include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
 
 #include "RTWrapper/RTWrapper.h"
@@ -36,27 +35,28 @@
 //============================================================================
 vtkStandardNewMacro(vtkOSPRayVolumeNode);
 
-//----------------------------------------------------------------------------
-vtkOSPRayVolumeNode::vtkOSPRayVolumeNode()
-{
-}
+//------------------------------------------------------------------------------
+vtkOSPRayVolumeNode::vtkOSPRayVolumeNode() = default;
 
-//----------------------------------------------------------------------------
-vtkOSPRayVolumeNode::~vtkOSPRayVolumeNode()
-{
-}
+//------------------------------------------------------------------------------
+vtkOSPRayVolumeNode::~vtkOSPRayVolumeNode() = default;
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkOSPRayVolumeNode::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkMTimeType vtkOSPRayVolumeNode::GetMTime()
 {
   vtkMTimeType mtime = this->Superclass::GetMTime();
-  vtkVolume *vol = (vtkVolume*)this->GetRenderable();
+  vtkVolume* vol = (vtkVolume*)this->GetRenderable();
+  if (!vol)
+  {
+    return mtime;
+  }
+
   if (vol->GetMTime() > mtime)
   {
     mtime = vol->GetMTime();
@@ -65,11 +65,11 @@ vtkMTimeType vtkOSPRayVolumeNode::GetMTime()
   {
     mtime = std::max(mtime, vol->GetProperty()->GetMTime());
   }
-  vtkAbstractVolumeMapper *mapper = vol->GetMapper();
+  vtkAbstractVolumeMapper* mapper = vol->GetMapper();
 
   if (mapper)
   {
-    vtkDataObject *dobj = mapper->GetDataSetInput();
+    vtkDataObject* dobj = mapper->GetDataSetInput();
     if (dobj)
     {
       mtime = std::max(mtime, dobj->GetMTime());

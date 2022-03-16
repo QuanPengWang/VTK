@@ -25,7 +25,6 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
 #include "vtkQuadric.h"
 #include "vtkUniformHyperTreeGrid.h"
 
@@ -37,7 +36,7 @@
 vtkStandardNewMacro(vtkHyperTreeGridAxisClip);
 vtkCxxSetObjectMacro(vtkHyperTreeGridAxisClip, Quadric, vtkQuadric);
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkHyperTreeGridAxisClip::vtkHyperTreeGridAxisClip()
 {
   // Defaut clipping mode is by plane
@@ -62,10 +61,9 @@ vtkHyperTreeGridAxisClip::vtkHyperTreeGridAxisClip()
   this->Quadric->SetCoefficients(1., 1., 1., 0., 0., 0., 0., 0., 0., -1.);
 
   // Defaut inside/out flag is false
-  this->InsideOut = 0;
+  this->InsideOut = false;
 
-  // This filter always creates an output with a material mask
-  this->OutMask = vtkBitArray::New();
+  this->OutMask = nullptr;
 
   // Output indices begin at 0
   this->CurrentId = 0;
@@ -74,7 +72,7 @@ vtkHyperTreeGridAxisClip::vtkHyperTreeGridAxisClip()
   this->AppropriateOutput = true;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkHyperTreeGridAxisClip::~vtkHyperTreeGridAxisClip()
 {
   if (this->OutMask)
@@ -90,7 +88,7 @@ vtkHyperTreeGridAxisClip::~vtkHyperTreeGridAxisClip()
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -110,14 +108,14 @@ void vtkHyperTreeGridAxisClip::PrintSelf(ostream& os, vtkIndent indent)
   }
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkHyperTreeGridAxisClip::FillOutputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkHyperTreeGrid");
   return 1;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::GetMinimumBounds(double bMin[3])
 {
   bMin[0] = this->Bounds[0];
@@ -125,7 +123,7 @@ void vtkHyperTreeGridAxisClip::GetMinimumBounds(double bMin[3])
   bMin[2] = this->Bounds[4];
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::GetMaximumBounds(double bMax[3])
 {
   bMax[0] = this->Bounds[1];
@@ -133,7 +131,7 @@ void vtkHyperTreeGridAxisClip::GetMaximumBounds(double bMax[3])
   bMax[2] = this->Bounds[5];
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::SetQuadricCoefficients(double q[10])
 {
   if (!this->Quadric)
@@ -144,19 +142,19 @@ void vtkHyperTreeGridAxisClip::SetQuadricCoefficients(double q[10])
   this->Modified();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::GetQuadricCoefficients(double q[10])
 {
   this->Quadric->GetCoefficients(q);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 double* vtkHyperTreeGridAxisClip::GetQuadricCoefficients()
 {
   return this->Quadric->GetCoefficients();
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkMTimeType vtkHyperTreeGridAxisClip::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime();
@@ -170,7 +168,7 @@ vtkMTimeType vtkHyperTreeGridAxisClip::GetMTime()
   return mTime;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 bool vtkHyperTreeGridAxisClip::IsClipped(vtkHyperTreeGridNonOrientedGeometryCursor* cursor)
 {
   // Check clipping status depending on clip type
@@ -185,26 +183,14 @@ bool vtkHyperTreeGridAxisClip::IsClipped(vtkHyperTreeGridNonOrientedGeometryCurs
       // Retrieve geometric origin of input cursor
       const double* origin = cursor->GetOrigin();
 
-      // Decide whether cell is clipped out depending on inside/out flag
-      if (!this->InsideOut)
-      {
-        // Check whether cursor is above hyperplane
-        if (origin[axis] > inter)
-        {
-          return true;
-        }
-      } // if (! this->InsideOut)
-      else
-      {
-        // Retrieve geometric size of input cursor
-        const double* size = cursor->GetSize();
+      // Retrieve geometric size of input cursor
+      const double* size = cursor->GetSize();
 
-        // Check whether cursor is below hyperplane
-        if (origin[axis] + size[axis] < inter)
-        {
-          return true;
-        }
-      } // else
+      // Check whether cursor is below hyperplane
+      if (origin[axis] + size[axis] < inter)
+      {
+        return !this->InsideOut;
+      }
       break;
     } // case PLANE
     case vtkHyperTreeGridAxisClip::BOX:
@@ -224,40 +210,15 @@ bool vtkHyperTreeGridAxisClip::IsClipped(vtkHyperTreeGridNonOrientedGeometryCurs
       cMax[1] = cMin[1] + size[1];
       cMax[2] = cMin[2] + size[2];
 
-      for (unsigned int d = 0; d < 3; ++d)
+      if (((cMin[0] >= bMin[0] && cMin[0] <= bMax[0]) ||
+            (cMax[0] >= bMin[0] && cMax[0] <= bMax[0])) &&
+        ((cMin[1] >= bMin[1] && cMin[1] <= bMax[1]) ||
+          (cMax[1] >= bMin[1] && cMax[1] <= bMax[1])) &&
+        ((cMin[2] >= bMin[2] && cMin[2] <= bMax[2]) || (cMax[2] >= bMin[2] && cMax[2] <= bMax[2])))
       {
-        // By default assume the cell will be clipped out
-        bool clipped = true;
-
-        // Do not clip cell yet if its lower bound is in prescribed bounds
-        if ((cMin[d] >= bMin[d]) && (cMin[d] <= bMax[d]))
-        {
-          clipped = false;
-        }
-        // Do not clip it either if it contains the prescribed lower bound
-        else if ((bMin[d] >= cMin[d]) && (bMin[d] <= cMax[d]))
-        {
-          clipped = false;
-        }
-
-        // Do not clip cell yet if its upper bound is in prescribed bounds
-        if ((cMax[d] >= bMin[d]) && (cMax[d] <= bMax[d]))
-        {
-          clipped = false;
-        }
-        // Do not clip it either if it contains the prescribed upper bound
-        else if ((bMax[d] >= cMin[d]) && (bMax[d] <= cMax[d]))
-        {
-          clipped = false;
-        }
-
-        // Being clipped in one dimension is sufficient to be clipped for good
-        if (clipped)
-        {
-          return true;
-        }
-      } // d
-      break;
+        return this->InsideOut;
+      }
+      return !this->InsideOut;
     } // case BOX
     case vtkHyperTreeGridAxisClip::QUADRIC:
     {
@@ -281,22 +242,20 @@ bool vtkHyperTreeGridAxisClip::IsClipped(vtkHyperTreeGridNonOrientedGeometryCurs
 
         // Evaluate quadric at current vertex
         double qv = this->Quadric->EvaluateFunction(pt);
-        if (qv < 0)
+        if (qv <= 0)
         {
           // Found negative value at this vertex, cell not clipped out
-          return false;
+          return !this->InsideOut;
         }
       } // v
-
-      // All quadric values are positive at cell vertices, it is clipped out
-      return true;
+      break;
     } // case QUADRIC
   }   //  switch (this->ClipType)
 
-  return false;
+  return this->InsideOut;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkHyperTreeGridAxisClip::ProcessTrees(vtkHyperTreeGrid* input, vtkDataObject* outputDO)
 {
   // Downcast output data object to hyper tree grid
@@ -306,6 +265,8 @@ int vtkHyperTreeGridAxisClip::ProcessTrees(vtkHyperTreeGrid* input, vtkDataObjec
     vtkErrorMacro("Incorrect type of output: " << outputDO->GetClassName());
     return 0;
   }
+
+  this->OutMask = vtkBitArray::New();
 
   // Retrieve input dimension
   unsigned int dimension = input->GetDimension();
@@ -326,22 +287,19 @@ int vtkHyperTreeGridAxisClip::ProcessTrees(vtkHyperTreeGrid* input, vtkDataObjec
   }
 
   // Set identical grid parameters
-  output->SetTransposedRootIndexing(input->GetTransposedRootIndexing());
-  output->SetBranchFactor(input->GetBranchFactor());
-  output->SetHasInterface(input->GetHasInterface());
-  output->SetInterfaceNormalsName(input->GetInterfaceNormalsName());
-  output->SetInterfaceInterceptsName(input->GetInterfaceInterceptsName());
+  output->Initialize();
+  output->CopyEmptyStructure(input);
 
   // Initialize output point data
-  this->InData = input->GetPointData();
-  this->OutData = output->GetPointData();
+  this->InData = input->GetCellData();
+  this->OutData = output->GetCellData();
   this->OutData->CopyAllocate(this->InData);
 
   // Output indices begin at 0
   this->CurrentId = 0;
 
   // Retrieve material mask
-  this->InMask = input->HasMask() ? input->GetMask() : 0;
+  this->InMask = input->HasMask() ? input->GetMask() : nullptr;
 
   // Storage for Cartesian indices
   unsigned int cart[3];
@@ -390,27 +348,10 @@ int vtkHyperTreeGridAxisClip::ProcessTrees(vtkHyperTreeGrid* input, vtkDataObjec
       clipped.insert(inIndex);
     } // else
   }   // it
-
   // Set grid sizes
   outSize[0] = maxId[0] - minId[0] + 1;
   outSize[1] = maxId[1] - minId[1] + 1;
   outSize[2] = maxId[2] - minId[2] + 1;
-
-  // JB Le maillage de sortie garde les specificites (1D, 2D ou 3D
-  // suivant certaines directions) du maillage d'entree
-  unsigned int dimensions[3];
-  for (unsigned int idim = 0; idim < 3; ++idim)
-  {
-    if (inSize[idim] == 1)
-    {
-      dimensions[idim] = 1;
-    }
-    else
-    {
-      dimensions[idim] = inSize[idim] + 1;
-    }
-  }
-  output->SetDimensions(dimensions); // GridPoints
 
   // Compute or copy output coordinates depending on output grid sizes
   vtkUniformHyperTreeGrid* inputUHTG = vtkUniformHyperTreeGrid::SafeDownCast(input);
@@ -488,18 +429,19 @@ int vtkHyperTreeGridAxisClip::ProcessTrees(vtkHyperTreeGrid* input, vtkDataObjec
       this->RecursivelyProcessTree(inCursor, outCursor);
     } // if origin
   }   // it
-
   // Squeeze and set output material mask if necessary
   if (this->OutMask)
   {
     this->OutMask->Squeeze();
     output->SetMask(this->OutMask);
+    this->OutMask->FastDelete();
+    this->OutMask = nullptr;
   }
 
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkHyperTreeGridAxisClip::RecursivelyProcessTree(
   vtkHyperTreeGridNonOrientedGeometryCursor* inCursor, vtkHyperTreeGridNonOrientedCursor* outCursor)
 {

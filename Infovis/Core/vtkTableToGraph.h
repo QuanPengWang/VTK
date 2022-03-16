@@ -61,13 +61,13 @@
  * the distinguishing value, but as a vtkVariant holding the raw value instead
  * of being converted to a string. The "ids" column is set as the vertex pedigree
  * ID attribute.
-*/
+ */
 
 #ifndef vtkTableToGraph_h
 #define vtkTableToGraph_h
 
-#include "vtkInfovisCoreModule.h" // For export macro
 #include "vtkGraphAlgorithm.h"
+#include "vtkInfovisCoreModule.h" // For export macro
 
 class vtkBitArray;
 class vtkMutableDirectedGraph;
@@ -78,7 +78,7 @@ class VTKINFOVISCORE_EXPORT vtkTableToGraph : public vtkGraphAlgorithm
 {
 public:
   static vtkTableToGraph* New();
-  vtkTypeMacro(vtkTableToGraph,vtkGraphAlgorithm);
+  vtkTypeMacro(vtkTableToGraph, vtkGraphAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -102,28 +102,29 @@ public:
    */
   void ClearLinkEdges();
 
-  //@{
+  ///@{
   /**
    * The graph describing how to link the columns in the table.
    */
   vtkGetObjectMacro(LinkGraph, vtkMutableDirectedGraph);
   void SetLinkGraph(vtkMutableDirectedGraph* g);
-  //@}
+  ///@}
 
   /**
    * Links the columns in a specific order.
    * This creates a simple path as the link graph.
    */
-  void LinkColumnPath(vtkStringArray* column, vtkStringArray* domain = nullptr, vtkBitArray* hidden = nullptr);
+  void LinkColumnPath(
+    vtkStringArray* column, vtkStringArray* domain = nullptr, vtkBitArray* hidden = nullptr);
 
-  //@{
+  ///@{
   /**
    * Specify the directedness of the output graph.
    */
   vtkSetMacro(Directed, bool);
   vtkGetMacro(Directed, bool);
   vtkBooleanMacro(Directed, bool);
-  //@}
+  ///@}
 
   /**
    * Get the current modified time.
@@ -150,15 +151,9 @@ protected:
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int RequestDataObject(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   bool Directed;
   vtkMutableDirectedGraph* LinkGraph;
@@ -170,4 +165,3 @@ private:
 };
 
 #endif
-

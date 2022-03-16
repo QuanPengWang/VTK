@@ -15,16 +15,6 @@ function(add_data_array_test test_name array_header array_valuetype array_type)
   list(APPEND data_array_tests "${VTK_TESTDATAARRAYAPI_TESTNAME},${CMAKE_CURRENT_BINARY_DIR}/${test_source}" PARENT_SCOPE)
 endfunction()
 
-# Legacy -- test that the vtkDataArrayTemplate interface still works:
-if(NOT VTK_LEGACY_REMOVE)
-  add_data_array_test(
-    vtkDataArrayTemplate_LEGACY
-    vtkDataArrayTemplate.h
-    float
-    vtkDataArrayTemplate<float>
-  )
-endif()
-
 # Non-templated classes:
 add_data_array_test(vtkCharArray vtkCharArray.h "char" vtkCharArray)
 add_data_array_test(vtkDoubleArray vtkDoubleArray.h "double" vtkDoubleArray)
@@ -91,14 +81,25 @@ set(TestSystemInformation_ARGS ${CMAKE_BINARY_DIR})
 # Tell TestXMLFileOutputWindow where to write test file
 set(TestXMLFileOutputWindow_ARGS ${CMAKE_BINARY_DIR}/Testing/Temporary/XMLFileOutputWindow.txt)
 
+set(TestCLI11_ARGS --file=sample.vtk -c 100 --flag)
+
+set(TestSMP_ARGS
+  --Sequential=$<BOOL:${VTK_SMP_ENABLE_SEQUENTIAL}>
+  --STDThread=$<BOOL:${VTK_SMP_ENABLE_STDTHREAD}>
+  --TBB=$<OR:$<BOOL:${VTK_SMP_ENABLE_TBB}>,$<STREQUAL:"${VTK_SMP_IMPLEMENTATION_TYPE}","TBB">>
+  --OpenMP=$<OR:$<BOOL:${VTK_SMP_ENABLE_OPENMP}>,$<STREQUAL:"${VTK_SMP_IMPLEMENTATION_TYPE}","OpenMP">>)
+
 if (VTK_BUILD_SCALED_SOA_ARRAYS)
-  set(scale_soa_test TestScaledSOADataArrayDispatchers.cxx TestScaledSOADataArrayTemplate.cxx)
+  set(scale_soa_test TestScaledSOADataArrayTemplate.cxx)
 endif ()
 
 
 vtk_add_test_cxx(vtkCommonCoreCxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
+  ExampleDataArrayRangeAPI.cxx
+  ExampleDataArrayRangeDispatch.cxx
   UnitTestMath.cxx
+  TestAbstractArraySize.cxx
   TestArrayAPI.cxx
   TestArrayAPIConvenience.cxx
   TestArrayAPIDense.cxx
@@ -117,6 +118,8 @@ vtk_add_test_cxx(vtkCommonCoreCxxTests tests
   TestArrayUniqueValueDetection.cxx
   TestArrayUserTypes.cxx
   TestArrayVariants.cxx
+  TestBitArray.cxx
+  TestCLI11.cxx
   TestCollection.cxx
   TestConditionVariable.cxx
   # TestCxxFeatures.cxx # This is in its own exe too.
@@ -126,6 +129,7 @@ vtk_add_test_cxx(vtkCommonCoreCxxTests tests
   TestDataArraySelection.cxx
   TestDataArrayTupleRange.cxx
   TestDataArrayValueRange.cxx
+  TestFMT.cxx
   TestGarbageCollector.cxx
   TestGenericDataArrayAPI.cxx
   TestInformationKeyLookup.cxx
@@ -136,6 +140,7 @@ vtk_add_test_cxx(vtkCommonCoreCxxTests tests
   TestMersenneTwister.cxx
   TestMinimalStandardRandomSequence.cxx
   TestNew.cxx
+  TestNumberOfGenerationsFromBase.cxx
   TestObjectFactory.cxx
   TestObservers.cxx
   TestObserversPerformance.cxx
@@ -166,6 +171,20 @@ vtk_add_test_cxx(vtkCommonCoreCxxTests tests
 
   ${scale_soa_test}
   )
+
+# Special test to check whether disabling loguru signal handling, i.e.,
+# stack trace printing when it catches a signal, works. We add an
+# executable where the stack trace is disabled. The actual test is a
+# CMake script that runs the test executable and analyzes the output to
+# determine whether a stack trace was printed or not.
+add_executable(TestLoggerDisableSignalHandlerCxx
+  TestLoggerDisableSignalHandler.cxx)
+target_link_libraries(TestLoggerDisableSignalHandlerCxx
+  PRIVATE VTK::CommonCore VTK::CommonDataModel)
+add_test(NAME TestLoggerDisableSignalHandler
+  COMMAND ${CMAKE_COMMAND}
+  -DEXECUTABLE_PATH:FILEPATH=$<TARGET_FILE:TestLoggerDisableSignalHandlerCxx>
+  -P ${CMAKE_CURRENT_SOURCE_DIR}/TestLoggerDisableSignalHandler.cmake)
 
 vtk_test_cxx_executable(vtkCommonCoreCxxTests tests
   vtkTestNewVar.cxx

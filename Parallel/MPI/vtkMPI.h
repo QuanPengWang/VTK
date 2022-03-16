@@ -15,17 +15,16 @@
 
 #ifndef vtkMPI_h
 #define vtkMPI_h
-#ifndef __VTK_WRAP__
 
 #ifndef USE_STDARG
- #define USE_STDARG
-#include "vtkParallelMPIModule.h" // For export macro
- #include "mpi.h"
- #undef USE_STDARG
+#define USE_STDARG
+#include "vtk_mpi.h"
+#undef USE_STDARG
 #else
- #include "mpi.h"
+#include "vtk_mpi.h"
 #endif
 
+#include "vtkParallelMPIModule.h" // For export macro
 #include "vtkSystemIncludes.h"
 
 class VTKPARALLELMPI_EXPORT vtkMPICommunicatorOpaqueComm
@@ -45,10 +44,7 @@ protected:
 class VTKPARALLELMPI_EXPORT vtkMPICommunicatorReceiveDataInfo
 {
 public:
-  vtkMPICommunicatorReceiveDataInfo()
-  {
-    this->Handle=0;
-  }
+  vtkMPICommunicatorReceiveDataInfo() { this->Handle = 0; }
   MPI_Datatype DataType;
   MPI_Status Status;
   MPI_Comm* Handle;
@@ -57,7 +53,10 @@ public:
 class VTKPARALLELMPI_EXPORT vtkMPIOpaqueFileHandle
 {
 public:
-  vtkMPIOpaqueFileHandle() : Handle(MPI_FILE_NULL) { }
+  vtkMPIOpaqueFileHandle()
+    : Handle(MPI_FILE_NULL)
+  {
+  }
   MPI_File Handle;
 };
 
@@ -68,7 +67,5 @@ public:
   MPI_Request Handle;
 };
 
-
-#endif
 #endif // vtkMPI_h
 // VTK-HeaderTest-Exclude: vtkMPI.h

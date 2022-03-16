@@ -13,7 +13,7 @@
 
 =========================================================================*/
 /**
- * @class   vtkFrustumSelector.h
+ * @class   vtkFrustumSelector
  *
  * vtkFrustumSelector is a vtkSelector that selects elements based
  * on whether they are inside or intersect a frustum of interest.  This handles
@@ -36,7 +36,7 @@ class vtkSignedCharArray;
 class VTKFILTERSEXTRACTION_EXPORT vtkFrustumSelector : public vtkSelector
 {
 public:
-  static vtkFrustumSelector *New();
+  static vtkFrustumSelector* New();
   vtkTypeMacro(vtkFrustumSelector, vtkSelector);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -47,16 +47,16 @@ public:
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Set the selection frustum. The planes object must contain six planes.
    */
   void SetFrustum(vtkPlanes*);
   vtkPlanes* GetFrustum();
-  //@}
+  ///@}
 
 protected:
-  vtkFrustumSelector(vtkPlanes *f=nullptr);
+  vtkFrustumSelector(vtkPlanes* f = nullptr);
   ~vtkFrustumSelector() override;
 
   vtkSmartPointer<vtkPlanes> Frustum;

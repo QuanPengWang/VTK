@@ -30,25 +30,26 @@ PURPOSE.  See the above copyright notice for more information.
  *
  * @sa
  * vtkGraph vtkBoostGraphAdapter
-*/
+ */
 
 #ifndef vtkBoostKruskalMinimumSpanningTree_h
 #define vtkBoostKruskalMinimumSpanningTree_h
 
 #include "vtkInfovisBoostGraphAlgorithmsModule.h" // For export macro
-#include "vtkStdString.h" // For string type
-#include "vtkVariant.h" // For variant type
+#include "vtkStdString.h"                         // For string type
+#include "vtkVariant.h"                           // For variant type
 
 #include "vtkSelectionAlgorithm.h"
 
-class VTKINFOVISBOOSTGRAPHALGORITHMS_EXPORT vtkBoostKruskalMinimumSpanningTree : public vtkSelectionAlgorithm
+class VTKINFOVISBOOSTGRAPHALGORITHMS_EXPORT vtkBoostKruskalMinimumSpanningTree
+  : public vtkSelectionAlgorithm
 {
 public:
-  static vtkBoostKruskalMinimumSpanningTree *New();
+  static vtkBoostKruskalMinimumSpanningTree* New();
   vtkTypeMacro(vtkBoostKruskalMinimumSpanningTree, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the name of the edge-weight input array, which must name an
    * array that is part of the edge data of the input graph and
@@ -57,18 +58,18 @@ public:
    * vtkDoubleArray.
    */
   vtkSetStringMacro(EdgeWeightArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the output selection type. The default is to use the
    * the set of minimum spanning tree edges "MINIMUM_SPANNING_TREE_EDGES". No
    * other options are defined.
    */
   vtkSetStringMacro(OutputSelectionType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether to negate the edge weights. By negating the edge
    * weights this algorithm will give you the 'maximal' spanning
@@ -79,22 +80,17 @@ public:
   void SetNegateEdgeWeights(bool value);
   vtkGetMacro(NegateEdgeWeights, bool);
   vtkBooleanMacro(NegateEdgeWeights, bool);
-  //@}
+  ///@}
 
 protected:
   vtkBoostKruskalMinimumSpanningTree();
-  ~vtkBoostKruskalMinimumSpanningTree();
+  ~vtkBoostKruskalMinimumSpanningTree() override;
 
-  int RequestData(
-    vtkInformation *,
-    vtkInformationVector **,
-    vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(
-    int port, vtkInformation* info) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  int FillOutputPortInformation(
-    int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
 private:
   char* EdgeWeightArrayName;

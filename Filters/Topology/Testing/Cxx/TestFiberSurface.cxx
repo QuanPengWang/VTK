@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPolyDataAlgorithm.h
+  Module:    TestFiberSurface.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,24 +13,22 @@
 
 =========================================================================*/
 
-
 // PURPOSE: FiberSurface test cases output generator (new vtkFiberSurface filter)
 
 #include <cstring>
 #include <sstream>
 #include <string>
 
-#include "vtkFiberSurface.h"
-#include "vtkTestUtilities.h"
 #include "vtkActor.h"
 #include "vtkCellArray.h"
 #include "vtkCleanPolyData.h"
+#include "vtkFiberSurface.h"
 #include "vtkFloatArray.h"
-#include "vtkPolyData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataReader.h"
 #include "vtkPolyDataWriter.h"
 #include "vtkSmartPointer.h"
+#include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridReader.h"
 
@@ -41,10 +39,8 @@ int TestFiberSurface(int argc, char* argv[])
   /************** Input File paths using vtkTestUtilities ****************/
   const char* inputDataFiles[3] = { vtkTestUtilities::ExpandDataFileName(
                                       argc, argv, "Data/FiberSurface/one_cube.vtk"),
-    vtkTestUtilities::ExpandDataFileName(argc, argv,
-                                      "Data/FiberSurface/one_cube_both_forking.vtk"),
-    vtkTestUtilities::ExpandDataFileName(argc, argv,
-                                      "Data/FiberSurface/one_cube_closed.vtk") };
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/FiberSurface/one_cube_both_forking.vtk"),
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/FiberSurface/one_cube_closed.vtk") };
 
   /************** FSCP File paths using vtkTestUtilities ****************/
   const char* inputFSCPFiles[15] = { vtkTestUtilities::ExpandDataFileName(
@@ -66,6 +62,7 @@ int TestFiberSurface(int argc, char* argv[])
   /**********************************************/
 
   /********************* Desired output arrays *********************/
+  // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
   std::string dataToCompare[15] = { "0.779,0.000,0.000,0.659,0.000,0.341,1.000,0.000,0.624,1.000,0."
                                     "797,0.000,0.659,0.659,1.000,1.000,1.000,0.203,1.000,0.376,1."
                                     "000,0.779,1.000,1.000",
@@ -209,13 +206,13 @@ int TestFiberSurface(int argc, char* argv[])
     } // end for
   }   // end for
 
-  for (int i = 0; i <  15; ++i)
+  for (int i = 0; i < 15; ++i)
   {
-    delete [] inputFSCPFiles[i];
+    delete[] inputFSCPFiles[i];
   }
-  delete [] inputDataFiles[0];
-  delete [] inputDataFiles[1];
-  delete [] inputDataFiles[2];
+  delete[] inputDataFiles[0];
+  delete[] inputDataFiles[1];
+  delete[] inputDataFiles[2];
 
   if (pass)
   {

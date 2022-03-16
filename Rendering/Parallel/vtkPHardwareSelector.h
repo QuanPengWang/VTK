@@ -25,13 +25,13 @@
  * triggers the renders. All other processes, simply listen to the StartEvent
  * fired and beginning of the render to ensure that vtkHardwareSelector's
  * CurrentPass is updated appropriately.
-*/
+ */
 
 #ifndef vtkPHardwareSelector_h
 #define vtkPHardwareSelector_h
 
-#include "vtkRenderingParallelModule.h" // For export macro
 #include "vtkOpenGLHardwareSelector.h"
+#include "vtkRenderingParallelModule.h" // For export macro
 
 class VTKRENDERINGPARALLEL_EXPORT vtkPHardwareSelector : public vtkOpenGLHardwareSelector
 {
@@ -40,7 +40,7 @@ public:
   vtkTypeMacro(vtkPHardwareSelector, vtkOpenGLHardwareSelector);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the is the root process. The root processes
    * is the only processes which has the composited result and hence the only
@@ -49,7 +49,7 @@ public:
   vtkSetMacro(ProcessIsRoot, bool);
   vtkGetMacro(ProcessIsRoot, bool);
   vtkBooleanMacro(ProcessIsRoot, bool);
-  //@}
+  ///@}
 
   /**
    * Overridden to only allow the superclass implementation on the root node. On
@@ -75,7 +75,6 @@ private:
   class vtkObserver;
   friend class vtkObserver;
   vtkObserver* Observer;
-
 };
 
 #endif

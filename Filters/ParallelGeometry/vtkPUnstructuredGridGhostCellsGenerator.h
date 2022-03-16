@@ -73,52 +73,52 @@
  *   - receive all cells sent to you, and merge everything together
  *   - if another layer is needed, repeat
  *
-*/
+ */
 
 #ifndef vtkPUnstructuredGridGhostCellsGenerator_h
 #define vtkPUnstructuredGridGhostCellsGenerator_h
 
+#include "vtkDeprecation.h"                   // For VTK_DEPRECATED_IN_9_1_0
 #include "vtkFiltersParallelGeometryModule.h" // For export macro
 #include "vtkUnstructuredGridGhostCellsGenerator.h"
 #include <vector> // For passing data between methods
 
 class vtkMultiProcessController;
 
-class VTKFILTERSPARALLELGEOMETRY_EXPORT vtkPUnstructuredGridGhostCellsGenerator:
-  public vtkUnstructuredGridGhostCellsGenerator
+class VTK_DEPRECATED_IN_9_1_0("Use vtkGhostCellsGenerator instead")
+  VTKFILTERSPARALLELGEOMETRY_EXPORT vtkPUnstructuredGridGhostCellsGenerator
+  : public vtkUnstructuredGridGhostCellsGenerator
 {
   vtkTypeMacro(vtkPUnstructuredGridGhostCellsGenerator, vtkUnstructuredGridGhostCellsGenerator);
 
 public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  static vtkPUnstructuredGridGhostCellsGenerator *New();
+  static vtkPUnstructuredGridGhostCellsGenerator* New();
 
-  //@{
+  ///@{
   /**
    * Set/Get the MPI multi process controller object.
    */
-  void SetController(vtkMultiProcessController *c);
+  void SetController(vtkMultiProcessController* c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
+  ///@}
 
 protected:
   vtkPUnstructuredGridGhostCellsGenerator();
   ~vtkPUnstructuredGridGhostCellsGenerator() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **,
-    vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  void GetFirstGhostLayer(int, vtkUnstructuredGrid *);
+  void GetFirstGhostLayer(int, vtkUnstructuredGrid*);
 
   void ExchangeBoundsAndDetermineNeighbors(std::vector<double>&);
   void ExtractAndReduceSurfacePointsShareData(std::vector<double>&);
   void ComputeSharedPoints();
 
-  void ExtractAndSendGhostCells(vtkUnstructuredGridBase *);
+  void ExtractAndSendGhostCells(vtkUnstructuredGridBase*);
 
-  void ReceiveAndMergeGhostCells(int, int, vtkUnstructuredGridBase *,
-    vtkUnstructuredGrid *);
+  void ReceiveAndMergeGhostCells(int, int, vtkUnstructuredGridBase*, vtkUnstructuredGrid*);
 
   void AddGhostLayer(int ghostLevel, int maxGhostLevel);
 
@@ -128,14 +128,16 @@ protected:
 
   void RemoveGlobalCellIds();
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
 private:
   struct vtkInternals;
-  vtkInternals *Internals;
+  vtkInternals* Internals;
 
   vtkPUnstructuredGridGhostCellsGenerator(const vtkPUnstructuredGridGhostCellsGenerator&) = delete;
   void operator=(const vtkPUnstructuredGridGhostCellsGenerator&) = delete;
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPUnstructuredGridGhostCellsGenerator.h

@@ -33,7 +33,7 @@
  *
  * @sa
  * vtkGraph vtkMutableDirectedGraph
-*/
+ */
 
 #ifndef vtkDirectedGraph_h
 #define vtkDirectedGraph_h
@@ -44,29 +44,29 @@
 class VTKCOMMONDATAMODEL_EXPORT vtkDirectedGraph : public vtkGraph
 {
 public:
-  static vtkDirectedGraph *New();
+  static vtkDirectedGraph* New();
   vtkTypeMacro(vtkDirectedGraph, vtkGraph);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return what type of dataset this is.
    */
-  int GetDataObjectType() override {return VTK_DIRECTED_GRAPH;}
+  int GetDataObjectType() override { return VTK_DIRECTED_GRAPH; }
 
-  //@{
+  ///@{
   /**
    * Retrieve a graph from an information vector.
    */
-  static vtkDirectedGraph *GetData(vtkInformation *info);
-  static vtkDirectedGraph *GetData(vtkInformationVector *v, int i=0);
-  //@}
+  static vtkDirectedGraph* GetData(vtkInformation* info);
+  static vtkDirectedGraph* GetData(vtkInformationVector* v, int i = 0);
+  ///@}
 
   /**
    * Check the storage, and accept it if it is a valid
    * undirected graph. This is public to allow
    * the ToDirected/UndirectedGraph to work.
    */
-  bool IsStructureValid(vtkGraph *g) override;
+  bool IsStructureValid(vtkGraph* g) override;
 
 protected:
   vtkDirectedGraph();

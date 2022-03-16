@@ -48,7 +48,7 @@ VTXvtkVTU::VTXvtkVTU(const std::string& schema, adios2::IO& io, adios2::Engine& 
   InitTimes();
 }
 
-VTXvtkVTU::~VTXvtkVTU() {}
+VTXvtkVTU::~VTXvtkVTU() = default;
 
 // PRIVATE
 void VTXvtkVTU::DoFill(vtkMultiBlockDataSet* multiBlock, const size_t step)
@@ -92,12 +92,15 @@ void VTXvtkVTU::ReadPiece(const size_t step, const size_t pieceID)
     for (auto& dataArrayPair : dataSet)
     {
       const std::string& variableName = dataArrayPair.first;
-      if (this->TIMENames.count(variableName) == 1)
+      if (VTXvtkVTU::TIMENames.count(variableName) == 1)
       {
         continue;
       }
       types::DataArray& dataArray = dataArrayPair.second;
-      this->UnstructuredGrid->GetPointData()->AddArray(dataArray.Data.GetPointer());
+      if (dataArray.IsUpdated)
+      {
+        this->UnstructuredGrid->GetPointData()->AddArray(dataArray.Data.GetPointer());
+      }
     }
   }
 
@@ -107,86 +110,104 @@ void VTXvtkVTU::ReadPiece(const size_t step, const size_t pieceID)
   {
     types::DataSet& dataSet = this->Pieces[pieceID][types::DataSetType::Points];
     types::DataArray& dataArray = dataSet.begin()->second;
-
-    // save nodeIdOffsets
-    nodeSizes.reserve(dataArray.BlockCounts.size());
-    for (const auto& bCount : dataArray.BlockCounts)
+    if (dataArray.IsUpdated)
     {
-      nodeSizes.push_back(bCount.second.front());
+      // save nodeIdOffsets
+      nodeSizes.reserve(dataArray.BlockCounts.size());
+      for (const auto& bCount : dataArray.BlockCounts)
+      {
+        nodeSizes.push_back(bCount.second.front());
+      }
+
+      dataArray.ConvertTo3DVTK();
+      vtkNew<vtkPoints> points;
+      points->SetData(dataArray.Data.GetPointer());
+      this->UnstructuredGrid->SetPoints(points);
     }
-
-    // vtkDoubleArray* nodes = vtkDoubleArray::SafeDownCast(dataArray.Data.GetPointer());
-    vtkNew<vtkPoints> points;
-    points->SetData(dataArray.Data.GetPointer());
-
-    this->UnstructuredGrid->SetPoints(points);
   }
 
   // Associate Cells
   {
     types::DataSet& dataSet = this->Pieces[pieceID][types::DataSetType::Cells];
 
-    types::DataArray& connectivity = dataSet.at("connectivity");
-    vtkIdTypeArray* iconnectivity = vtkIdTypeArray::SafeDownCast(connectivity.Data.GetPointer());
-    vtkIdType* pconn = iconnectivity->GetPointer(0);
-
-    // increase the connectivity offsets to match the local block point id
-    vtkIdType blockOffset = 0;
-    size_t linearOffset = 0;
-
-    // update with block offsets (squashed blocks)
-    auto itBlocks = connectivity.BlockCounts.begin();
-    size_t n = 0;
-
-    for (const auto& blockPair : connectivity.BlockCounts)
+    auto itConnectivity = dataSet.find("connectivity");
+    if (itConnectivity == dataSet.end())
     {
-      const adios2::Dims& blockCount = blockPair.second;
-
-      // through elements
-      for (size_t e = 0; e < blockCount[0]; ++e)
-      {
-        const vtkIdType nPoints = pconn[linearOffset];
-        for (vtkIdType p = 0; p < nPoints; ++p)
-        {
-          const size_t index = linearOffset + p + 1;
-          pconn[index] += blockOffset;
-        }
-        linearOffset += nPoints + 1; // 1 for nPoints itself
-      }
-
-      blockOffset += nodeSizes[n];
-      ++n;
-      ++itBlocks;
+      throw std::invalid_argument("ERROR: VTU UnstructuredGrid data model requires the variable "
+                                  "connectivity, in VTK::IOADIOS2 VTX reader");
     }
 
-    vtkIdType size = connectivity.Data->GetSize();
-    vtkNew<vtkCellArray> cellArray;
-
-    cellArray->SetCells(size, iconnectivity);
-
-    types::DataArray& types = dataSet.at("types");
-
-    // single type cells
-    if (types.Data->GetSize() == 1)
+    types::DataArray& connectivity = itConnectivity->second;
+    if (connectivity.IsUpdated)
     {
-      int type = -1;
+      vtkIdTypeArray* iconnectivity = vtkIdTypeArray::SafeDownCast(connectivity.Data.GetPointer());
+      vtkIdType* pconn = iconnectivity->GetPointer(0);
 
-      if (types.Data->GetDataType() == VTK_UNSIGNED_INT)
+      // increase the connectivity offsets to match the local block point id
+      vtkIdType blockOffset = 0;
+      size_t linearOffset = 0;
+
+      // update with block offsets (squashed blocks)
+      auto itBlocks = connectivity.BlockCounts.begin();
+      size_t n = 0;
+
+      for (const auto& blockPair : connectivity.BlockCounts)
       {
-        vtkUnsignedIntArray* itypes = vtkUnsignedIntArray::SafeDownCast(types.Data.GetPointer());
-        type = static_cast<int>(itypes->GetValue(0));
+        const adios2::Dims& blockCount = blockPair.second;
+
+        // through elements
+        for (size_t e = 0; e < blockCount[0]; ++e)
+        {
+          const vtkIdType nPoints = pconn[linearOffset];
+          for (vtkIdType p = 0; p < nPoints; ++p)
+          {
+            const size_t index = linearOffset + p + 1;
+            pconn[index] += blockOffset;
+          }
+          linearOffset += nPoints + 1; // 1 for nPoints itself
+        }
+
+        blockOffset += nodeSizes[n];
+        ++n;
+        ++itBlocks;
       }
-      else if (types.Data->GetDataType() == VTK_INT)
+
+      vtkIdType size = connectivity.Data->GetSize();
+      vtkNew<vtkCellArray> cellArray;
+
+      cellArray->AllocateExact(size, iconnectivity->GetNumberOfValues() - size);
+      cellArray->ImportLegacyFormat(iconnectivity);
+
+      auto itTypes = dataSet.find("types");
+      if (itTypes == dataSet.end())
       {
-        vtkIntArray* itypes = vtkIntArray::SafeDownCast(types.Data.GetPointer());
-        type = itypes->GetValue(0);
+        throw std::invalid_argument("ERROR: VTU UnstructuredGrid data model requires the variable "
+                                    "types, in VTK::IOADIOS2 VTX reader");
       }
-      else
+      types::DataArray& types = dataSet.at("types");
+
+      // single type cells
+      if (types.Data->GetSize() == 1)
       {
-        throw std::invalid_argument("ERROR: types data array must be "
-                                    "an int32_t or uint32_t type\n");
+        int type = -1;
+
+        if (types.Data->GetDataType() == VTK_UNSIGNED_INT)
+        {
+          vtkUnsignedIntArray* itypes = vtkUnsignedIntArray::SafeDownCast(types.Data.GetPointer());
+          type = static_cast<int>(itypes->GetValue(0));
+        }
+        else if (types.Data->GetDataType() == VTK_INT)
+        {
+          vtkIntArray* itypes = vtkIntArray::SafeDownCast(types.Data.GetPointer());
+          type = itypes->GetValue(0);
+        }
+        else
+        {
+          throw std::invalid_argument("ERROR: types data array must be "
+                                      "an int32_t or uint32_t type\n");
+        }
+        this->UnstructuredGrid->SetCells(type, cellArray);
       }
-      this->UnstructuredGrid->SetCells(type, cellArray);
     }
   }
 }
@@ -198,7 +219,7 @@ void VTXvtkVTU::Init()
     const std::string nodeName = DataSetType(type);
     const pugi::xml_node dataSetNode = helper::XMLNode(
       nodeName, pieceNode, true, "when reading " + nodeName + " node in ImageData", false);
-    types::DataSet dataSet = helper::XMLInitDataSet(dataSetNode, this->SpecialNames);
+    types::DataSet dataSet = helper::XMLInitDataSet(dataSetNode, VTXvtkVTU::SpecialNames);
     piece[type] = dataSet;
   };
 

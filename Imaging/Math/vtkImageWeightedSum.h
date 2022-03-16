@@ -23,7 +23,7 @@
  *
  * @par Thanks:
  * The original author of this class is Lauren O'Donnell (MIT) for Slicer
-*/
+ */
 
 #ifndef vtkImageWeightedSum_h
 #define vtkImageWeightedSum_h
@@ -35,25 +35,25 @@ class vtkDoubleArray;
 class VTKIMAGINGMATH_EXPORT vtkImageWeightedSum : public vtkThreadedImageAlgorithm
 {
 public:
-  static vtkImageWeightedSum *New();
-  vtkTypeMacro(vtkImageWeightedSum,vtkThreadedImageAlgorithm);
+  static vtkImageWeightedSum* New();
+  vtkTypeMacro(vtkImageWeightedSum, vtkThreadedImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The weights control the contribution of each input to the sum.
    * They will be normalized to sum to 1 before filter execution.
    */
   virtual void SetWeights(vtkDoubleArray*);
   vtkGetObjectMacro(Weights, vtkDoubleArray);
-  //@}
+  ///@}
 
   /**
    * Change a specific weight. Reallocation is done
    */
   virtual void SetWeight(vtkIdType id, double weight);
 
-  //@{
+  ///@{
   /**
    * Setting NormalizeByWeight on will divide the
    * final result by the total weight of the component functions.
@@ -63,7 +63,7 @@ public:
   vtkGetMacro(NormalizeByWeight, vtkTypeBool);
   vtkSetClampMacro(NormalizeByWeight, vtkTypeBool, 0, 1);
   vtkBooleanMacro(NormalizeByWeight, vtkTypeBool);
-  //@}
+  ///@}
 
   /**
    * Compute the total value of all the weight
@@ -75,20 +75,17 @@ protected:
   ~vtkImageWeightedSum() override;
 
   // Array to hold all the weights
-  vtkDoubleArray *Weights;
+  vtkDoubleArray* Weights;
 
   // Boolean flag to divide by sum or not
   vtkTypeBool NormalizeByWeight;
 
-  int RequestInformation (vtkInformation * vtkNotUsed(request),
-    vtkInformationVector** vtkNotUsed( inputVector ),
-    vtkInformationVector *outputVector) override;
+  int RequestInformation(vtkInformation* vtkNotUsed(request),
+    vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector) override;
 
-  void ThreadedRequestData (vtkInformation* request,
-                            vtkInformationVector** inputVector,
-                            vtkInformationVector* outputVector,
-                            vtkImageData ***inData, vtkImageData **outData,
-                            int ext[6], int id) override;
+  void ThreadedRequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector, vtkImageData*** inData, vtkImageData** outData, int ext[6],
+    int id) override;
   int FillInputPortInformation(int i, vtkInformation* info) override;
 
 private:
@@ -97,4 +94,3 @@ private:
 };
 
 #endif
-

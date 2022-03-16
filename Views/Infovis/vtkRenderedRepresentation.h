@@ -21,15 +21,15 @@
  * @class   vtkRenderedRepresentation
  *
  *
-*/
+ */
 
 #ifndef vtkRenderedRepresentation_h
 #define vtkRenderedRepresentation_h
 
-#include "vtkViewsInfovisModule.h" // For export macro
 #include "vtkDataRepresentation.h"
-#include "vtkSmartPointer.h" // for SP ivars
-#include "vtkUnicodeString.h" // for string
+#include "vtkSmartPointer.h"       // for SP ivars
+#include "vtkUnicodeString.h"      // for string
+#include "vtkViewsInfovisModule.h" // For export macro
 
 class vtkApplyColors;
 class vtkProp;
@@ -46,7 +46,7 @@ public:
   vtkTypeMacro(vtkRenderedRepresentation, vtkDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the label render mode.
    * vtkRenderView::QT - Use Qt-based labeler with fitted labeling
@@ -55,13 +55,13 @@ public:
    */
   vtkSetMacro(LabelRenderMode, int);
   vtkGetMacro(LabelRenderMode, int);
-  //@}
+  ///@}
 
 protected:
   vtkRenderedRepresentation();
   ~vtkRenderedRepresentation() override;
 
-  //@{
+  ///@{
   /**
    * Subclasses may call these methods to add or remove props from the representation.
    * Use these if the number of props/actors changes as the result of input connection
@@ -69,7 +69,7 @@ protected:
    */
   void AddPropOnNextRender(vtkProp* p);
   void RemovePropOnNextRender(vtkProp* p);
-  //@}
+  ///@}
 
   /**
    * Obtains the hover text for a particular prop and cell.
@@ -77,13 +77,17 @@ protected:
    * Subclasses should override GetHoverTextInternal, in which the prop and cell
    * are converted to an appropriate selection using ConvertSelection().
    */
+  std::string GetHoverString(vtkView* view, vtkProp* prop, vtkIdType cell);
+  VTK_DEPRECATED_IN_9_1_0(
+    "Use void std::string GetHoverString(vtkView* view, vtkProp* prop, vtkIdType cell)")
   vtkUnicodeString GetHoverText(vtkView* view, vtkProp* prop, vtkIdType cell);
 
   /**
    * Subclasses may override this method to generate the hover text.
    */
-  virtual vtkUnicodeString GetHoverTextInternal(vtkSelection*)
-    { return vtkUnicodeString(); }
+  virtual std::string GetHoverStringInternal(vtkSelection*) { return ""; }
+  VTK_DEPRECATED_IN_9_1_0("Use std::string GetHoverStringInternal(vtkSelection*)")
+  vtkUnicodeString GetHoverTextInternal(vtkSelection* selection);
 
   /**
    * The view will call this method before every render.
@@ -104,4 +108,3 @@ private:
 };
 
 #endif
-

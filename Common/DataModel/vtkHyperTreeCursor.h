@@ -29,26 +29,29 @@
  * This class was modified by Guenole Harel and Jacques-Bernard Lekien 2014
  * This class was revised by Philippe Pebay, 2016
  * This work was supported by Commissariat a l'Energie Atomique (CEA/DIF)
-*/
+ */
 
 #ifndef vtkHyperTreeCursor_h
 #define vtkHyperTreeCursor_h
 
 #include "vtkCommonDataModelModule.h" // For export macro
+#include "vtkDeprecation.h"           // For deprecation
 #include "vtkObject.h"
 
 class vtkHyperTree;
 
-class VTKCOMMONDATAMODEL_EXPORT vtkHyperTreeCursor : public vtkObject
+class VTK_DEPRECATED_IN_9_2_0(
+  "Use other Hyper Tree Grid cursors instead.") VTKCOMMONDATAMODEL_EXPORT vtkHyperTreeCursor
+  : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkHyperTreeCursor,vtkObject);
+  vtkTypeMacro(vtkHyperTreeCursor, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the HyperTree to which the cursor is pointing.
    */
-  virtual void SetTree( vtkHyperTree* ) = 0;
+  virtual void SetTree(vtkHyperTree*) = 0;
 
   /**
    * Return the HyperTree to which the cursor is pointing.
@@ -101,7 +104,7 @@ public:
    * \pre not_leaf: !IsLeaf()
    * \pre valid_child: child>=0 && child<this->GetNumberOfChildren()
    */
-  virtual void ToChild( int child ) = 0;
+  virtual void ToChild(int child) = 0;
 
   /**
    * Move the cursor to the same vertex pointed by `other'.
@@ -109,14 +112,14 @@ public:
    * \pre same_hypertree: this->SameTree(other);
    * \post equal: this->IsEqual(other)
    */
-  virtual void ToSameVertex( vtkHyperTreeCursor* other ) = 0;
+  virtual void ToSameVertex(vtkHyperTreeCursor* other) = 0;
 
   /**
    * Is `this' equal to `other'?
    * \pre other_exists: other!=0
    * \pre same_hypertree: this->SameTree(other);
    */
-  virtual bool IsEqual( vtkHyperTreeCursor* other ) = 0;
+  virtual bool IsEqual(vtkHyperTreeCursor* other) = 0;
 
   /**
    * Create a copy of `this'.
@@ -129,7 +132,7 @@ public:
    * Are `this' and `other' pointing on the same hypertree?
    * \pre other_exists: other!=0
    */
-  virtual int SameTree( vtkHyperTreeCursor* other ) = 0;
+  virtual int SameTree(vtkHyperTreeCursor* other) = 0;
 
   /**
    * Return the number of children for each node (non-vertex leaf) of the tree.
@@ -153,3 +156,4 @@ private:
   void operator=(const vtkHyperTreeCursor&) = delete;
 };
 #endif
+// VTK-HeaderTest-Exclude: vtkHyperTreeCursor.h

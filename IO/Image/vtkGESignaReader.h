@@ -27,7 +27,7 @@
  *
  * @sa
  * vtkImageReader2
-*/
+ */
 
 #ifndef vtkGESignaReader_h
 #define vtkGESignaReader_h
@@ -38,42 +38,34 @@
 class VTKIOIMAGE_EXPORT vtkGESignaReader : public vtkMedicalImageReader2
 {
 public:
-  static vtkGESignaReader *New();
-  vtkTypeMacro(vtkGESignaReader,vtkMedicalImageReader2);
+  static vtkGESignaReader* New();
+  vtkTypeMacro(vtkGESignaReader, vtkMedicalImageReader2);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Is the given file a GESigna file?
    */
-  int CanReadFile(const char* fname) override;
+  int CanReadFile(VTK_FILEPATH const char* fname) override;
 
   /**
    * Valid extentsions
    */
-  const char* GetFileExtensions() override
-  {
-      return ".MR .CT";
-  }
+  const char* GetFileExtensions() override { return ".MR .CT"; }
 
   /**
    * A descriptive name for this format
    */
-  const char* GetDescriptiveName() override
-  {
-      return "GESigna";
-  }
+  const char* GetDescriptiveName() override { return "GESigna"; }
 
 protected:
-  vtkGESignaReader() {}
-  ~vtkGESignaReader() override {}
+  vtkGESignaReader() = default;
+  ~vtkGESignaReader() override = default;
 
   void ExecuteInformation() override;
-  void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation* outInfo) override;
+  void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) override;
 
 private:
   vtkGESignaReader(const vtkGESignaReader&) = delete;
   void operator=(const vtkGESignaReader&) = delete;
 };
 #endif
-
-

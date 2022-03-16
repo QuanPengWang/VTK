@@ -25,7 +25,7 @@
  *
  * @sa
  * vtkOBJReader vtkPLYReader vtkSTLReader
-*/
+ */
 
 #ifndef vtkAbstractPolyDataReader_h
 #define vtkAbstractPolyDataReader_h
@@ -39,19 +39,20 @@ public:
   vtkTypeMacro(vtkAbstractPolyDataReader, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify file name of AbstractPolyData file (obj / ply / stl).
    */
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
-  //@}
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
 
 protected:
   vtkAbstractPolyDataReader();
   ~vtkAbstractPolyDataReader() override;
 
-  char *FileName;
+  char* FileName;
+
 private:
   vtkAbstractPolyDataReader(const vtkAbstractPolyDataReader&) = delete;
   void operator=(const vtkAbstractPolyDataReader&) = delete;

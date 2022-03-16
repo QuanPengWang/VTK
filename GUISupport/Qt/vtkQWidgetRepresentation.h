@@ -25,6 +25,7 @@
 #ifndef vtkQWidgetRepresentation_h
 #define vtkQWidgetRepresentation_h
 
+#include "vtkDeprecation.h"        // For VTK_DEPRECATED_IN_9_2_0
 #include "vtkGUISupportQtModule.h" // For export macro
 #include "vtkWidgetRepresentation.h"
 
@@ -43,16 +44,15 @@ public:
   /**
    * Instantiate the class.
    */
-  static vtkQWidgetRepresentation *New();
+  static vtkQWidgetRepresentation* New();
 
-  //@{
+  ///@{
   /**
    * Standard methods for the class.
    */
-  vtkTypeMacro(vtkQWidgetRepresentation,vtkWidgetRepresentation);
+  vtkTypeMacro(vtkQWidgetRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
-
+  ///@}
 
   /**
    * Satisfies superclass API.  This returns a pointer to the underlying
@@ -66,38 +66,40 @@ public:
    */
   void UpdatePlacement(void);
 
-  //@{
+  ///@{
   /**
    * Methods to interface with the vtkImplicitPlaneWidget2.
    */
   void PlaceWidget(double bounds[6]) override;
   void BuildRepresentation() override;
-  int ComputeComplexInteractionState(
-    vtkRenderWindowInteractor *iren,
-    vtkAbstractWidget *widget,
-    unsigned long event, void *calldata, int modify = 0) override;
-  //@}
+  int ComputeComplexInteractionState(vtkRenderWindowInteractor* iren, vtkAbstractWidget* widget,
+    unsigned long event, void* calldata, int modify = 0) override;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Methods supporting the rendering process.
    */
-  double *GetBounds() VTK_SIZEHINT(6) override;
-  void GetActors(vtkPropCollection *pc) override;
+  double* GetBounds() VTK_SIZEHINT(6) override;
+  void GetActors(vtkPropCollection* pc) override;
   void ReleaseGraphicsResources(vtkWindow*) override;
   int RenderOpaqueGeometry(vtkViewport*) override;
   int RenderTranslucentPolygonalGeometry(vtkViewport*) override;
   vtkTypeBool HasTranslucentPolygonalGeometry() override;
-  //@}
+  ///@}
 
   // Manage the state of the widget
-  enum _InteractionState
+  enum InteractionStateType
   {
-    Outside=0,
+    Outside = 0,
     Inside
   };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef InteractionStateType _InteractionState;
+#endif
 
-  //@{
+  ///@{
   /**
    * The interaction state may be set from a widget (e.g.,
    * vtkQWidgetWidget) or other object. This controls how the
@@ -107,13 +109,13 @@ public:
    * geometric considerations (i.e., cursor near a widget feature), then
    * based on events, the widget may modify this further.
    */
-  vtkSetClampMacro(InteractionState,int,Outside,Inside);
-  //@}
+  vtkSetClampMacro(InteractionState, int, Outside, Inside);
+  ///@}
 
   /**
    * Set the QWidget this representation will render
    */
-  void SetWidget(QWidget *w);
+  void SetWidget(QWidget* w);
 
   /**
    * Get the QWidgetTexture used by the representation
@@ -130,21 +132,21 @@ public:
    * Get the widget coordinates as computed in the last call to
    * ComputeComplexInteractionState.
    */
-  vtkGetVector2Macro(WidgetCoordinates, int);
+  vtkGetVector2Macro(WidgetCoordinates, float);
 
 protected:
   vtkQWidgetRepresentation();
   ~vtkQWidgetRepresentation() override;
 
-  int WidgetCoordinates[2];
+  float WidgetCoordinates[2];
 
-  vtkPlaneSource    *PlaneSource;
-  vtkPolyDataMapper *PlaneMapper;
-  vtkActor          *PlaneActor;
-  vtkOpenGLTexture  *PlaneTexture;
-  vtkQWidgetTexture *QWidgetTexture;
+  vtkPlaneSource* PlaneSource;
+  vtkPolyDataMapper* PlaneMapper;
+  vtkActor* PlaneActor;
+  vtkOpenGLTexture* PlaneTexture;
+  vtkQWidgetTexture* QWidgetTexture;
 
-  vtkCellPicker *Picker;
+  vtkCellPicker* Picker;
 
   // Register internal Pickers within PickingManager
   void RegisterPickers() override;

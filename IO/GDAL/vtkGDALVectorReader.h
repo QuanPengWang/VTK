@@ -25,25 +25,26 @@
  *
  * @sa
  * vtkMultiBlockDataSet
-*/
+ */
 
 #ifndef vtkGDALVectorReader_h
 #define vtkGDALVectorReader_h
 
-#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkIOGDALModule.h" // For export macro
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
-#include <map> // STL required.
+#include <map>    // STL required.
+#include <string> // for ivars
 
 class VTKIOGDAL_EXPORT vtkGDALVectorReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkGDALVectorReader* New();
-  void PrintSelf( ostream& os, vtkIndent indent ) override;
-  vtkTypeMacro(vtkGDALVectorReader,vtkMultiBlockDataSetAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkGDALVectorReader, vtkMultiBlockDataSetAlgorithm);
 
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
 
   /**
    * Return number of layers.
@@ -53,12 +54,12 @@ public:
   /**
    * Given a index return layer type (eg point, line, polygon).
    */
-  int GetLayerType(int layerIndex=0);
+  int GetLayerType(int layerIndex = 0);
 
   /**
    * Given a layer index return number of features (shapes).
    */
-  int GetFeatureCount(int layerIndex=0);
+  int GetFeatureCount(int layerIndex = 0);
 
   /**
    * Return the active layer type (eg point, line, polygon).
@@ -70,17 +71,17 @@ public:
    */
   int GetActiveLayerFeatureCount();
 
-  //@{
+  ///@{
   /**
    * Set and Get the active layer.
    * If ActiveLayer is less than 0 (the default is -1), then all
    * layers are read. Otherwise, only the specified layer is read.
    */
-  vtkSetMacro(ActiveLayer,int);
-  vtkGetMacro(ActiveLayer,int);
-  //@}
+  vtkSetMacro(ActiveLayer, int);
+  vtkGetMacro(ActiveLayer, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set and Get whether features are appended to a single
    * vtkPolyData. Turning the option on is useful when a shapefile has
@@ -90,7 +91,7 @@ public:
   vtkSetMacro(AppendFeatures, int);
   vtkGetMacro(AppendFeatures, int);
   vtkBooleanMacro(AppendFeatures, int);
-  //@}
+  ///@}
 
   /**
    * Return projection string belonging to each layer in WKT format.
@@ -110,7 +111,7 @@ public:
    */
   const char* GetLayerProjectionAsProj4(int layerIndex);
 
-  //@{
+  ///@{
   /**
    * Set/get whether feature IDs should be generated.
    * Some GDAL primitives (e.g., a polygon with a hole
@@ -121,17 +122,17 @@ public:
    * The array of feature IDs will be the active
    * cell-data pedigree IDs.
    */
-  vtkSetMacro(AddFeatureIds,int);
-  vtkGetMacro(AddFeatureIds,int);
-  vtkBooleanMacro(AddFeatureIds,int);
-  //@}
+  vtkSetMacro(AddFeatureIds, int);
+  vtkGetMacro(AddFeatureIds, int);
+  vtkBooleanMacro(AddFeatureIds, int);
+  ///@}
 
 protected:
   vtkGDALVectorReader();
   ~vtkGDALVectorReader() override;
 
-  int RequestInformation( vtkInformation*, vtkInformationVector**, vtkInformationVector* ) override;
-  int RequestData( vtkInformation*, vtkInformationVector**, vtkInformationVector* ) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int InitializeInternal();
 

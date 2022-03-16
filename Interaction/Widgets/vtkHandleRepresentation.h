@@ -40,11 +40,12 @@
  *
  * @sa
  * vtkRectilinearWipeWidget vtkWidgetRepresentation vtkAbstractWidget
-*/
+ */
 
 #ifndef vtkHandleRepresentation_h
 #define vtkHandleRepresentation_h
 
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
 #include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkWidgetRepresentation.h"
 
@@ -55,15 +56,15 @@ class vtkPointPlacer;
 class VTKINTERACTIONWIDGETS_EXPORT vtkHandleRepresentation : public vtkWidgetRepresentation
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instances of this class.
    */
-  vtkTypeMacro(vtkHandleRepresentation,vtkWidgetRepresentation);
+  vtkTypeMacro(vtkHandleRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Handles usually have their coordinates set in display coordinates
    * (generally by an associated widget) and internally maintain the position
@@ -78,36 +79,47 @@ public:
   virtual void SetWorldPosition(double pos[3]);
   virtual void GetWorldPosition(double pos[3]);
   virtual double* GetWorldPosition() VTK_SIZEHINT(3);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The tolerance representing the distance to the widget (in pixels)
    * in which the cursor is considered near enough to the widget to
    * be active.
    */
-  vtkSetClampMacro(Tolerance,int,1,100);
-  vtkGetMacro(Tolerance,int);
-  //@}
+  vtkSetClampMacro(Tolerance, int, 1, 100);
+  vtkGetMacro(Tolerance, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Flag controls whether the widget becomes visible when the mouse pointer
    * moves close to it (i.e., the widget becomes active). By default,
    * ActiveRepresentation is off and the representation is always visible.
    */
-  vtkSetMacro(ActiveRepresentation,vtkTypeBool);
-  vtkGetMacro(ActiveRepresentation,vtkTypeBool);
-  vtkBooleanMacro(ActiveRepresentation,vtkTypeBool);
-  //@}
+  vtkSetMacro(ActiveRepresentation, vtkTypeBool);
+  vtkGetMacro(ActiveRepresentation, vtkTypeBool);
+  vtkBooleanMacro(ActiveRepresentation, vtkTypeBool);
+  ///@}
 
   // Enums define the state of the representation relative to the mouse pointer
   // position. Used by ComputeInteractionState() to communicate with the
   // widget. Note that ComputeInteractionState() and several other methods
   // must be implemented by subclasses.
-  enum _InteractionState { Outside=0, Nearby, Selecting, Translating, Scaling };
+  enum InteractionStateType
+  {
+    Outside = 0,
+    Nearby,
+    Selecting,
+    Translating,
+    Scaling
+  };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef InteractionStateType _InteractionState;
+#endif
 
-  //@{
+  ///@{
   /**
    * The interaction state may be set from a widget (e.g., HandleWidget) or
    * other object. This controls how the interaction with the widget
@@ -117,19 +129,19 @@ public:
    * widget feature), then based on events, the widget may modify this
    * further.
    */
-  vtkSetClampMacro(InteractionState,int,Outside,Scaling);
-  //@}
+  vtkSetClampMacro(InteractionState, int, Outside, Scaling);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify whether any motions (such as scale, translate, etc.) are
    * constrained in some way (along an axis, etc.) Widgets can use this
    * to control the resulting motion.
    */
-  vtkSetMacro(Constrained,vtkTypeBool);
-  vtkGetMacro(Constrained,vtkTypeBool);
-  vtkBooleanMacro(Constrained,vtkTypeBool);
-  //@}
+  vtkSetMacro(Constrained, vtkTypeBool);
+  vtkGetMacro(Constrained, vtkTypeBool);
+  vtkBooleanMacro(Constrained, vtkTypeBool);
+  ///@}
 
   /**
    * Method has to be overridden in the subclasses which has
@@ -138,16 +150,16 @@ public:
    * if the position is within the constraint, else it should return
    * 0. By default it returns 1.
    */
-  virtual int CheckConstraint(vtkRenderer *renderer, double pos[2]);
+  virtual int CheckConstraint(vtkRenderer* renderer, double pos[2]);
 
-  //@{
+  ///@{
   /**
    * Methods to make this class properly act like a vtkWidgetRepresentation.
    */
-  void ShallowCopy(vtkProp *prop) override;
-  virtual void DeepCopy(vtkProp *prop);
-  void SetRenderer(vtkRenderer *ren) override;
-  //@}
+  void ShallowCopy(vtkProp* prop) override;
+  virtual void DeepCopy(vtkProp* prop);
+  void SetRenderer(vtkRenderer* ren) override;
+  ///@}
 
   /**
    * Overload the superclasses' GetMTime() because the internal vtkCoordinates
@@ -155,7 +167,7 @@ public:
    */
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the point placer. Point placers can be used to dictate constraints
    * on the placement of handles. As an example, see vtkBoundedPlanePointPlacer
@@ -164,9 +176,55 @@ public:
    * The default point placer is vtkPointPlacer (which does not apply any
    * constraints, so the handles are free to move anywhere).
    */
-  virtual void SetPointPlacer ( vtkPointPlacer * );
-  vtkGetObjectMacro( PointPlacer, vtkPointPlacer );
-  //@}
+  virtual void SetPointPlacer(vtkPointPlacer*);
+  vtkGetObjectMacro(PointPlacer, vtkPointPlacer);
+  ///@}
+
+  ///@{
+  /**
+   * Gets the translation vector
+   */
+  virtual void GetTranslationVector(const double* p1, const double* p2, double* v) const;
+
+  ///@{
+  /**
+   * Translates world position by vector p1p2 projected on the constraint axis if any.
+   */
+  virtual void Translate(const double* p1, const double* p2);
+  ///@}
+
+  ///@{
+  /**
+   * Translates world position by vector v projected on the constraint axis if any.
+   */
+  virtual void Translate(const double* v);
+  ///@}
+
+  ///@{
+  /**
+   * Gets/Sets the constraint axis for translations. Returns Axis::NONE
+   * if none.
+   **/
+  vtkGetMacro(TranslationAxis, int);
+  vtkSetClampMacro(TranslationAxis, int, -1, 2);
+  ///@}
+
+  ///@{
+  /**
+   * Toggles constraint translation axis on/off.
+   */
+  void SetXTranslationAxisOn() { this->TranslationAxis = Axis::XAxis; }
+  void SetYTranslationAxisOn() { this->TranslationAxis = Axis::YAxis; }
+  void SetZTranslationAxisOn() { this->TranslationAxis = Axis::ZAxis; }
+  void SetTranslationAxisOff() { this->TranslationAxis = Axis::NONE; }
+  ///@}
+
+  ///@{
+  /**
+   * Returns true if ContrainedAxis
+   **/
+  bool IsTranslationConstrained() { return this->TranslationAxis != Axis::NONE; }
+  ///@}
 
 protected:
   vtkHandleRepresentation();
@@ -180,15 +238,18 @@ protected:
   // coordinates and the other in world coordinates. These facilitate
   // the conversion between these two systems. Note that the WorldPosition
   // is the ultimate maintainer of position.
-  vtkCoordinate *DisplayPosition;
-  vtkCoordinate *WorldPosition;
+  vtkCoordinate* DisplayPosition;
+  vtkCoordinate* WorldPosition;
 
   // Keep track of when coordinates were changed
   vtkTimeStamp DisplayPositionTime;
   vtkTimeStamp WorldPositionTime;
 
-  // Constrain the placement of handles.
-  vtkPointPlacer * PointPlacer;
+  // Constraint the placement of handles.
+  vtkPointPlacer* PointPlacer;
+
+  // Constraint axis translation
+  int TranslationAxis;
 
 private:
   vtkHandleRepresentation(const vtkHandleRepresentation&) = delete;

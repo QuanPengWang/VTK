@@ -19,27 +19,35 @@ else ()
   set(vtk_has_vtkm OFF)
 endif ()
 
-_vtk_module_write_import_prefix("${vtk_cmake_build_dir}/vtk-prefix.cmake" "${vtk_cmake_destination}")
+get_property(vtk_smp_backends GLOBAL
+  PROPERTY _vtk_smp_backends)
 
-set(vtk_prefix_paths)
+_vtk_module_write_import_prefix("${vtk_cmake_build_dir}/vtk-prefix.cmake" "${vtk_cmake_destination}")
 
 set(vtk_python_version "")
 if (VTK_WRAP_PYTHON)
   set(vtk_python_version "${VTK_PYTHON_VERSION}")
 endif ()
 
+set(vtk_has_qml 0)
+if (TARGET VTK::GUISupportQtQuick)
+  set(vtk_has_qml 1)
+endif ()
+
+get_property(vtk_opengl_preference_set GLOBAL
+  PROPERTY _vtk_opengl_preference
+  SET)
+if (vtk_opengl_preference_set)
+  get_property(vtk_opengl_preference GLOBAL
+    PROPERTY _vtk_opengl_preference)
+else ()
+  set(vtk_opengl_preference "")
+endif ()
+
 configure_file(
   "${vtk_cmake_dir}/vtk-config.cmake.in"
   "${vtk_cmake_build_dir}/vtk-config.cmake"
   @ONLY)
-
-if (NOT DEFINED VTK_RELOCATABLE_INSTALL)
-  option(VTK_RELOCATABLE_INSTALL "Do not embed hard-coded paths into the install" ON)
-  mark_as_advanced(VTK_RELOCATABLE_INSTALL)
-endif ()
-if (VTK_RELOCATABLE_INSTALL)
-  set(vtk_prefix_paths)
-endif ()
 
 configure_file(
   "${vtk_cmake_dir}/vtk-config.cmake.in"
@@ -65,11 +73,13 @@ set(vtk_cmake_module_files
   Finddouble-conversion.cmake
   FindEigen3.cmake
   FindEXPAT.cmake
+  FindExprTk.cmake
   FindFFMPEG.cmake
   FindFontConfig.cmake
   FindFreetype.cmake
   FindGL2PS.cmake
   FindGLEW.cmake
+  FindJOGL.cmake
   FindJsonCpp.cmake
   FindLibHaru.cmake
   FindLibPROJ.cmake
@@ -81,19 +91,20 @@ set(vtk_cmake_module_files
   FindNetCDF.cmake
   FindODBC.cmake
   FindOGG.cmake
-  FindOpenMP.cmake
   FindOpenSlide.cmake
   FindOpenVR.cmake
+  FindOpenXR.cmake
   FindOSMesa.cmake
-  FindPostgreSQL.cmake
+  FindPEGTL.cmake
+  FindSDL2.cmake
   FindTBB.cmake
   FindTHEORA.cmake
   Findutf8cpp.cmake
+  FindCGNS.cmake
 
   vtkCMakeBackports.cmake
   vtkDetectLibraryType.cmake
   vtkEncodeString.cmake
-  vtkExternalData.cmake
   vtkHashSource.cmake
   vtkModule.cmake
   vtkModuleGraphviz.cmake
@@ -106,29 +117,30 @@ set(vtk_cmake_module_files
   vtkObjectFactory.h.in
   vtkTestingDriver.cmake
   vtkTestingRenderingDriver.cmake
-  vtkTopologicalSort.cmake)
+  vtkTopologicalSort.cmake
+  vtk-use-file-compat.cmake
+  vtk-use-file-deprecated.cmake
+  vtk-use-file-error.cmake)
 set(vtk_cmake_patch_files
-  patches/3.7/FindPNG.cmake
-  patches/3.7/FindTIFF.cmake
-  patches/3.7/exportheader.cmake.in
-  patches/3.7/GenerateExportHeader.cmake
-  patches/3.10/FindMPI/fortranparam_mpi.f90.in
-  patches/3.10/FindMPI/libver_mpi.c
-  patches/3.10/FindMPI/libver_mpi.f90.in
-  patches/3.10/FindMPI/mpiver.f90.in
-  patches/3.10/FindMPI/test_mpi.c
-  patches/3.10/FindMPI/test_mpi.f90.in
-  patches/3.10/FindMPI.cmake
   patches/3.13/FindZLIB.cmake
-  patches/99/FindGDAL.cmake
+  patches/3.16/FindPostgreSQL.cmake
+  patches/3.19/FindJPEG.cmake
+  patches/3.19/FindLibArchive.cmake
+  patches/3.19/FindSQLite3.cmake
+  patches/3.19/FindX11.cmake
+  patches/3.20/FindGDAL.cmake
+  patches/3.22/FindMPI/fortranparam_mpi.f90.in
+  patches/3.22/FindMPI/libver_mpi.c
+  patches/3.22/FindMPI/libver_mpi.f90.in
+  patches/3.22/FindMPI/mpiver.f90.in
+  patches/3.22/FindMPI/test_mpi.c
+  patches/3.22/FindMPI/test_mpi.f90.in
+  patches/3.22/FindMPI.cmake
+  patches/3.23/FindPython/Support.cmake
+  patches/3.23/FindPython2.cmake
+  patches/3.23/FindPython3.cmake
   patches/99/FindHDF5.cmake
-  patches/99/FindJPEG.cmake
-  patches/99/FindOpenGL.cmake
-  patches/99/FindPython/Support.cmake
-  patches/99/FindPython2.cmake
-  patches/99/FindPython3.cmake
-  patches/99/FindSQLite3.cmake
-  patches/99/FindX11.cmake)
+  patches/99/FindOpenGL.cmake)
 
 set(vtk_cmake_files_to_install)
 foreach (vtk_cmake_module_file IN LISTS vtk_cmake_module_files vtk_cmake_patch_files)
@@ -141,6 +153,7 @@ foreach (vtk_cmake_module_file IN LISTS vtk_cmake_module_files vtk_cmake_patch_f
 endforeach ()
 
 include(vtkInstallCMakePackageHelpers)
+
 if (NOT VTK_RELOCATABLE_INSTALL)
   list(APPEND vtk_cmake_files_to_install
     "${vtk_cmake_build_dir}/vtk-find-package-helpers.cmake")
@@ -167,11 +180,6 @@ install(
               "${vtk_cmake_build_dir}/vtk-prefix.cmake"
   DESTINATION "${vtk_cmake_destination}"
   COMPONENT   "development")
-
-install(
-  FILES       "${CMAKE_CURRENT_LIST_DIR}/../Copyright.txt"
-  DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-  COMPONENT   "license")
 
 vtk_module_export_find_packages(
   CMAKE_DESTINATION "${vtk_cmake_destination}"

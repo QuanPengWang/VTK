@@ -32,7 +32,7 @@
  * @sa
  * vtkInteractorStyleTrackballCamera vtkInteractorStyleJoystickActor
  * vtkInteractorStyleJoystickCamera
-*/
+ */
 
 #ifndef vtkInteractorStyleTrackballActor_h
 #define vtkInteractorStyleTrackballActor_h
@@ -45,11 +45,11 @@ class vtkCellPicker;
 class VTKINTERACTIONSTYLE_EXPORT vtkInteractorStyleTrackballActor : public vtkInteractorStyle
 {
 public:
-  static vtkInteractorStyleTrackballActor *New();
-  vtkTypeMacro(vtkInteractorStyleTrackballActor,vtkInteractorStyle);
+  static vtkInteractorStyleTrackballActor* New();
+  vtkTypeMacro(vtkInteractorStyleTrackballActor, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
@@ -61,7 +61,7 @@ public:
   void OnMiddleButtonUp() override;
   void OnRightButtonDown() override;
   void OnRightButtonUp() override;
-  //@}
+  ///@}
 
   // These methods for the different interactions in different modes
   // are overridden in subclasses to perform the correct motion. Since
@@ -79,16 +79,13 @@ protected:
 
   void FindPickedActor(int x, int y);
 
-  void Prop3DTransform(vtkProp3D *prop3D,
-                       double *boxCenter,
-                       int NumRotation,
-                       double **rotate,
-                       double *scale);
+  void Prop3DTransform(
+    vtkProp3D* prop3D, double* boxCenter, int NumRotation, double** rotate, double* scale);
 
   double MotionFactor;
 
-  vtkProp3D *InteractionProp;
-  vtkCellPicker *InteractionPicker;
+  vtkProp3D* InteractionProp;
+  vtkCellPicker* InteractionPicker;
 
 private:
   vtkInteractorStyleTrackballActor(const vtkInteractorStyleTrackballActor&) = delete;

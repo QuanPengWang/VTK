@@ -30,7 +30,7 @@
  * you may tell the filter to create a new array, assuming that the size
  * of each leaf vertex is 1.  You may optionally set a flag to first take the
  * log of all leaf values before aggregating.
-*/
+ */
 
 #ifndef vtkTreeFieldAggregator_h
 #define vtkTreeFieldAggregator_h
@@ -44,51 +44,51 @@ class vtkTree;
 class VTKINFOVISCORE_EXPORT vtkTreeFieldAggregator : public vtkTreeAlgorithm
 {
 public:
-  static vtkTreeFieldAggregator *New();
+  static vtkTreeFieldAggregator* New();
 
-  vtkTypeMacro(vtkTreeFieldAggregator,vtkTreeAlgorithm);
+  vtkTypeMacro(vtkTreeFieldAggregator, vtkTreeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * The field to aggregate.  If this is a string array, the entries are converted to double.
    * TODO: Remove this field and use the ArrayToProcess in vtkAlgorithm.
    */
   vtkGetStringMacro(Field);
   vtkSetStringMacro(Field);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If the value of the vertex is less than MinValue then consider it's value to be minVal.
    */
   vtkGetMacro(MinValue, double);
   vtkSetMacro(MinValue, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If set, the algorithm will assume a size of 1 for each leaf vertex.
    */
   vtkSetMacro(LeafVertexUnitSize, bool);
   vtkGetMacro(LeafVertexUnitSize, bool);
   vtkBooleanMacro(LeafVertexUnitSize, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If set, the leaf values in the tree will be logarithmically scaled (base 10).
    */
   vtkSetMacro(LogScale, bool);
   vtkGetMacro(LogScale, bool);
   vtkBooleanMacro(LogScale, bool);
-  //@}
+  ///@}
 
 protected:
   vtkTreeFieldAggregator();
   ~vtkTreeFieldAggregator() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   char* Field;

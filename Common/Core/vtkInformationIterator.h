@@ -22,7 +22,7 @@
  *
  * @sa
  * vtkInformation vtkInformationKey
-*/
+ */
 
 #ifndef vtkInformationIterator_h
 #define vtkInformationIterator_h
@@ -37,17 +37,17 @@ class vtkInformationIteratorInternals;
 class VTKCOMMONCORE_EXPORT vtkInformationIterator : public vtkObject
 {
 public:
-  static vtkInformationIterator *New();
-  vtkTypeMacro(vtkInformationIterator,vtkObject);
+  static vtkInformationIterator* New();
+  vtkTypeMacro(vtkInformationIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the information to iterator over.
    */
   void SetInformation(vtkInformation*);
   vtkGetObjectMacro(Information, vtkInformation);
-  //@}
+  ///@}
 
   /**
    * Set the function to iterate over. The iterator

@@ -21,12 +21,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPolyPointSource);
 
-vtkCxxSetObjectMacro(vtkPolyPointSource, Points, vtkPoints)
+vtkCxxSetObjectMacro(vtkPolyPointSource, Points, vtkPoints);
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkPolyPointSource::vtkPolyPointSource()
 {
   this->Points = nullptr;
@@ -34,7 +34,7 @@ vtkPolyPointSource::vtkPolyPointSource()
   this->SetNumberOfInputPorts(0);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkPolyPointSource::~vtkPolyPointSource()
 {
   if (this->Points)
@@ -43,22 +43,22 @@ vtkPolyPointSource::~vtkPolyPointSource()
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkMTimeType vtkPolyPointSource::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
 
-  if ( this->Points != nullptr )
+  if (this->Points != nullptr)
   {
     time = this->Points->GetMTime();
-    mTime = ( time > mTime ? time : mTime );
+    mTime = (time > mTime ? time : mTime);
   }
 
   return mTime;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPolyPointSource::SetNumberOfPoints(vtkIdType numPoints)
 {
   if (!this->Points)
@@ -76,7 +76,7 @@ void vtkPolyPointSource::SetNumberOfPoints(vtkIdType numPoints)
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkIdType vtkPolyPointSource::GetNumberOfPoints()
 {
   if (this->Points)
@@ -87,7 +87,7 @@ vtkIdType vtkPolyPointSource::GetNumberOfPoints()
   return 0;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPolyPointSource::Resize(vtkIdType numPoints)
 {
   if (!this->Points)
@@ -102,7 +102,7 @@ void vtkPolyPointSource::Resize(vtkIdType numPoints)
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPolyPointSource::SetPoint(vtkIdType id, double x, double y, double z)
 {
   if (!this->Points)
@@ -120,18 +120,15 @@ void vtkPolyPointSource::SetPoint(vtkIdType id, double x, double y, double z)
   this->Modified();
 }
 
-//----------------------------------------------------------------------------
-int vtkPolyPointSource::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+//------------------------------------------------------------------------------
+int vtkPolyPointSource::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   // get the info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // get the output
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkIdType numPoints = this->GetNumberOfPoints();
   vtkSmartPointer<vtkIdList> pointIds = vtkSmartPointer<vtkIdList>::New();
@@ -150,7 +147,7 @@ int vtkPolyPointSource::RequestData(
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkPolyPointSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

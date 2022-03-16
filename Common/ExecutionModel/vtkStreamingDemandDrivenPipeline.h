@@ -21,7 +21,7 @@
  * the style of pipeline update that is provided by the old-style VTK
  * 4.x pipeline.  Instead of always updating an entire data set, this
  * executive supports asking for pieces or sub-extents.
-*/
+ */
 
 #ifndef vtkStreamingDemandDrivenPipeline_h
 #define vtkStreamingDemandDrivenPipeline_h
@@ -43,29 +43,29 @@ class vtkInformationStringKey;
 class vtkInformationStringKey;
 class vtkInformationUnsignedLongKey;
 
-class VTKCOMMONEXECUTIONMODEL_EXPORT vtkStreamingDemandDrivenPipeline : public vtkDemandDrivenPipeline
+class VTKCOMMONEXECUTIONMODEL_EXPORT vtkStreamingDemandDrivenPipeline
+  : public vtkDemandDrivenPipeline
 {
 public:
   static vtkStreamingDemandDrivenPipeline* New();
-  vtkTypeMacro(vtkStreamingDemandDrivenPipeline,vtkDemandDrivenPipeline);
+  vtkTypeMacro(vtkStreamingDemandDrivenPipeline, vtkDemandDrivenPipeline);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Generalized interface for asking the executive to fulfill update
    * requests.
    */
-  int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inInfo,
-                             vtkInformationVector* outInfo) override;
+  vtkTypeBool ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) override;
 
-  //@{
+  ///@{
   /**
    * Bring the outputs up-to-date.
    */
-  int Update() override;
-  int Update(int port) override;
-  virtual int UpdateWholeExtent();
-  //@}
+  vtkTypeBool Update() override;
+  vtkTypeBool Update(int port) override;
+  virtual vtkTypeBool UpdateWholeExtent();
+  ///@}
 
   /**
    * This method enables the passing of data requests to the algorithm
@@ -89,7 +89,7 @@ public:
    * Available requests include UPDATE_PIECE_NUMBER(), UPDATE_NUMBER_OF_PIECES()
    * UPDATE_EXTENT() etc etc.
    */
-  virtual int Update(int port, vtkInformationVector* requests);
+  virtual vtkTypeBool Update(int port, vtkInformationVector* requests);
 
   /**
    * Propagate the update request from the given output port back
@@ -98,27 +98,27 @@ public:
    */
   int PropagateUpdateExtent(int outputPort);
 
-  //@{
+  ///@{
   /**
    * Propagate time through the pipeline. this is a special pass
    * only necessary if there is temporal meta data that must be updated
    */
   int PropagateTime(int outputPort);
   int UpdateTimeDependentInformation(int outputPort);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the whole extent of an output port.  The whole extent is
    * meta data for structured data sets.  It gets set by the algorithm
    * during the update information pass.
    */
-  static int SetWholeExtent(vtkInformation *, int extent[6]);
-  static void GetWholeExtent(vtkInformation *, int extent[6]);
-  static int* GetWholeExtent(vtkInformation *) VTK_SIZEHINT(6);
-  //@}
+  static int SetWholeExtent(vtkInformation*, int extent[6]);
+  static void GetWholeExtent(vtkInformation*, int extent[6]);
+  static int* GetWholeExtent(vtkInformation*) VTK_SIZEHINT(6);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * This request flag indicates whether the requester can handle more
    * data than requested for the given port.  Right now it is used in
@@ -129,7 +129,7 @@ public:
    */
   int SetRequestExactExtent(int port, int flag);
   int GetRequestExactExtent(int port);
-  //@}
+  ///@}
 
   /**
    * Key defining a request to propagate the update extent upstream.
@@ -234,25 +234,25 @@ public:
    * key to record the bounds of a dataset.
    * \ingroup InformationKeys
    */
-  static vtkInformationDoubleVectorKey *BOUNDS();
+  static vtkInformationDoubleVectorKey* BOUNDS();
 
-  //@{
+  ///@{
   /**
    * Get/Set the update extent for output ports that use 3D extents.
    */
-  static void GetUpdateExtent(vtkInformation *, int extent[6]);
-  static int* GetUpdateExtent(vtkInformation *);
-  //@}
-  //@{
+  static void GetUpdateExtent(vtkInformation*, int extent[6]);
+  static int* GetUpdateExtent(vtkInformation*);
+  ///@}
+  ///@{
   /**
    * Set/Get the update piece, update number of pieces, and update
    * number of ghost levels for an output port.  Similar to update
    * extent in 3D.
    */
-  static int GetUpdatePiece(vtkInformation *);
-  static int GetUpdateNumberOfPieces(vtkInformation *);
-  static int GetUpdateGhostLevel(vtkInformation *);
-  //@}
+  static int GetUpdatePiece(vtkInformation*);
+  static int GetUpdateNumberOfPieces(vtkInformation*);
+  static int GetUpdateGhostLevel(vtkInformation*);
+  ///@}
 
 protected:
   vtkStreamingDemandDrivenPipeline();
@@ -272,44 +272,34 @@ protected:
 
   // Does the time request correspond to what is in the data?
   // Returns 0 if yes, 1 otherwise.
-  virtual int NeedToExecuteBasedOnTime(vtkInformation* outInfo,
-                                       vtkDataObject* dataObject);
+  virtual int NeedToExecuteBasedOnTime(vtkInformation* outInfo, vtkDataObject* dataObject);
 
   // Setup default information on the output after the algorithm
   // executes information.
-  int ExecuteInformation(vtkInformation* request,
-                                 vtkInformationVector** inInfoVec,
-                                 vtkInformationVector* outInfoVec) override;
+  int ExecuteInformation(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
 
   // Copy information for the given request.
   void CopyDefaultInformation(vtkInformation* request, int direction,
-                                      vtkInformationVector** inInfoVec,
-                                      vtkInformationVector* outInfoVec) override;
+    vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
 
   // Helper to check output information before propagating it to inputs.
-  virtual int VerifyOutputInformation(int outputPort,
-                                      vtkInformationVector** inInfoVec,
-                                      vtkInformationVector* outInfoVec);
-
+  virtual int VerifyOutputInformation(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
   // Override this check to account for update extent.
-  int NeedToExecuteData(int outputPort,
-                                vtkInformationVector** inInfoVec,
-                                vtkInformationVector* outInfoVec) override;
+  int NeedToExecuteData(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
 
   // Override these to handle the continue-executing option.
-  void ExecuteDataStart(vtkInformation* request,
-                                vtkInformationVector** inInfoVec,
-                                vtkInformationVector* outInfoVec) override;
-  void ExecuteDataEnd(vtkInformation* request,
-                              vtkInformationVector** inInfoVec,
-                              vtkInformationVector* outInfoVec) override;
+  void ExecuteDataStart(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
+  void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
 
   // Override this to handle cropping and ghost levels.
-  void MarkOutputsGenerated(vtkInformation* request,
-                                    vtkInformationVector** inInfoVec,
-                                    vtkInformationVector* outInfoVec) override;
-
+  void MarkOutputsGenerated(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
 
   // Remove update/whole extent when resetting pipeline information.
   void ResetPipelineInformation(int port, vtkInformation*) override;
@@ -318,10 +308,10 @@ protected:
   // request.
   int ContinueExecuting;
 
-  vtkInformation *UpdateExtentRequest;
-  vtkInformation *UpdateTimeRequest;
-  vtkInformation *TimeDependentInformationRequest;
-  vtkInformationIterator *InformationIterator;
+  vtkInformation* UpdateExtentRequest;
+  vtkInformation* UpdateTimeRequest;
+  vtkInformation* TimeDependentInformationRequest;
+  vtkInformationIterator* InformationIterator;
 
   // did the most recent PUE do anything ?
   int LastPropogateUpdateExtentShortCircuited;

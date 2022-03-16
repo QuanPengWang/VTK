@@ -19,7 +19,7 @@
  * vtkXMLFileReadTester reads the smallest part of a file necessary to
  * determine whether it is a VTK XML file.  If so, it extracts the
  * file type and version number.
-*/
+ */
 
 #ifndef vtkXMLFileReadTester_h
 #define vtkXMLFileReadTester_h
@@ -27,10 +27,10 @@
 #include "vtkIOXMLModule.h" // For export macro
 #include "vtkXMLParser.h"
 
-class VTKIOXML_EXPORT vtkXMLFileReadTester: public vtkXMLParser
+class VTKIOXML_EXPORT vtkXMLFileReadTester : public vtkXMLParser
 {
 public:
-  vtkTypeMacro(vtkXMLFileReadTester,vtkXMLParser);
+  vtkTypeMacro(vtkXMLFileReadTester, vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkXMLFileReadTester* New();
 
@@ -40,21 +40,21 @@ public:
    */
   int TestReadFile();
 
-  //@{
+  ///@{
   /**
    * Get the data type of the XML file tested.  If the file could not
    * be read, returns nullptr.
    */
   vtkGetStringMacro(FileDataType);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the file version of the XML file tested.  If the file could not
    * be read, returns nullptr.
    */
   vtkGetStringMacro(FileVersion);
-  //@}
+  ///@}
 
 protected:
   vtkXMLFileReadTester();

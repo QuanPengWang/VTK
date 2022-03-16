@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
  * @sa
  * vtkTextCodecFactory
  *
-*/
+ */
 
 #ifndef vtkTextCodec_h
 #define vtkTextCodec_h
@@ -46,14 +46,14 @@ class VTKIOCORE_EXPORT vtkTextCodec : public vtkObject
 public:
   vtkTypeMacro(vtkTextCodec, vtkObject);
 
-  //@{
+  ///@{
   /**
    * The name this codec goes by - should match the string the factory will take
    * to create it
    */
   virtual const char* Name();
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   virtual bool CanHandle(const char* NameString);
 
@@ -62,57 +62,63 @@ public:
    */
   virtual bool IsValid(istream& InputStream);
 
-  //@{
+  ///@{
   /**
    * a base class that any output iterators need to derive from to use the first
    * signature of to_unicode.  Templates will not allow the vtable to
    * re-reference to the correct class so even though we only need the interface
    * we have to use derivation.
    */
+  // FIXME(#18327): This class should be migrated to do UTF-8-based processing.
+  // Currently it works based on `vtkUnicodeString` due to the `vtkTypeUInt32`
+  // item type.
   class OutputIterator
   {
   public:
-    virtual OutputIterator& operator++(int) = 0;
-    virtual OutputIterator& operator*() = 0;
-    virtual OutputIterator& operator=(const vtkUnicodeString::value_type value) = 0;
-  //@}
+    virtual OutputIterator& operator++(int) { return *this; }
+    virtual OutputIterator& operator*() { return *this; }
+    virtual OutputIterator& operator=(const vtkTypeUInt32& value) = 0;
 
-    OutputIterator() {}    virtual ~OutputIterator() {}
+    OutputIterator() = default;
+    virtual ~OutputIterator() = default;
 
   private:
     OutputIterator(const OutputIterator&) = delete;
     OutputIterator& operator=(const OutputIterator&) = delete;
   };
+  ///@}
 
   /**
    * Iterate through the sequence represented by the stream assigning the result
    * to the output iterator.  The stream will be advanced to its end so
    * subsequent use would need to reset it.
    */
-  virtual void ToUnicode(istream& InputStream,
-                         vtkTextCodec::OutputIterator& output) = 0;
+  virtual void ToUnicode(istream& inputStream, vtkTextCodec::OutputIterator& output);
 
   /**
    * convenience method to take data from the stream and put it into a
-   * vtkUnicodeString.
+   * string.
    */
-  vtkUnicodeString ToUnicode(istream & inputStream);
+  std::string ToString(istream& inputStream);
+  VTK_DEPRECATED_IN_9_1_0("Use std::string ToString(istream& inputStream)")
+  vtkUnicodeString ToUnicode(istream& inputStream);
 
   /**
    * Return the next code point from the sequence represented by the stream
    * advancing the stream through however many places needed to assemble that
    * code point.
    */
-  virtual vtkUnicodeString::value_type NextUnicode(istream& inputStream) = 0;
+  virtual vtkTypeUInt32 NextUTF32CodePoint(istream& inputStream) = 0;
+  VTK_DEPRECATED_IN_9_1_0("Use vtkTypeUInt32 NextUTF32CodePoint(istream& inputStream)")
+  vtkUnicodeString::value_type NextUnicode(istream& inputStream);
 
 protected:
   vtkTextCodec();
   ~vtkTextCodec() override;
 
 private:
-  vtkTextCodec(const vtkTextCodec &) = delete;
-  void operator=(const vtkTextCodec &) = delete;
-
+  vtkTextCodec(const vtkTextCodec&) = delete;
+  void operator=(const vtkTextCodec&) = delete;
 };
 
 #endif

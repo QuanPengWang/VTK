@@ -31,21 +31,21 @@
  * a very good reason to use vtkMutexLock. If higher-performance equivalents
  * for non-Windows platforms (Irix, SunOS, etc) are discovered, they
  * should replace the implementations in this class
-*/
+ */
 
 #ifndef vtkCriticalSection_h
 #define vtkCriticalSection_h
 
 #include "vtkCommonCoreModule.h" // For export macro
 #include "vtkObject.h"
-#include "vtkSimpleCriticalSection.h" // For simple critical section
+#include <mutex> // for std::mutex
 
 class VTKCOMMONCORE_EXPORT vtkCriticalSection : public vtkObject
 {
 public:
-  static vtkCriticalSection *New();
+  static vtkCriticalSection* New();
 
-  vtkTypeMacro(vtkCriticalSection,vtkObject);
+  vtkTypeMacro(vtkCriticalSection, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -59,24 +59,23 @@ public:
   void Unlock();
 
 protected:
-  vtkSimpleCriticalSection SimpleCriticalSection;
-  vtkCriticalSection() {}
-  ~vtkCriticalSection() override {}
+  std::mutex mtx;
+  vtkCriticalSection() = default;
+  ~vtkCriticalSection() override = default;
 
 private:
   vtkCriticalSection(const vtkCriticalSection&) = delete;
   void operator=(const vtkCriticalSection&) = delete;
 };
 
-
 inline void vtkCriticalSection::Lock()
 {
-  this->SimpleCriticalSection.Lock();
+  this->mtx.lock();
 }
 
 inline void vtkCriticalSection::Unlock()
 {
-  this->SimpleCriticalSection.Unlock();
+  this->mtx.unlock();
 }
 
 #endif

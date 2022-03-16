@@ -47,6 +47,7 @@
 #define SEEK_END 2
 #endif
 
+#include "ncpathmgr.h"
 #include "ncio.h"
 #include "fbits.h"
 #include "rnd.h"
@@ -468,7 +469,7 @@ px_rel(ncio_px *const pxp, off_t offset, int rflags)
    RGN_MODIFIED.
 
    For POSIX system, without NC_SHARE, this becomes the rel function
-   pointed to by the ncio rel function pointer. It mearly checks for
+   pointed to by the ncio rel function pointer. It merely checks for
    file write permission, then calls px_rel to do everything.
 
    nciop - pointer to ncio struct.
@@ -1132,7 +1133,7 @@ typedef struct ncio_spx {
 /* This function releases the region specified by offset.
 
    For POSIX system, with NC_SHARE, this becomes the rel function
-   pointed to by the ncio rel function pointer. It mearly checks for
+   pointed to by the ncio rel function pointer. It merely checks for
    file write permission, then calls px_rel to do everything.
 
    nciop - pointer to ncio struct.
@@ -1462,7 +1463,7 @@ ncio_spx_init2(ncio *const nciop, const size_t *const sizehintp)
 
 
 /* First half of init for ncio_spx struct, setting the rel, get, move,
-   snyc, and free function pointers to the NC_SHARE versions of these
+   sync, and free function pointers to the NC_SHARE versions of these
    functions (i.e. the ncio_spx_* functions).
 */
 static void
@@ -1622,10 +1623,10 @@ posixio_create(const char *path, int ioflags,
 	fSet(oflags, O_BINARY);
 #endif
 #ifdef vms
-	fd = open(path, oflags, NC_DEFAULT_CREAT_MODE, "ctx=stm");
+	fd = NCopen3(path, oflags, NC_DEFAULT_CREAT_MODE, "ctx=stm");
 #else
 	/* Should we mess with the mode based on NC_SHARE ?? */
-	fd = open(path, oflags, NC_DEFAULT_CREAT_MODE);
+	fd = NCopen3(path, oflags, NC_DEFAULT_CREAT_MODE);
 #endif
 #if 0
 	(void) fprintf(stderr, "ncio_create(): path=\"%s\"\n", path);
@@ -1760,9 +1761,9 @@ posixio_open(const char *path,
 #endif
 
 #ifdef vms
-	fd = open(path, oflags, 0, "ctx=stm");
+	fd = NCopen3(path, oflags, 0, "ctx=stm");
 #else
-	fd = open(path, oflags, 0);
+	fd = NCopen3(path, oflags, 0);
 #endif
 	if(fd < 0)
 	{

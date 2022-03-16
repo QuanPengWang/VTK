@@ -15,7 +15,7 @@
 /**
  * @class   vtkExplicitStructuredGridToUnstructuredGrid
  * @brief   Filter which converts an explicit structured grid into an unstructured grid.
-*/
+ */
 
 #ifndef vtkExplicitStructuredGridToUnstructuredGrid_h
 #define vtkExplicitStructuredGridToUnstructuredGrid_h
@@ -23,20 +23,20 @@
 #include "vtkFiltersCoreModule.h" // For export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class VTKFILTERSCORE_EXPORT vtkExplicitStructuredGridToUnstructuredGrid :
-  public vtkUnstructuredGridAlgorithm
+class VTKFILTERSCORE_EXPORT vtkExplicitStructuredGridToUnstructuredGrid
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkExplicitStructuredGridToUnstructuredGrid* New();
   vtkTypeMacro(vtkExplicitStructuredGridToUnstructuredGrid, vtkUnstructuredGridAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkExplicitStructuredGridToUnstructuredGrid() = default;
   ~vtkExplicitStructuredGridToUnstructuredGrid() override = default;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
-  int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkExplicitStructuredGridToUnstructuredGrid(

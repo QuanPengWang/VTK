@@ -24,14 +24,14 @@
  * This class is also the parent class for any more specialized view which uses
  * a renderer.
  *
-*/
+ */
 
 #ifndef vtkRenderViewBase_h
 #define vtkRenderViewBase_h
 
-#include "vtkViewsCoreModule.h" // For export macro
-#include "vtkView.h"
 #include "vtkSmartPointer.h" // For SP ivars
+#include "vtkView.h"
+#include "vtkViewsCoreModule.h" // For export macro
 
 class vtkInteractorObserver;
 class vtkRenderer;
@@ -63,9 +63,9 @@ public:
    * handling in order to do correctly - see the notes in the detailed
    * description of vtkRenderViewBase.
    */
-  virtual void SetRenderWindow(vtkRenderWindow *win);
+  virtual void SetRenderWindow(vtkRenderWindow* win);
 
-  //@{
+  ///@{
   /**
    * The render window interactor. Note that this requires special
    * handling in order to do correctly - see the notes in the detailed
@@ -73,7 +73,7 @@ public:
    */
   virtual vtkRenderWindowInteractor* GetInteractor();
   virtual void SetInteractor(vtkRenderWindowInteractor*);
-  //@}
+  ///@}
 
   /**
    * Updates the representations, then calls Render() on the render window

@@ -16,6 +16,9 @@
 #ifdef HAVE_STDIO_H
 #include <stdio.h>
 #endif
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /*
 This is included in bottom
@@ -25,20 +28,7 @@ missing functions should be
 defined and missing types defined.
 */
 
-#ifndef HAVE_STRDUP
-extern char* strdup(const char*);
-#endif
-
-/* handle null arguments */
-#ifndef nulldup
-#ifdef HAVE_STRDUP
-#define nulldup(s) ((s)==NULL?NULL:strdup(s))
-#else
-char *nulldup(const char* s);
-#endif
-#endif
-
-#ifdef _MSC_VER
+#ifdef _WIN32
 #ifndef HAVE_SSIZE_T
 #include <basetsd.h>
 typedef SSIZE_T ssize_t;
@@ -46,47 +36,59 @@ typedef SSIZE_T ssize_t;
 #endif
 #endif
 
+#include "config.h"
+#include "vtk_netcdf_mangle.h"
+
 /*Warning: Cygwin with -ansi does not define these functions
   in its headers.*/
 #ifndef _WIN32
 #if __STDC__ == 1 /*supposed to be same as -ansi flag */
 
+/* WARNING: in some systems, these functions may be defined as macros, so check */
 #ifndef strdup
 extern char* strdup(const char*);
 #endif
-
-#ifndef strlcat
+#ifndef HAVE_STRLCAT
 extern size_t strlcat(char*,const char*,size_t);
 #endif
-
 #ifndef snprintf
 extern int snprintf(char*, size_t, const char*, ...);
 #endif
-
+#ifndef strcasecmp
 extern int strcasecmp(const char*, const char*);
+#endif
+#ifndef strtoll
 extern long long int strtoll(const char*, char**, int);
+#endif
+#ifndef strtoull
 extern unsigned long long int strtoull(const char*, char**, int);
-
+#endif
 #ifndef fileno
 extern int fileno(FILE*);
 #endif
 
 #endif /*STDC*/
-#endif /*!WIN32*/
+#endif /*!_WIN32*/
 
 #ifdef _WIN32
-#ifndef strlcat
+#ifndef HAVE_STRLCAT
 #define strlcat(d,s,n) strcat_s((d),(n),(s))
 #endif
 #endif
 
 /* handle null arguments */
 #ifndef nulldup
+#ifdef HAVE_STRDUP
 #define nulldup(s) ((s)==NULL?NULL:strdup(s))
+#else
+extern char *nulldup(const char* s);
 #endif
+#endif
+
 #ifndef nulllen
 #define nulllen(s) ((s)==NULL?0:strlen(s))
 #endif
+
 #ifndef nullfree
 #define nullfree(s) {if((s)!=NULL) {free(s);} else {}}
 #endif
@@ -108,6 +110,27 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 #endif
 
+#ifndef HAVE_UINT64
+typedef unsigned long long uint64;
+#endif
+
+#ifndef HAVE_UINT64_T
+typedef unsigned long long uint64_t;
+#endif
+
+#ifndef _WIN32
+#ifndef HAVE_UINTPTR_T
+#if SIZEOF_VOIDP == 8
+#define uintptr_t unsigned long
+#else
+#define uintptr_t unsigned int
+#endif
+#endif
+#endif
+
+#ifndef HAVE_SIZE64_T
+typedef unsigned long long size64_t;
+#endif
 
 /* Provide a fixed size alternative to off_t or off64_t */
 typedef long long fileoffset_t;

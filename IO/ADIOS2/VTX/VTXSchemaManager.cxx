@@ -47,8 +47,11 @@ void VTXSchemaManager::Update(
   {
     this->StreamName = streamName;
     this->SchemaName = schemaName;
-    this->IO = this->ADIOS->DeclareIO(this->StreamName);
-    this->Engine = this->IO.Open(this->StreamName, adios2::Mode::Read);
+
+    const std::string fileName = helper::GetFileName(this->StreamName);
+    this->IO = this->ADIOS->DeclareIO(fileName);
+    this->IO.SetEngine(helper::GetEngineType(fileName));
+    this->Engine = this->IO.Open(fileName, adios2::Mode::Read);
     InitReader();
   }
   else
@@ -86,11 +89,12 @@ bool VTXSchemaManager::InitReaderXMLVTK()
 
   // check if it's file, not optimizing with MPI_Bcast
   std::string xmlFileName;
-  if (vtksys::SystemTools::FileIsDirectory(this->Engine.Name()))
+
+  if (vtksys::SystemTools::FileIsDirectory(this->Engine.Name())) // BP4
   {
     xmlFileName = this->Engine.Name() + "/" + this->SchemaName;
   }
-  else if (vtksys::SystemTools::FileIsDirectory(this->Engine.Name() + ".dir"))
+  else if (vtksys::SystemTools::FileIsDirectory(this->Engine.Name() + ".dir")) // BP3
   {
     xmlFileName = this->Engine.Name() + ".dir/" + this->SchemaName;
   }
@@ -136,10 +140,10 @@ bool VTXSchemaManager::InitReaderXMLVTK()
 
   const std::string type = std::string(typeXML.value());
 
-  if (this->SupportedTypes.count(type) == 0)
+  if (VTXSchemaManager::SupportedTypes.count(type) == 0)
   {
     throw std::runtime_error("ERROR: ADIOS2Reader only supports types= " +
-      helper::SetToCSV(this->SupportedTypes) + " when reading type xml attribute in " +
+      helper::SetToCSV(VTXSchemaManager::SupportedTypes) + " when reading type xml attribute in " +
       this->SchemaName + " from " + this->Engine.Name() + "\n");
   }
 
@@ -152,7 +156,7 @@ bool VTXSchemaManager::InitReaderXMLVTK()
     this->Reader.reset(new schema::VTXvtkVTU(xmlContents, this->IO, this->Engine));
   }
 
-  const bool success = this->Reader ? true : false;
+  const bool success = static_cast<bool>(this->Reader);
   return success;
 }
 

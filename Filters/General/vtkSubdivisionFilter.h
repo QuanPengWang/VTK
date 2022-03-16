@@ -19,7 +19,7 @@
  * vtkSubdivisionFilter is an abstract class that defines
  * the protocol for subdivision surface filters.
  *
-*/
+ */
 
 #ifndef vtkSubdivisionFilter_h
 #define vtkSubdivisionFilter_h
@@ -37,19 +37,19 @@ class vtkPointData;
 class VTKFILTERSGENERAL_EXPORT vtkSubdivisionFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkSubdivisionFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkSubdivisionFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/get the number of subdivisions.
    * Default is 1.
    */
-  vtkSetMacro(NumberOfSubdivisions,int);
-  vtkGetMacro(NumberOfSubdivisions,int);
-  //@}
+  vtkSetMacro(NumberOfSubdivisions, int);
+  vtkGetMacro(NumberOfSubdivisions, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get CheckForTriangles
    * Should subdivision check that the dataset only contains triangles?
@@ -58,16 +58,17 @@ public:
   vtkSetClampMacro(CheckForTriangles, vtkTypeBool, 0, 1);
   vtkGetMacro(CheckForTriangles, vtkTypeBool);
   vtkBooleanMacro(CheckForTriangles, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkSubdivisionFilter();
-  ~vtkSubdivisionFilter() override {}
+  ~vtkSubdivisionFilter() override = default;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int NumberOfSubdivisions;
   vtkTypeBool CheckForTriangles;
+
 private:
   vtkSubdivisionFilter(const vtkSubdivisionFilter&) = delete;
   void operator=(const vtkSubdivisionFilter&) = delete;

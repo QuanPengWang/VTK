@@ -34,7 +34,7 @@
  * @warning
  * Note this filter only operates on polygons and triangle strips.
  * Vertices and polylines are passed through untouched.
-*/
+ */
 
 #ifndef vtkFillHolesFilter_h
 #define vtkFillHolesFilter_h
@@ -47,16 +47,16 @@ class vtkAbstractTransform;
 class VTKFILTERSMODELING_EXPORT vtkFillHolesFilter : public vtkPolyDataAlgorithm
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instantiation, type information and printing.
    */
-  static vtkFillHolesFilter *New();
-  vtkTypeMacro(vtkFillHolesFilter,vtkPolyDataAlgorithm);
+  static vtkFillHolesFilter* New();
+  vtkTypeMacro(vtkFillHolesFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the maximum hole size to fill. This is represented as a radius
    * to the bounding circumsphere containing the hole.  Note that this is an
@@ -65,13 +65,13 @@ public:
    */
   vtkSetClampMacro(HoleSize, double, 0.0, VTK_FLOAT_MAX);
   vtkGetMacro(HoleSize, double);
-  //@}
+  ///@}
 
 protected:
   vtkFillHolesFilter();
   ~vtkFillHolesFilter() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   double HoleSize;
 

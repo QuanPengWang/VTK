@@ -15,11 +15,11 @@
 
 #ifndef vtkSegYReaderInternal_h
 #define vtkSegYReaderInternal_h
-#ifndef __VTK_WRAP__
 
 #include <fstream>
 #include <string>
 #include <vector>
+#include <vtksys/FStream.hxx>
 
 // Forward declarations
 class vtkStructuredGrid;
@@ -37,18 +37,18 @@ public:
   ~vtkSegYReaderInternal();
 
 public:
-  bool Is3DComputeParameters(int* extent, double origin[3], double spacing[3][3], int* spacingSign);
-  void LoadTraces(int *extent);
+  bool Is3DComputeParameters(
+    int* extent, double origin[3], double spacing[3][3], int* spacingSign, bool force2D);
+  void LoadTraces(int* extent);
 
-  void ExportData(vtkImageData*, int* extent,
-                  double origin[3], double spacing[3][3], int* spacingSign);
-  void ExportData(vtkStructuredGrid*, int* extent,
-    double origin[3], double spacing[3][3]);
+  void ExportData(
+    vtkImageData*, int* extent, double origin[3], double spacing[3][3], int* spacingSign);
+  void ExportData(vtkStructuredGrid*, int* extent, double origin[3], double spacing[3][3]);
 
   void SetXYCoordBytePositions(int x, int y);
   void SetVerticalCRS(int);
 
-  std::ifstream In;
+  vtksys::ifstream In;
 
 protected:
   bool ReadHeader();
@@ -64,6 +64,5 @@ private:
   int SampleCountPerTrace;
 };
 
-#endif
 #endif // vtkSegYReaderInternal_h
 // VTK-HeaderTest-Exclude: vtkSegYReaderInternal.h

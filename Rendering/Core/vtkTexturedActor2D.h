@@ -22,13 +22,13 @@
  *
  * @sa
  * vtkActor2D vtkProp vtkMapper2D vtkProperty2D
-*/
+ */
 
 #ifndef vtkTexturedActor2D_h
 #define vtkTexturedActor2D_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkActor2D.h"
+#include "vtkRenderingCoreModule.h" // For export macro
 
 class vtkProp;
 class vtkTexture;
@@ -42,7 +42,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
   vtkTypeMacro(vtkTexturedActor2D, vtkActor2D);
 
-  //@{
+  ///@{
   /**
    * Set/Get the texture object to control rendering texture maps.  This will
    * be a vtkTexture object. An actor does not need to have an associated
@@ -50,7 +50,7 @@ public:
    */
   virtual void SetTexture(vtkTexture* texture);
   vtkGetObjectMacro(Texture, vtkTexture);
-  //@}
+  ///@}
 
   /**
    * Release any graphics resources that are being consumed by this actor.
@@ -59,14 +59,14 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* win) override;
 
-  //@{
+  ///@{
   /**
    * Support the standard render methods.
    */
   int RenderOverlay(vtkViewport* viewport) override;
   int RenderOpaqueGeometry(vtkViewport* viewport) override;
   int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) override;
-  //@}
+  ///@}
 
   /**
    * Return this object's modified time.

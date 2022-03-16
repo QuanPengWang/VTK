@@ -55,15 +55,16 @@ class vtkPointSet;
 class VTKCOMMONDATAMODEL_EXPORT vtkImageTransform : public vtkObject
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for construction, type information, printing.
    */
-  static vtkImageTransform *New();
-  vtkTypeMacro(vtkImageTransform,vtkObject);
+  static vtkImageTransform* New();
+  vtkTypeMacro(vtkImageTransform, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
+  ///@{
   /**
    * Given a vtkImageData (and hence its associated orientation
    * matrix), and an instance of vtkPointSet, transform its points, as
@@ -71,9 +72,14 @@ public:
    * vtkPointSet. This is a convenience function, internally it calls
    * TranslatePoints(), TransformPoints(), TransformNormals(), and/or
    * TransformVectors() as appropriate. Note that both the normals and
-   * vectors associated with the point and cell data are transformed.
+   * vectors associated with the point and cell data are transformed
+   * unless the second signature is called, which controls whether to
+   * transform normals and/or vectors.
    */
-  static void TransformPointSet(vtkImageData *im, vtkPointSet *ps);
+  static void TransformPointSet(vtkImageData* im, vtkPointSet* ps);
+  static void TransformPointSet(
+    vtkImageData* im, vtkPointSet* ps, bool transNormals, bool transVectors);
+  ///@}
 
   /**
    * Given x-y-z points represented by a vtkDataArray,
@@ -81,34 +87,29 @@ public:
    * method is useful if there is no orientation or
    * spacing to apply.
    */
-  static void TranslatePoints(double *t, vtkDataArray *da);
+  static void TranslatePoints(double* t, vtkDataArray* da);
 
   /**
    * Given x-y-z points represented by a vtkDataArray,
    * transform the points using the matrix provided.
    */
-  static void TransformPoints(vtkMatrix4x4 *m4, vtkDataArray *da);
+  static void TransformPoints(vtkMatrix4x4* m4, vtkDataArray* da);
 
   /**
    * Given three-component normals represented by a vtkDataArray,
    * transform the normals using the matrix provided.
    */
-  static void TransformNormals(vtkMatrix3x3 *m3,
-                               double spacing[3],
-                               vtkDataArray *da);
+  static void TransformNormals(vtkMatrix3x3* m3, double spacing[3], vtkDataArray* da);
 
   /**
    * Given three-component vectors represented by a vtkDataArray,
    * transform the vectors using the matrix provided.
    */
-  static void TransformVectors(vtkMatrix3x3 *m3,
-                               double spacing[3],
-                               vtkDataArray *da);
-
+  static void TransformVectors(vtkMatrix3x3* m3, double spacing[3], vtkDataArray* da);
 
 protected:
-  vtkImageTransform() {};
-  ~vtkImageTransform() override {};
+  vtkImageTransform() = default;
+  ~vtkImageTransform() override = default;
 
 private:
   vtkImageTransform(const vtkImageTransform&) = delete;

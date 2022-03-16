@@ -17,11 +17,10 @@
 
 #include "vtkGUISupportQtModule.h" // For export macro
 #include "vtkTextureObject.h"
+#include <array>      // for ivar
 #include <functional> // for ivar
 
 class QGraphicsScene;
-class QOffscreenSurface;
-class	QOpenGLFramebufferObject;
 class QWidget;
 
 /**
@@ -36,23 +35,24 @@ class VTKGUISUPPORTQT_EXPORT vtkQWidgetTexture : public vtkTextureObject
 public:
   static vtkQWidgetTexture* New();
   vtkTypeMacro(vtkQWidgetTexture, vtkTextureObject);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the QWidget that this TextureObject will render/use
    */
-  void SetWidget(QWidget *w);
-  QWidget *GetWidget() { return this->Widget; }
-  //@}
+  void SetWidget(QWidget* w);
+  QWidget* GetWidget() { return this->Widget; }
+  ///@}
 
   /**
    * get the QScene used for rendering, this is where events will
    * be forwarded to.
    */
-  QGraphicsScene *GetScene() { return this->Scene; }
+  QGraphicsScene* GetScene() { return this->Scene; }
 
   /**
-   * Activate and Bind the texture. Ovrloaded to handle the opengl related
+   * Activate and Bind the texture. Overloaded to handle the opengl related
    * setup at the same time. as We know the context will be active then.
    */
   void Activate() override;
@@ -60,22 +60,23 @@ public:
   /**
    * Free resources
    */
-  void ReleaseGraphicsResources(vtkWindow *win) override;
+  void ReleaseGraphicsResources(vtkWindow* win) override;
 
 protected:
   vtkQWidgetTexture();
   ~vtkQWidgetTexture() override;
 
-  QGraphicsScene *Scene;
-  QOffscreenSurface *OffscreenSurface;
-  QOpenGLFramebufferObject *Framebuffer;
-  QWidget *Widget;
+  QGraphicsScene* Scene;
+  QWidget* Widget;
 
   // method called when the widget needs repainting
   std::function<void()> RedrawMethod;
 
   // internal method to setup the scene/framebuffer/etc
   void AllocateFromWidget();
+
+  unsigned char* ImageBuffer;
+  std::array<int, 2> ImageBufferDimensions;
 
 private:
   vtkQWidgetTexture(const vtkQWidgetTexture&) = delete;

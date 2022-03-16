@@ -40,22 +40,23 @@
  * Conference: Proceedings of the SIGCHI conference on Human Factors in computing systems
  * Year: 2006
  *
-*/
+ */
 
 #ifndef vtkCirclePackFrontChainLayoutStrategy_h
 #define vtkCirclePackFrontChainLayoutStrategy_h
 
-#include "vtkInfovisLayoutModule.h" // For export macro
 #include "vtkCirclePackLayoutStrategy.h"
+#include "vtkInfovisLayoutModule.h" // For export macro
 
 class vtkCirclePackFrontChainLayoutStrategyImplementation;
 
-class VTKINFOVISLAYOUT_EXPORT vtkCirclePackFrontChainLayoutStrategy : public vtkCirclePackLayoutStrategy
+class VTKINFOVISLAYOUT_EXPORT vtkCirclePackFrontChainLayoutStrategy
+  : public vtkCirclePackLayoutStrategy
 {
 public:
-  static vtkCirclePackFrontChainLayoutStrategy *New();
+  static vtkCirclePackFrontChainLayoutStrategy* New();
 
-  vtkTypeMacro(vtkCirclePackFrontChainLayoutStrategy,vtkCirclePackLayoutStrategy);
+  vtkTypeMacro(vtkCirclePackFrontChainLayoutStrategy, vtkCirclePackLayoutStrategy);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -63,10 +64,9 @@ public:
    * bounds of each vertex as a tuple in a data array.
    * (Xcenter, Ycenter, Radius).
    */
-  void Layout(vtkTree *inputTree, vtkDataArray *areaArray,
-                      vtkDataArray* sizeArray) override;
+  void Layout(vtkTree* inputTree, vtkDataArray* areaArray, vtkDataArray* sizeArray) override;
 
-  //@{
+  ///@{
   /**
    * Width and Height define the size of the output window that the
    * circle packing is placed inside.  Defaults to Width 1, Height 1
@@ -75,18 +75,17 @@ public:
   vtkSetMacro(Width, int);
   vtkGetMacro(Height, int);
   vtkSetMacro(Height, int);
-  //@}
+  ///@}
 
 protected:
   vtkCirclePackFrontChainLayoutStrategy();
   ~vtkCirclePackFrontChainLayoutStrategy() override;
 
-  char * CirclesFieldName;
+  char* CirclesFieldName;
   int Width;
   int Height;
 
 private:
-
   vtkCirclePackFrontChainLayoutStrategyImplementation* pimpl; // Private implementation
 
   vtkCirclePackFrontChainLayoutStrategy(const vtkCirclePackFrontChainLayoutStrategy&) = delete;

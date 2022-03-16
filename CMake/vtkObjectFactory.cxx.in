@@ -13,13 +13,16 @@
 
 =========================================================================*/
 
+// Object factories should never have deprecation warnings.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "@_vtk_object_factory_library_name@ObjectFactory.h"
 #include "vtkVersion.h"
 
 // Include all of the classes we want to create overrides for.
 @_vtk_object_factory_includes@
 
-vtkStandardNewMacro(@_vtk_object_factory_library_name@ObjectFactory)
+vtkStandardNewMacro(@_vtk_object_factory_library_name@ObjectFactory);
 
 // Now create the functions to create overrides with.
 @_vtk_object_factory_functions@

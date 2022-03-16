@@ -30,13 +30,13 @@
  *
  * @sa
  * vtkBitArray vtkGenericDataArray
-*/
+ */
 
 #ifndef vtkDataArray_h
 #define vtkDataArray_h
 
-#include "vtkCommonCoreModule.h" // For export macro
 #include "vtkAbstractArray.h"
+#include "vtkCommonCoreModule.h"          // For export macro
 #include "vtkVTK_USE_SCALED_SOA_ARRAYS.h" // For #define of VTK_USE_SCALED_SOA_ARRAYS
 
 class vtkDoubleArray;
@@ -49,7 +49,7 @@ class vtkPoints;
 class VTKCOMMONCORE_EXPORT vtkDataArray : public vtkAbstractArray
 {
 public:
-  vtkTypeMacro(vtkDataArray,vtkAbstractArray);
+  vtkTypeMacro(vtkDataArray, vtkAbstractArray);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -58,7 +58,7 @@ public:
    * or a more derived type, and performs a static_cast to return
    * source as a vtkDataArray pointer. Otherwise, nullptr is returned.
    */
-  static vtkDataArray* FastDownCast(vtkAbstractArray *source);
+  static vtkDataArray* FastDownCast(vtkAbstractArray* source);
 
   /**
    * This method is here to make backward compatibility easier.  It
@@ -66,32 +66,36 @@ public:
    * All vtkDataArray subclasses contain numeric data, hence this method
    * always returns 1(true).
    */
-  int IsNumeric() override
-    { return 1; }
+  int IsNumeric() const override { return 1; }
 
   /**
    * Return the size, in bytes, of the lowest-level element of an
    * array.  For vtkDataArray and subclasses this is the size of the
    * data type.
    */
-  int GetElementComponentSize() override
-    { return this->GetDataTypeSize(); }
+  int GetElementComponentSize() const override { return this->GetDataTypeSize(); }
 
   // Reimplemented virtuals (doc strings are inherited from superclass):
-  void InsertTuple(vtkIdType dstTupleIdx, vtkIdType srcTupleIdx,
-                   vtkAbstractArray* source) override;
-  vtkIdType InsertNextTuple(vtkIdType srcTupleIdx,
-                                    vtkAbstractArray* source) override;
-  void InsertTuples(vtkIdList *dstIds, vtkIdList *srcIds,
-                            vtkAbstractArray *source) override;
-  void InsertTuples(vtkIdType dstStart, vtkIdType n, vtkIdType srcStart,
-                            vtkAbstractArray* source) override;
-  void GetTuples(vtkIdList *tupleIds, vtkAbstractArray *output) override;
-  void GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *output) override;
-  void InterpolateTuple(vtkIdType dstTupleIdx, vtkIdList *ptIndices,
-                                vtkAbstractArray* source,  double* weights) override;
-  void InterpolateTuple(vtkIdType dstTupleIdx,
-    vtkIdType srcTupleIdx1, vtkAbstractArray* source1,
+  ///@{
+  /**
+   * See documentation from parent class.
+   * This method assumes that the `source` inherits from `vtkDataArray`, but its value type doesn't
+   * have to match the type of the current instance.
+   */
+  void InsertTuple(vtkIdType dstTupleIdx, vtkIdType srcTupleIdx, vtkAbstractArray* source) override;
+  vtkIdType InsertNextTuple(vtkIdType srcTupleIdx, vtkAbstractArray* source) override;
+  void InsertTuples(vtkIdList* dstIds, vtkIdList* srcIds, vtkAbstractArray* source) override;
+  void InsertTuples(
+    vtkIdType dstStart, vtkIdType n, vtkIdType srcStart, vtkAbstractArray* source) override;
+  void InsertTuplesStartingAt(
+    vtkIdType dstStart, vtkIdList* srcIds, vtkAbstractArray* source) override;
+  void SetTuple(vtkIdType dstTupleIdx, vtkIdType srcTupleIdx, vtkAbstractArray* source) override;
+  ///@}
+  void GetTuples(vtkIdList* tupleIds, vtkAbstractArray* output) override;
+  void GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray* output) override;
+  void InterpolateTuple(vtkIdType dstTupleIdx, vtkIdList* ptIndices, vtkAbstractArray* source,
+    double* weights) override;
+  void InterpolateTuple(vtkIdType dstTupleIdx, vtkIdType srcTupleIdx1, vtkAbstractArray* source1,
     vtkIdType srcTupleIdx2, vtkAbstractArray* source2, double t) override;
 
   /**
@@ -99,7 +103,7 @@ public:
    * Note: this method is not thread-safe, and the pointer is only valid
    * as long as another method invocation to a vtk object is not performed.
    */
-  virtual double *GetTuple(vtkIdType tupleIdx)
+  virtual double* GetTuple(vtkIdType tupleIdx)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples()) = 0;
 
   /**
@@ -107,50 +111,41 @@ public:
    * Make sure that your array is large enough to hold the NumberOfComponents
    * amount of data being returned.
    */
-  virtual void GetTuple(vtkIdType tupleIdx, double * tuple)
+  virtual void GetTuple(vtkIdType tupleIdx, double* tuple)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples()) = 0;
 
-  //@{
+  ///@{
   /**
    * These methods are included as convenience for the wrappers.
    * GetTuple() and SetTuple() which return/take arrays can not be
    * used from wrapped languages. These methods can be used instead.
    */
-  double GetTuple1(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  double* GetTuple2(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
+  double GetTuple1(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
+  double* GetTuple2(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
     VTK_SIZEHINT(2);
-  double* GetTuple3(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
+  double* GetTuple3(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
     VTK_SIZEHINT(3);
-  double* GetTuple4(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
+  double* GetTuple4(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
     VTK_SIZEHINT(4);
-  double* GetTuple6(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
+  double* GetTuple6(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
     VTK_SIZEHINT(6);
-  double* GetTuple9(vtkIdType tupleIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
+  double* GetTuple9(vtkIdType tupleIdx) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
     VTK_SIZEHINT(9);
-  //@}
+  ///@}
 
-  void SetTuple(vtkIdType dstTupleIdx, vtkIdType srcTupleIdx,
-                        vtkAbstractArray* source) override;
-
-  //@{
+  ///@{
   /**
    * Set the data tuple at tupleIdx. Note that range checking or
    * memory allocation is not performed; use this method in conjunction
    * with SetNumberOfTuples() to allocate space.
    */
-  virtual void SetTuple(vtkIdType tupleIdx, const float * tuple)
+  virtual void SetTuple(vtkIdType tupleIdx, const float* tuple)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  virtual void SetTuple(vtkIdType tupleIdx, const double * tuple)
+  virtual void SetTuple(vtkIdType tupleIdx, const double* tuple)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are included as convenience for the wrappers.
    * GetTuple() and SetTuple() which return/take arrays can not be
@@ -162,64 +157,53 @@ public:
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
   void SetTuple3(vtkIdType tupleIdx, double val0, double val1, double val2)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  void SetTuple4(vtkIdType tupleIdx, double val0, double val1, double val2,
-                 double val3)
+  void SetTuple4(vtkIdType tupleIdx, double val0, double val1, double val2, double val3)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  void SetTuple6(vtkIdType tupleIdx, double val0, double val1, double val2,
-                 double val3, double val4, double val5)
+  void SetTuple6(vtkIdType tupleIdx, double val0, double val1, double val2, double val3,
+    double val4, double val5) VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
+  void SetTuple9(vtkIdType tupleIdx, double val0, double val1, double val2, double val3,
+    double val4, double val5, double val6, double val7, double val8)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  void SetTuple9(vtkIdType tupleIdx, double val0, double val1, double val2,
-                 double val3, double val4, double val5, double val6,
-                 double val7, double val8)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples());
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Insert the data tuple at tupleIdx. Note that memory allocation
    * is performed as necessary to hold the data.
    */
-  virtual void InsertTuple(vtkIdType tupleIdx, const float * tuple)
-    VTK_EXPECTS(0 <= tupleIdx) = 0;
-  virtual void InsertTuple(vtkIdType tupleIdx, const double * tuple)
-    VTK_EXPECTS(0 <= tupleIdx) = 0;
-  //@}
+  virtual void InsertTuple(vtkIdType tupleIdx, const float* tuple) VTK_EXPECTS(0 <= tupleIdx) = 0;
+  virtual void InsertTuple(vtkIdType tupleIdx, const double* tuple) VTK_EXPECTS(0 <= tupleIdx) = 0;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are included as convenience for the wrappers.
    * InsertTuple() which takes arrays can not be
    * used from wrapped languages. These methods can be used instead.
    */
-  void InsertTuple1(vtkIdType tupleIdx, double value)
-    VTK_EXPECTS(0 <= tupleIdx);
-  void InsertTuple2(vtkIdType tupleIdx, double val0, double val1)
-    VTK_EXPECTS(0 <= tupleIdx);
+  void InsertTuple1(vtkIdType tupleIdx, double value) VTK_EXPECTS(0 <= tupleIdx);
+  void InsertTuple2(vtkIdType tupleIdx, double val0, double val1) VTK_EXPECTS(0 <= tupleIdx);
   void InsertTuple3(vtkIdType tupleIdx, double val0, double val1, double val2)
     VTK_EXPECTS(0 <= tupleIdx);
-  void InsertTuple4(vtkIdType tupleIdx, double val0, double val1, double val2,
-                    double val3)
+  void InsertTuple4(vtkIdType tupleIdx, double val0, double val1, double val2, double val3)
     VTK_EXPECTS(0 <= tupleIdx);
-  void InsertTuple6(vtkIdType tupleIdx, double val0, double val1, double val2,
-                    double val3, double val4, double val5)
-    VTK_EXPECTS(0 <= tupleIdx);
-  void InsertTuple9(vtkIdType tupleIdx, double val0, double val1, double val2,
-                    double val3, double val4, double val5, double val6,
-                    double val7, double val8)
-    VTK_EXPECTS(0 <= tupleIdx);
-  //@}
+  void InsertTuple6(vtkIdType tupleIdx, double val0, double val1, double val2, double val3,
+    double val4, double val5) VTK_EXPECTS(0 <= tupleIdx);
+  void InsertTuple9(vtkIdType tupleIdx, double val0, double val1, double val2, double val3,
+    double val4, double val5, double val6, double val7, double val8) VTK_EXPECTS(0 <= tupleIdx);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Insert the data tuple at the end of the array and return the tuple index at
    * which the data was inserted. Memory is allocated as necessary to hold
    * the data.
    */
-  virtual vtkIdType InsertNextTuple(const float * tuple) = 0;
-  virtual vtkIdType InsertNextTuple(const double * tuple) = 0;
-  //@}
+  virtual vtkIdType InsertNextTuple(const float* tuple) = 0;
+  virtual vtkIdType InsertNextTuple(const double* tuple) = 0;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are included as convenience for the wrappers.
    * InsertTuple() which takes arrays can not be
@@ -228,16 +212,14 @@ public:
   void InsertNextTuple1(double value);
   void InsertNextTuple2(double val0, double val1);
   void InsertNextTuple3(double val0, double val1, double val2);
-  void InsertNextTuple4(double val0, double val1, double val2,
-                        double val3);
-  void InsertNextTuple6(double val0, double val1, double val2,
-                        double val3, double val4, double val5);
-  void InsertNextTuple9(double val0, double val1, double val2,
-                        double val3, double val4, double val5, double val6,
-                        double val7, double val8);
-  //@}
+  void InsertNextTuple4(double val0, double val1, double val2, double val3);
+  void InsertNextTuple6(
+    double val0, double val1, double val2, double val3, double val4, double val5);
+  void InsertNextTuple9(double val0, double val1, double val2, double val3, double val4,
+    double val5, double val6, double val7, double val8);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods remove tuples from the data array. They shift data and
    * resize array, so the data array is still valid after this operation. Note,
@@ -247,15 +229,14 @@ public:
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples()) = 0;
   virtual void RemoveFirstTuple() { this->RemoveTuple(0); }
   virtual void RemoveLastTuple();
-  //@}
+  ///@}
 
   /**
    * Return the data component at the location specified by tupleIdx and
    * compIdx.
    */
-  virtual double GetComponent(vtkIdType tupleIdx, int compIdx)
-    VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
-    VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
+  virtual double GetComponent(vtkIdType tupleIdx, int compIdx) VTK_EXPECTS(0 <= tupleIdx &&
+    tupleIdx < GetNumberOfTuples()) VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
 
   /**
    * Set the data component at the location specified by tupleIdx and compIdx
@@ -266,15 +247,14 @@ public:
    */
   virtual void SetComponent(vtkIdType tupleIdx, int compIdx, double value)
     VTK_EXPECTS(0 <= tupleIdx && tupleIdx < GetNumberOfTuples())
-    VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
+      VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
 
   /**
    * Insert value at the location specified by tupleIdx and compIdx.
    * Note that memory allocation is performed as necessary to hold the data.
    */
   virtual void InsertComponent(vtkIdType tupleIdx, int compIdx, double value)
-    VTK_EXPECTS(0 <= tupleIdx)
-    VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
+    VTK_EXPECTS(0 <= tupleIdx) VTK_EXPECTS(0 <= compIdx && compIdx < GetNumberOfComponents());
 
   /**
    * Get the data as a double array in the range (tupleMin,tupleMax) and
@@ -284,17 +264,17 @@ public:
    * doubleing point values. This method is provided as a convenience for data
    * exchange, and is not very fast.
    */
-  virtual void GetData(vtkIdType tupleMin, vtkIdType tupleMax, int compMin,
-                       int compMax, vtkDoubleArray* data);
+  virtual void GetData(
+    vtkIdType tupleMin, vtkIdType tupleMax, int compMin, int compMax, vtkDoubleArray* data);
 
-  //@{
+  ///@{
   /**
    * Deep copy of data. Copies data from different data arrays even if
    * they are different types (using doubleing-point exchange).
    */
-  void DeepCopy(vtkAbstractArray *aa) override;
-  virtual void DeepCopy(vtkDataArray *da);
-  //@}
+  void DeepCopy(vtkAbstractArray* aa) override;
+  virtual void DeepCopy(vtkDataArray* da);
+  ///@}
 
   /**
    * Create a shallow copy of other into this, if possible. Shallow copies are
@@ -305,7 +285,7 @@ public:
    * does not.)
    * If a shallow copy is not possible, a deep copy will be performed instead.
    */
-  virtual void ShallowCopy(vtkDataArray *other);
+  virtual void ShallowCopy(vtkDataArray* other);
 
   /**
    * Fill a component of a data array with a specified value. This method
@@ -329,8 +309,7 @@ public:
    * a component (column) from one data array and paste that data into
    * a component on this data array.
    */
-  virtual void CopyComponent(int dstComponent, vtkDataArray *src,
-                             int srcComponent);
+  virtual void CopyComponent(int dstComponent, vtkDataArray* src, int srcComponent);
 
   /**
    * Get the address of a particular data index. Make sure data is allocated
@@ -347,7 +326,7 @@ public:
    * information returned is valid only after the pipeline has
    * been updated.
    */
-  unsigned long GetActualMemorySize() override;
+  unsigned long GetActualMemorySize() const override;
 
   /**
    * Create default lookup table. Generally used to create one when none
@@ -355,13 +334,13 @@ public:
    */
   void CreateDefaultLookupTable();
 
-  //@{
+  ///@{
   /**
    * Set/get the lookup table associated with this scalar data, if any.
    */
-  void SetLookupTable(vtkLookupTable *lut);
-  vtkGetObjectMacro(LookupTable,vtkLookupTable);
-  //@}
+  void SetLookupTable(vtkLookupTable* lut);
+  vtkGetObjectMacro(LookupTable, vtkLookupTable);
+  ///@}
 
   /**
    * The range of the data array values for the given component will be
@@ -372,12 +351,9 @@ public:
    * requested component changes.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  void GetRange(double range[2], int comp)
-  {
-    this->ComputeRange(range, comp);
-  }
+  void GetRange(double range[2], int comp) { this->ComputeRange(range, comp); }
 
-  //@{
+  ///@{
   /**
    * Return the range of the data array values for the given component. If
    * comp is -1, return the range of the magnitude (L2 norm) over all
@@ -391,7 +367,7 @@ public:
     this->GetRange(this->Range, comp);
     return this->Range;
   }
-  //@}
+  ///@}
 
   /**
    * Return the range of the data array. If the array has multiple components,
@@ -400,10 +376,7 @@ public:
    * on subsequent calls to GetRange() unless the array is modified.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  double* GetRange() VTK_SIZEHINT(2)
-  {
-    return this->GetRange(0);
-  }
+  double* GetRange() VTK_SIZEHINT(2) { return this->GetRange(0); }
 
   /**
    * The range of the data array values will be returned in the provided
@@ -413,10 +386,7 @@ public:
    * subsequent calls to GetRange() unless the array is modified.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  void GetRange(double range[2])
-  {
-    this->GetRange(range,0);
-  }
+  void GetRange(double range[2]) { this->GetRange(range, 0); }
 
   /**
    * The range of the data array values for the given component will be
@@ -427,12 +397,9 @@ public:
    * requested component changes.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  void GetFiniteRange(double range[2], int comp)
-  {
-    this->ComputeFiniteRange(range, comp);
-  }
+  void GetFiniteRange(double range[2], int comp) { this->ComputeFiniteRange(range, comp); }
 
-  //@{
+  ///@{
   /**
    * Return the range of the data array values for the given component. If
    * comp is -1, return the range of the magnitude (L2 norm) over all
@@ -441,12 +408,12 @@ public:
    * modified or the requested component changes.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  double *GetFiniteRange(int comp) VTK_SIZEHINT(2)
+  double* GetFiniteRange(int comp) VTK_SIZEHINT(2)
   {
     this->GetFiniteRange(this->FiniteRange, comp);
     return this->FiniteRange;
   }
-  //@}
+  ///@}
 
   /**
    * Return the range of the data array. If the array has multiple components,
@@ -455,10 +422,7 @@ public:
    * on subsequent calls to GetRange() unless the array is modified.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  double *GetFiniteRange() VTK_SIZEHINT(2)
-  {
-    return this->GetFiniteRange(0);
-  }
+  double* GetFiniteRange() VTK_SIZEHINT(2) { return this->GetFiniteRange(0); }
 
   /**
    * The range of the data array values will be returned in the provided
@@ -468,12 +432,9 @@ public:
    * subsequent calls to GetRange() unless the array is modified.
    * THIS METHOD IS NOT THREAD SAFE.
    */
-  void GetFiniteRange(double range[2])
-  {
-    this->GetFiniteRange(range, 0);
-  }
+  void GetFiniteRange(double range[2]) { this->GetFiniteRange(range, 0); }
 
-  //@{
+  ///@{
   /**
    * These methods return the Min and Max possible range of the native
    * data type. For example if a vtkScalars consists of unsigned char
@@ -485,7 +446,7 @@ public:
   static void GetDataTypeRange(int type, double range[2]);
   static double GetDataTypeMin(int type);
   static double GetDataTypeMax(int type);
-  //@}
+  ///@}
 
   /**
    * Return the maximum norm for the tuples.
@@ -497,7 +458,7 @@ public:
    * Creates an array for dataType where dataType is one of
    * VTK_BIT, VTK_CHAR, VTK_SIGNED_CHAR, VTK_UNSIGNED_CHAR, VTK_SHORT,
    * VTK_UNSIGNED_SHORT, VTK_INT, VTK_UNSIGNED_INT, VTK_LONG,
-   * VTK_UNSIGNED_LONG, VTK_DOUBLE, VTK_DOUBLE, VTK_ID_TYPE.
+   * VTK_UNSIGNED_LONG, VTK_FLOAT, VTK_DOUBLE, VTK_ID_TYPE.
    * Note that the data array returned has be deleted by the
    * user.
    */
@@ -539,7 +500,7 @@ public:
   /**
    * A human-readable string indicating the units for the array data.
    */
-  static vtkInformationStringKey *UNITS_LABEL();
+  static vtkInformationStringKey* UNITS_LABEL();
 
   /**
    * Copy information instance. Arrays use information objects
@@ -548,15 +509,14 @@ public:
    * others must be. NOTE: Up to the implmenter to make sure that
    * keys not intended to be copied are excluded here.
    */
-  int CopyInformation(vtkInformation *infoFrom, int deep=1) override;
+  int CopyInformation(vtkInformation* infoFrom, int deep = 1) override;
 
   /**
    * Method for type-checking in FastDownCast implementations.
    */
-  int GetArrayType() override { return DataArray; }
+  int GetArrayType() const override { return DataArray; }
 
 protected:
-
   friend class vtkPoints;
 
   /**
@@ -585,8 +545,10 @@ protected:
    */
   virtual bool ComputeScalarRange(double* ranges);
 
-  // Returns true if the range was computed. Will return false
-  // if you try to compute the range of an array of length zero.
+  /**
+   * Returns true if the range was computed. Will return false
+   * if you try to compute the range of an array of length zero.
+   */
   virtual bool ComputeVectorRange(double range[2]);
 
   /**
@@ -597,15 +559,17 @@ protected:
    */
   virtual bool ComputeFiniteScalarRange(double* ranges);
 
-  // Returns true if the range was computed. Will return false
-  // if you try to compute the range of an array of length zero.
+  /**
+   * Returns true if the range was computed. Will return false
+   * if you try to compute the range of an array of length zero.
+   */
   virtual bool ComputeFiniteVectorRange(double range[2]);
 
   // Construct object with default tuple dimension (number of components) of 1.
   vtkDataArray();
   ~vtkDataArray() override;
 
-  vtkLookupTable *LookupTable;
+  vtkLookupTable* LookupTable;
   double Range[2];
   double FiniteRange[2];
 
@@ -618,7 +582,7 @@ private:
 };
 
 //------------------------------------------------------------------------------
-inline vtkDataArray* vtkDataArray::FastDownCast(vtkAbstractArray *source)
+inline vtkDataArray* vtkDataArray::FastDownCast(vtkAbstractArray* source)
 {
   if (source)
   {
@@ -637,6 +601,18 @@ inline vtkDataArray* vtkDataArray::FastDownCast(vtkAbstractArray *source)
   return nullptr;
 }
 
-vtkArrayDownCast_FastCastMacro(vtkDataArray)
+vtkArrayDownCast_FastCastMacro(vtkDataArray);
+
+// These are used by vtkDataArrayPrivate.txx, but need to be available to
+// vtkGenericDataArray.h as well.
+namespace vtkDataArrayPrivate
+{
+struct AllValues
+{
+};
+struct FiniteValues
+{
+};
+}
 
 #endif

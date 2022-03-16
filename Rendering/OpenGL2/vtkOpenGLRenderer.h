@@ -18,17 +18,19 @@
  *
  * vtkOpenGLRenderer is a concrete implementation of the abstract class
  * vtkRenderer. vtkOpenGLRenderer interfaces to the OpenGL graphics library.
-*/
+ */
 
 #ifndef vtkOpenGLRenderer_h
 #define vtkOpenGLRenderer_h
 
-#include "vtkRenderingOpenGL2Module.h" // For export macro
+#include "vtkDeprecation.h" // for VTK_DEPRECATED_IN_9_1_0
 #include "vtkRenderer.h"
-#include "vtkSmartPointer.h" // For vtkSmartPointer
-#include <vector>  // STL Header
-#include <string> // Ivars
+#include "vtkRenderingOpenGL2Module.h" // For export macro
+#include "vtkSmartPointer.h"           // For vtkSmartPointer
+#include <string>                      // Ivars
+#include <vector>                      // STL Header
 
+class vtkFloatArray;
 class vtkOpenGLFXAAFilter;
 class vtkRenderPass;
 class vtkOpenGLState;
@@ -41,11 +43,12 @@ class vtkPBRLUTTexture;
 class vtkPBRPrefilterTexture;
 class vtkShaderProgram;
 class vtkShadowMapPass;
+class vtkSSAOPass;
 
 class VTKRENDERINGOPENGL2_EXPORT vtkOpenGLRenderer : public vtkRenderer
 {
 public:
-  static vtkOpenGLRenderer *New();
+  static vtkOpenGLRenderer* New();
   vtkTypeMacro(vtkOpenGLRenderer, vtkRenderer);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -88,6 +91,8 @@ public:
    * The bug is fixed on macOS 10.11 and later, and this method
    * will return false when the OS is new enough.
    */
+  VTK_DEPRECATED_IN_9_1_0(
+    "Removed in 9.1.0 as this bug does not affect any macOS release that VTK supports")
   bool HaveApplePrimitiveIdBug();
 
   /**
@@ -105,22 +110,23 @@ public:
 
   // Get the state object used to keep track of
   // OpenGL state
-  vtkOpenGLState *GetState();
+  vtkOpenGLState* GetState();
 
   // get the standard lighting uniform declarations
   // for the current set of lights
-  const char *GetLightingUniforms();
+  const char* GetLightingUniforms();
 
   // update the lighting uniforms for this shader if they
   // are out of date
-  void UpdateLightingUniforms(vtkShaderProgram *prog);
+  void UpdateLightingUniforms(vtkShaderProgram* prog);
 
   // get the complexity of the current lights as a int
   // 0 = no lighting
   // 1 = headlight
   // 2 = directional lights
   // 3 = positional lights
-  enum LightingComplexityEnum {
+  enum LightingComplexityEnum
+  {
     NoLighting = 0,
     Headlight = 1,
     Directional = 2,
@@ -131,25 +137,45 @@ public:
   // get the number of lights turned on
   vtkGetMacro(LightingCount, int);
 
+  ///@{
   /**
    * Set the user light transform applied after the camera transform.
    * Can be null to disable it.
    */
   void SetUserLightTransform(vtkTransform* transform);
+  vtkTransform* GetUserLightTransform();
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get environment textures used for image based lighting.
    */
   vtkPBRLUTTexture* GetEnvMapLookupTable();
   vtkPBRIrradianceTexture* GetEnvMapIrradiance();
   vtkPBRPrefilterTexture* GetEnvMapPrefiltered();
-  //@}
+  ///@}
 
   /**
-   * Overriden in order to connect the cubemap to the environment map textures.
+   * Get spherical harmonics coefficients used for irradiance
    */
-  void SetEnvironmentCubeMap(vtkTexture* cubemap, bool isSRGB = false) override;
+  vtkFloatArray* GetSphericalHarmonics();
+
+  ///@{
+  /**
+   * Use spherical harmonics instead of irradiance texture
+   */
+  vtkSetMacro(UseSphericalHarmonics, bool);
+  vtkGetMacro(UseSphericalHarmonics, bool);
+  vtkBooleanMacro(UseSphericalHarmonics, bool);
+  ///@}
+
+  /**
+   * Overriden in order to connect the texture to the environment map textures.
+   */
+  void SetEnvironmentTexture(vtkTexture* texture, bool isSRGB = false) override;
+
+  // Method to release graphics resources
+  void ReleaseGraphicsResources(vtkWindow* w) override;
 
 protected:
   vtkOpenGLRenderer();
@@ -159,9 +185,6 @@ protected:
    * Check the compilation status of some fragment shader source.
    */
   void CheckCompilation(unsigned int fragmentShader);
-
-  // Internal method to release graphics resources in any derived renderers.
-  void ReleaseGraphicsResources(vtkWindow *w) override;
 
   /**
    * Ask all props to update and draw any opaque and translucent
@@ -185,22 +208,27 @@ protected:
   /**
    * FXAA is delegated to an instance of vtkOpenGLFXAAFilter
    */
-  vtkOpenGLFXAAFilter *FXAAFilter;
+  vtkOpenGLFXAAFilter* FXAAFilter;
 
   /**
    * Depth peeling is delegated to an instance of vtkDepthPeelingPass
    */
-  vtkDepthPeelingPass *DepthPeelingPass;
+  vtkDepthPeelingPass* DepthPeelingPass;
 
   /**
    * Fallback for transparency
    */
-  vtkOrderIndependentTranslucentPass *TranslucentPass;
+  vtkOrderIndependentTranslucentPass* TranslucentPass;
 
   /**
    * Shadows are delegated to an instance of vtkShadowMapPass
    */
-  vtkShadowMapPass *ShadowMapPass;
+  vtkShadowMapPass* ShadowMapPass;
+
+  /**
+   * SSAO is delegated to an instance of vtkSSAOPass
+   */
+  vtkSSAOPass* SSAOPass;
 
   // Is rendering at translucent geometry stage using depth peeling and
   // rendering a layer other than the first one? (Boolean value)
@@ -223,6 +251,8 @@ protected:
   vtkPBRLUTTexture* EnvMapLookupTable;
   vtkPBRIrradianceTexture* EnvMapIrradiance;
   vtkPBRPrefilterTexture* EnvMapPrefiltered;
+  vtkSmartPointer<vtkFloatArray> SphericalHarmonics;
+  bool UseSphericalHarmonics;
 
 private:
   vtkOpenGLRenderer(const vtkOpenGLRenderer&) = delete;

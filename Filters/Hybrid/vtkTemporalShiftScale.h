@@ -28,23 +28,22 @@
  * John Biddiscombe, Berk Geveci, Ken Martin, Kenneth Moreland, David Thompson,
  * "Time Dependent Processing in a Parallel Pipeline Architecture",
  * IEEE Visualization 2007.
-*/
+ */
 
 #ifndef vtkTemporalShiftScale_h
 #define vtkTemporalShiftScale_h
 
-#include "vtkFiltersHybridModule.h" // For export macro
 #include "vtkAlgorithm.h"
+#include "vtkFiltersHybridModule.h" // For export macro
 
-
-class VTKFILTERSHYBRID_EXPORT vtkTemporalShiftScale: public vtkAlgorithm
+class VTKFILTERSHYBRID_EXPORT vtkTemporalShiftScale : public vtkAlgorithm
 {
 public:
-  static vtkTemporalShiftScale *New();
+  static vtkTemporalShiftScale* New();
   vtkTypeMacro(vtkTemporalShiftScale, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Apply a translation to the data before scaling.
    * To convert T{5,100} to T{0,1} use Preshift=-5, Scale=1/95, PostShift=0
@@ -52,25 +51,25 @@ public:
    */
   vtkSetMacro(PreShift, double);
   vtkGetMacro(PreShift, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Apply a translation to the time
    */
   vtkSetMacro(PostShift, double);
   vtkGetMacro(PostShift, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Apply a scale to the time.
    */
   vtkSetMacro(Scale, double);
   vtkGetMacro(Scale, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If Periodic is true, requests for time will be wrapped around so that
    * the source appears to be a periodic time source. If data exists for times
@@ -87,9 +86,9 @@ public:
   vtkSetMacro(Periodic, vtkTypeBool);
   vtkGetMacro(Periodic, vtkTypeBool);
   vtkBooleanMacro(Periodic, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * if Periodic time is enabled, this flag determines if the last time step is the same
    * as the first. If PeriodicEndCorrection is true, then it is assumed that the input
@@ -102,9 +101,9 @@ public:
   vtkSetMacro(PeriodicEndCorrection, vtkTypeBool);
   vtkGetMacro(PeriodicEndCorrection, vtkTypeBool);
   vtkBooleanMacro(PeriodicEndCorrection, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * if Periodic time is enabled, this controls how many time periods time is reported
    * for. A filter cannot output an infinite number of time steps and therefore a finite
@@ -112,7 +111,7 @@ public:
    */
   vtkSetMacro(MaximumNumberOfPeriods, double);
   vtkGetMacro(MaximumNumberOfPeriods, double);
-  //@}
+  ///@}
 
 protected:
   vtkTemporalShiftScale();
@@ -121,43 +120,32 @@ protected:
   double PreShift;
   double PostShift;
   double Scale;
-  vtkTypeBool    Periodic;
-  vtkTypeBool    PeriodicEndCorrection;
+  vtkTypeBool Periodic;
+  vtkTypeBool PeriodicEndCorrection;
   double MaximumNumberOfPeriods;
   //
   double InRange[2];
   double OutRange[2];
   double PeriodicRange[2];
-  int    PeriodicN;
+  int PeriodicN;
   double TempMultiplier;
 
   /**
    * see vtkAlgorithm for details
    */
-  int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inputVector,
-                             vtkInformationVector* outputVector) override;
+  vtkTypeBool ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
-  virtual int RequestUpdateExtent (vtkInformation *,
-                                   vtkInformationVector **,
-                                   vtkInformationVector *);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info) override;
 
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestDataObject(vtkInformation *,
-                                vtkInformationVector **,
-                                vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-
-  virtual int RequestInformation (vtkInformation *,
-                                  vtkInformationVector **,
-                                  vtkInformationVector *);
-
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   double ForwardConvert(double T0);
   double BackwardConvert(double T1);
@@ -167,9 +155,4 @@ private:
   void operator=(const vtkTemporalShiftScale&) = delete;
 };
 
-
-
 #endif
-
-
-

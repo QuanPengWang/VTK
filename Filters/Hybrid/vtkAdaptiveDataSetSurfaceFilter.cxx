@@ -24,6 +24,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkRenderer.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtkIncrementalPointLocator.h"
 #include "vtkMergePoints.h"
@@ -37,7 +38,7 @@ static const unsigned int VonNeumannOffsets3D[] = { 0, 0, 0, 1, 1, 1 };
 
 vtkStandardNewMacro(vtkAdaptiveDataSetSurfaceFilter);
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkAdaptiveDataSetSurfaceFilter::vtkAdaptiveDataSetSurfaceFilter()
 {
   this->InData = nullptr;
@@ -74,14 +75,16 @@ vtkAdaptiveDataSetSurfaceFilter::vtkAdaptiveDataSetSurfaceFilter()
 
   // Default Locator is 0
   this->Merging = false;
+
+  // vtkGeometryFilter allows an optional 2nd input. Need to
+  // disable this.
+  this->SetNumberOfInputPorts(1);
 }
 
-//-----------------------------------------------------------------------------
-vtkAdaptiveDataSetSurfaceFilter::~vtkAdaptiveDataSetSurfaceFilter()
-{
-}
+//------------------------------------------------------------------------------
+vtkAdaptiveDataSetSurfaceFilter::~vtkAdaptiveDataSetSurfaceFilter() = default;
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -144,7 +147,7 @@ void vtkAdaptiveDataSetSurfaceFilter::PrintSelf(ostream& os, vtkIndent indent)
      << this->LastCameraFocalPoint[1] << ", " << this->LastCameraFocalPoint[2] << endl;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkAdaptiveDataSetSurfaceFilter::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -162,11 +165,11 @@ int vtkAdaptiveDataSetSurfaceFilter::RequestData(
     return this->Superclass::RequestData(request, inputVector, outputVector);
   }
 
-  return this->DataSetExecute(input, output);
+  return this->DataObjectExecute(input, output);
 }
 
-//----------------------------------------------------------------------------
-int vtkAdaptiveDataSetSurfaceFilter::DataSetExecute(vtkDataObject* inputDS, vtkPolyData* output)
+//------------------------------------------------------------------------------
+int vtkAdaptiveDataSetSurfaceFilter::DataObjectExecute(vtkDataObject* inputDS, vtkPolyData* output)
 {
   // Retrieve input grid
   vtkHyperTreeGrid* input = vtkHyperTreeGrid::SafeDownCast(inputDS);
@@ -184,7 +187,7 @@ int vtkAdaptiveDataSetSurfaceFilter::DataSetExecute(vtkDataObject* inputDS, vtkP
   this->Orientation = input->GetOrientation();
 
   // Initialize output cell data
-  this->InData = static_cast<vtkDataSetAttributes*>(input->GetPointData());
+  this->InData = static_cast<vtkDataSetAttributes*>(input->GetCellData());
   this->OutData = static_cast<vtkDataSetAttributes*>(output->GetCellData());
   this->OutData->CopyAllocate(this->InData);
 
@@ -299,22 +302,6 @@ int vtkAdaptiveDataSetSurfaceFilter::DataSetExecute(vtkDataObject* inputDS, vtkP
     this->WindowBounds[1] = this->LastCameraFocalPoint[0] + cam->GetParallelScale() * ratio;
     this->WindowBounds[2] = this->LastCameraFocalPoint[1] - cam->GetParallelScale();
     this->WindowBounds[3] = this->LastCameraFocalPoint[1] + cam->GetParallelScale();
-
-#ifndef NDEBUG
-    this->NbRejectByCircle = 0;
-    this->NbRejectByBB = 0;
-
-    std::cerr << "LevelMax        " << this->LevelMax << std::endl;
-    std::cerr << "CircleSelection " << this->CircleSelection << std::endl;
-    std::cerr << "Circle R        " << this->Radius << std::endl;
-    std::cerr << "       CX       " << this->LastCameraFocalPoint[this->Axis1] << std::endl;
-    std::cerr << "       CY       " << this->LastCameraFocalPoint[this->Axis2] << std::endl;
-    std::cerr << "BBSelection     " << this->BBSelection << std::endl;
-    std::cerr << "Bounds X        " << this->WindowBounds[0] << " : " << this->WindowBounds[1]
-              << std::endl;
-    std::cerr << "       Y        " << this->WindowBounds[2] << " : " << this->WindowBounds[3]
-              << std::endl;
-#endif
   }
   else
   {
@@ -330,14 +317,14 @@ int vtkAdaptiveDataSetSurfaceFilter::DataSetExecute(vtkDataObject* inputDS, vtkP
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkAdaptiveDataSetSurfaceFilter::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::ProcessTrees(vtkHyperTreeGrid* input, vtkPolyData* output)
 {
   if (this->Points)
@@ -362,7 +349,7 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessTrees(vtkHyperTreeGrid* input, vtkP
   }
 
   // Retrieve material mask
-  this->Mask = input->HasMask() ? input->GetMask() : 0;
+  this->Mask = input->HasMask() ? input->GetMask() : nullptr;
 
   //
   vtkUnsignedCharArray* ghost = nullptr; // DDM input->GetPointGhostArray();
@@ -420,29 +407,10 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessTrees(vtkHyperTreeGrid* input, vtkP
     output->SetPolys(this->Cells);
   }
 
-#ifndef NDEBUG
-  std::cerr << "vtkAdaptiveDataSetSurfaceFilter #Points            "
-            << this->Points->GetNumberOfPoints() << std::endl;
-  std::cerr << "                                #Cells             "
-            << this->Cells->GetNumberOfCells() << std::endl;
-  std::cerr << "                                #Type&Connectivity "
-            << this->Cells->GetNumberOfConnectivityEntries() << std::endl;
-  std::cerr << "                          Cells #NbRejectByBB      " << this->NbRejectByBB
-            << std::endl;
-  std::cerr << "                                #NbRejectByCircle  " << this->NbRejectByCircle
-            << std::endl;
-#endif
-  std::cerr << "vtkAdaptiveDataSetSurfaceFilter #Points            "
-            << this->Points->GetNumberOfPoints() << std::endl;
-  std::cerr << "                                #Cells             "
-            << this->Cells->GetNumberOfCells() << std::endl;
-  std::cerr << "                                #Type&Connectivity "
-            << this->Cells->GetNumberOfConnectivityEntries() << std::endl;
-
   this->Points->Delete();
-  this->Points = NULL;
+  this->Points = nullptr;
   this->Cells->Delete();
-  this->Cells = NULL;
+  this->Cells = nullptr;
 
   if (this->Locator)
   {
@@ -451,7 +419,7 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessTrees(vtkHyperTreeGrid* input, vtkP
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::RecursivelyProcessTreeNot3D(
   vtkHyperTreeGridNonOrientedGeometryCursor* cursor, int level)
 {
@@ -496,16 +464,6 @@ void vtkAdaptiveDataSetSurfaceFilter::RecursivelyProcessTreeNot3D(
         (originAxis1 <= this->WindowBounds[1]) &&
         (originAxis2 + 2 * halfAxis2 >= this->WindowBounds[2]) &&
         (originAxis2 <= this->WindowBounds[3]));
-#ifndef NDEBUG
-      if (!insideBB)
-      {
-        this->NbRejectByBB++;
-      }
-    }
-    else
-    {
-      this->NbRejectByCircle++;
-#endif
     }
   }
   if (insideBB)
@@ -537,7 +495,7 @@ void vtkAdaptiveDataSetSurfaceFilter::RecursivelyProcessTreeNot3D(
   }     // if( insideBB )
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf1D(
   vtkHyperTreeGridNonOrientedGeometryCursor* cursor)
 {
@@ -569,7 +527,7 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf1D(
   this->Cells->InsertNextCell(2, id);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf2D(
   vtkHyperTreeGridNonOrientedGeometryCursor* cursor)
 
@@ -589,7 +547,7 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf2D(
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::RecursivelyProcessTree3D(
   vtkHyperTreeGridNonOrientedVonNeumannSuperCursorLight* cursor, int level)
 {
@@ -612,7 +570,7 @@ void vtkAdaptiveDataSetSurfaceFilter::RecursivelyProcessTree3D(
   }   // else
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf3D(
   vtkHyperTreeGridNonOrientedVonNeumannSuperCursorLight* superCursor)
 {
@@ -654,7 +612,7 @@ void vtkAdaptiveDataSetSurfaceFilter::ProcessLeaf3D(
   } // c
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::AddFace(
   vtkIdType inId, const double* origin, const double* size, int offset, unsigned int orientation)
 {
@@ -712,7 +670,7 @@ void vtkAdaptiveDataSetSurfaceFilter::AddFace(
   this->OutData->CopyData(this->InData, inId, outId);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkAdaptiveDataSetSurfaceFilter::SetRenderer(vtkRenderer* ren)
 {
   if (ren != this->Renderer)
@@ -722,7 +680,7 @@ void vtkAdaptiveDataSetSurfaceFilter::SetRenderer(vtkRenderer* ren)
   }
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkMTimeType vtkAdaptiveDataSetSurfaceFilter::GetMTime()
 {
   // Check for minimal changes
@@ -741,7 +699,7 @@ vtkMTimeType vtkAdaptiveDataSetSurfaceFilter::GetMTime()
       }
 
       // Check & Update renderer size
-      int* sz = this->Renderer->GetSize();
+      const int* sz = this->Renderer->GetSize();
       if (this->LastRendererSize[0] != sz[0] || this->LastRendererSize[1] != sz[1])
       {
         this->LastRendererSize[0] = sz[0];

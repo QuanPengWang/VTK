@@ -23,8 +23,8 @@
  *
  * Option MergeCoincidentAtoms specifies if coincident atoms should be merged or not.
  * This may be useful in Parallel mode to remove ghost atoms when gather molecule on a rank.
- * When merging, use the data of the non ghost atom. If none, use the data of the last coincident atom.
- * This option is active by default.
+ * When merging, use the data of the non ghost atom. If none, use the data of the last coincident
+ * atom. This option is active by default.
  */
 
 #ifndef vtkMoleculeAppend_h
@@ -38,18 +38,19 @@ class VTKFILTERSCORE_EXPORT vtkMoleculeAppend : public vtkMoleculeAlgorithm
 public:
   static vtkMoleculeAppend* New();
   vtkTypeMacro(vtkMoleculeAppend, vtkMoleculeAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get one input to this filter. This method is only for support of
    * old-style pipeline connections.  When writing new code you should
    * use vtkAlgorithm::GetInputConnection(0, num).
    */
-  vtkDataObject* GetInput(int num);
+  vtkDataObject* GetInput(int idx);
   vtkDataObject* GetInput() { return this->GetInput(0); }
-    //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify if coincident atoms (atom with exactly the same position)
    * should be merged into one.

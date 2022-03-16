@@ -21,6 +21,7 @@ typedef struct NCauth {
 	int compress; /*CURLOPT_ENCODING*/
 	int verbose; /*CURLOPT_ENCODING*/
 	int timeout; /*CURLOPT_TIMEOUT*/
+	int connecttimeout; /*CURLOPT_CONNECTTIMEOUT*/
 	int maxredirs; /*CURLOPT_MAXREDIRS*/
 	char* useragent; /*CURLOPT_USERAGENT*/
 	int cookiejarcreated;
@@ -48,10 +49,14 @@ typedef struct NCauth {
 	char *user; /*CURLOPT_USERNAME*/
 	char *pwd; /*CURLOPT_PASSWORD*/
     } creds;
+    struct s3credentials {
+	char *accessid;
+	char *secretkey;
+    } s3creds;
 } NCauth;
 
-extern int NC_authsetup(NCauth*, NCURI*);
-extern void NC_authclear(NCauth*);
+extern int NC_authsetup(NCauth**, NCURI*);
+extern void NC_authfree(NCauth*);
 extern char* NC_combinehostport(NCURI*);
 extern int NC_parsecredentials(const char* userpwd, char** userp, char** pwdp);
 

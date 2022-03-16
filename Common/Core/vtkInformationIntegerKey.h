@@ -18,7 +18,7 @@
  *
  * vtkInformationIntegerKey is used to represent keys for integer values
  * in vtkInformation.
-*/
+ */
 
 #ifndef vtkInformationIntegerKey_h
 #define vtkInformationIntegerKey_h
@@ -31,7 +31,7 @@
 class VTKCOMMONCORE_EXPORT vtkInformationIntegerKey : public vtkInformationKey
 {
 public:
-  vtkTypeMacro(vtkInformationIntegerKey,vtkInformationKey);
+  vtkTypeMacro(vtkInformationIntegerKey, vtkInformationKey);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkInformationIntegerKey(const char* name, const char* location);
@@ -42,19 +42,19 @@ public:
    * name and a location. This method is provided for wrappers. Use the
    * constructor directly from C++ instead.
    */
-  static vtkInformationIntegerKey* MakeKey(const char* name, const char* location)
+  static VTK_NEWINSTANCE vtkInformationIntegerKey* MakeKey(const char* name, const char* location)
   {
     return new vtkInformationIntegerKey(name, location);
   }
 
-  //@{
+  ///@{
   /**
    * Get/Set the value associated with this key in the given
    * information object.
    */
   void Set(vtkInformation* info, int);
   int Get(vtkInformation* info);
-  //@}
+  ///@}
 
   /**
    * Copy the entry associated with this key from one information

@@ -21,7 +21,7 @@
  * for individual blocks in a multi-block dataset. Attributes are mapped to
  * blocks through their flat-index; This is the mechanism used in legacy
  * OpenGL classes.
-*/
+ */
 
 #ifndef vtkCompositeDataDisplayAttributesLegacy_h
 #define vtkCompositeDataDisplayAttributesLegacy_h
@@ -39,7 +39,7 @@ class VTKRENDERINGCORE_EXPORT vtkCompositeDataDisplayAttributesLegacy : public v
 {
 public:
   static vtkCompositeDataDisplayAttributesLegacy* New();
-  vtkTypeMacro(vtkCompositeDataDisplayAttributesLegacy, vtkObject)
+  vtkTypeMacro(vtkCompositeDataDisplayAttributesLegacy, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -47,13 +47,13 @@ public:
    */
   bool HasBlockVisibilities() const;
 
-  //@{
+  ///@{
   /**
    * Set/get the visibility for the block with \p flat_index.
    */
   void SetBlockVisibility(unsigned int flat_index, bool visible);
   bool GetBlockVisibility(unsigned int flat_index) const;
-  //@}
+  ///@}
 
   /**
    * Returns true if the block with the given flat_index has a visibility
@@ -71,21 +71,19 @@ public:
    * for all blocks to true.
    */
   void RemoveBlockVisibilities();
-  // This method is deprecated and will be removed in VTK 8.2. It is misspelled.
-  VTK_LEGACY(void RemoveBlockVisibilites());
 
   /**
    * Returns true if any block has any block visibility is set.
    */
   bool HasBlockPickabilities() const;
 
-  //@{
+  ///@{
   /**
    * Set/get the visibility for the block with \p flat_index.
    */
   void SetBlockPickability(unsigned int flat_index, bool visible);
   bool GetBlockPickability(unsigned int flat_index) const;
-  //@}
+  ///@}
 
   /**
    * Returns true if the block with the given flat_index has a visibility
@@ -104,14 +102,14 @@ public:
    */
   void RemoveBlockPickabilities();
 
-  //@{
+  ///@{
   /**
    * Set/get the color for the block with \p flat_index.
    */
   void SetBlockColor(unsigned int flat_index, const double color[3]);
   void GetBlockColor(unsigned int flat_index, double color[3]) const;
   vtkColor3d GetBlockColor(unsigned int flat_index) const;
-  //@}
+  ///@}
 
   /**
    * Returns true if any block has any block color is set.
@@ -133,13 +131,13 @@ public:
    */
   void RemoveBlockColors();
 
-  //@{
+  ///@{
   /**
    * Set/get the opacity for the block with flat_index.
    */
   void SetBlockOpacity(unsigned int flat_index, double opacity);
   double GetBlockOpacity(unsigned int flat_index) const;
-  //@}
+  ///@}
 
   /**
    * Returns true if any block has an opacity set.
@@ -166,9 +164,7 @@ public:
   // blocks, which is specified in the vtkCompositeDataDisplayAttributesLegacy \a cda,
   // to compute the \a bounds.
   static void ComputeVisibleBounds(
-    vtkCompositeDataDisplayAttributesLegacy* cda,
-    vtkDataObject *dobj,
-    double bounds[6]);
+    vtkCompositeDataDisplayAttributesLegacy* cda, vtkDataObject* dobj, double bounds[6]);
 
 protected:
   vtkCompositeDataDisplayAttributesLegacy();
@@ -187,18 +183,13 @@ private:
    * the vtkBoundingBox \a bbox. The \a paraentVisible is the
    * visibility for the starting flat_index.
    */
-  static void ComputeVisibleBoundsInternal(
-    vtkCompositeDataDisplayAttributesLegacy* cda,
-    vtkDataObject *dobj,
-    unsigned int& flat_index,
-    vtkBoundingBox* bbox,
-    bool parentVisible = true);
+  static void ComputeVisibleBoundsInternal(vtkCompositeDataDisplayAttributesLegacy* cda,
+    vtkDataObject* dobj, unsigned int& flat_index, vtkBoundingBox* bbox, bool parentVisible = true);
 
   std::map<unsigned int, bool> BlockVisibilities;
   std::map<unsigned int, vtkColor3d> BlockColors;
   std::map<unsigned int, double> BlockOpacities;
   std::map<unsigned int, bool> BlockPickabilities;
-
 };
 
 #endif // vtkCompositeDataDisplayAttributesLegacy_h

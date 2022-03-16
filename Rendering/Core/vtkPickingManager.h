@@ -65,7 +65,7 @@
  * to an other !!
  * This has been done to allow adding multiple times the same picker to the manager
  * by not passing the referenced object to not force the suppression of all pickers
-*/
+ */
 
 #ifndef vtkPickingManager_h
 #define vtkPickingManager_h
@@ -82,11 +82,11 @@ class vtkRenderWindowInteractor;
 class VTKRENDERINGCORE_EXPORT vtkPickingManager : public vtkObject
 {
 public:
-  static vtkPickingManager *New();
-  vtkTypeMacro(vtkPickingManager,vtkObject);
+  static vtkPickingManager* New();
+  vtkTypeMacro(vtkPickingManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable management.
    * When disabled, it redirects every pick on the picker.
@@ -95,9 +95,9 @@ public:
   vtkBooleanMacro(Enabled, bool);
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Enable/Disable optimization depending on the renderWindowInteractor events.
    * The mechanism keeps in cache the last selected picker as well as the last
@@ -109,15 +109,15 @@ public:
    */
   void SetOptimizeOnInteractorEvents(bool optimize);
   vtkGetMacro(OptimizeOnInteractorEvents, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the window interactor associated with the manager.
    */
   void SetInteractor(vtkRenderWindowInteractor* iren);
   vtkGetMacro(Interactor, vtkRenderWindowInteractor*);
-  //@}
+  ///@}
 
   /**
    * Register a picker into the picking manager.
@@ -170,10 +170,8 @@ public:
    * Otherwise it simply proceeds to a pick using the given renderer and
    * returns the corresponding assembly path.
    */
-  vtkAssemblyPath* GetAssemblyPath(double X, double Y, double Z,
-                                   vtkAbstractPropPicker* picker,
-                                   vtkRenderer* renderer,
-                                   vtkObject* obj);
+  vtkAssemblyPath* GetAssemblyPath(double X, double Y, double Z, vtkAbstractPropPicker* picker,
+    vtkRenderer* renderer, vtkObject* obj);
 
   /**
    * Return the number of pickers registered.

@@ -22,7 +22,7 @@
  * by reader producing composite datasets to describes the relationships among
  * the blocks.
  * Refer to http://www.paraview.org/Wiki/Block_Hierarchy_Meta_Data for details.
-*/
+ */
 
 #ifndef vtkSILBuilder_h
 #define vtkSILBuilder_h
@@ -41,34 +41,34 @@ public:
   vtkTypeMacro(vtkSILBuilder, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the graph to populate.
    */
   void SetSIL(vtkMutableDirectedGraph*);
   vtkGetObjectMacro(SIL, vtkMutableDirectedGraph);
-  //@}
+  ///@}
 
   /**
    * Initializes the data-structures.
    */
   void Initialize();
 
-  //@{
+  ///@{
   /**
    * Add vertex, child-edge or cross-edge to the graph.
    */
   vtkIdType AddVertex(const char* name);
   vtkIdType AddChildEdge(vtkIdType parent, vtkIdType child);
   vtkIdType AddCrossEdge(vtkIdType src, vtkIdType dst);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Returns the vertex id for the root vertex.
    */
   vtkGetMacro(RootVertex, vtkIdType);
-  //@}
+  ///@}
 
 protected:
   vtkSILBuilder();
@@ -83,7 +83,6 @@ protected:
 private:
   vtkSILBuilder(const vtkSILBuilder&) = delete;
   void operator=(const vtkSILBuilder&) = delete;
-
 };
 
 #endif

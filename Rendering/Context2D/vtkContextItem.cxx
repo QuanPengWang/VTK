@@ -14,18 +14,19 @@
 =========================================================================*/
 
 #include "vtkContextItem.h"
+#include "vtkContextTransform.h"
 
-//-----------------------------------------------------------------------------
-vtkContextItem::vtkContextItem()
+vtkCxxSetObjectMacro(vtkContextItem, Transform, vtkContextTransform);
+
+//------------------------------------------------------------------------------
+vtkContextItem::~vtkContextItem()
 {
-  this->Opacity = 1.0;
+  this->SetTransform(nullptr);
 }
 
-//-----------------------------------------------------------------------------
-vtkContextItem::~vtkContextItem() = default;
-
-//-----------------------------------------------------------------------------
-void vtkContextItem::PrintSelf(ostream &os, vtkIndent indent)
+//------------------------------------------------------------------------------
+void vtkContextItem::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Opacity: " << this->Opacity << endl;
 }

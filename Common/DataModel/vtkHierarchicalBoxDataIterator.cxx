@@ -12,6 +12,9 @@
  PURPOSE.  See the above copyright notice for more information.
 
  =========================================================================*/
+// VTK_DEPRECATED_IN_9_2_0() warnings for this class.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkObjectFactory.h"
 
@@ -23,8 +26,7 @@ vtkHierarchicalBoxDataIterator::vtkHierarchicalBoxDataIterator() = default;
 vtkHierarchicalBoxDataIterator::~vtkHierarchicalBoxDataIterator() = default;
 
 //------------------------------------------------------------------------------
-void vtkHierarchicalBoxDataIterator::PrintSelf(ostream &os, vtkIndent indent)
+void vtkHierarchicalBoxDataIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

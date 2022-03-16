@@ -23,7 +23,7 @@
  * The X and Y Amplitude ivars make the output move in the X and Y directions
  * over time. The Growing ivar makes the number of cells in the output grow
  * and then shrink over time.
-*/
+ */
 
 #ifndef vtkTimeSourceExample_h
 #define vtkTimeSourceExample_h
@@ -34,11 +34,11 @@
 class VTKFILTERSGENERAL_EXPORT vtkTimeSourceExample : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkTimeSourceExample *New();
-  vtkTypeMacro(vtkTimeSourceExample,vtkUnstructuredGridAlgorithm);
+  static vtkTimeSourceExample* New();
+  vtkTypeMacro(vtkTimeSourceExample, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * When off (the default) this source produces a discrete set of values.
    * When on, this source produces a value analytically for any queried time.
@@ -46,9 +46,9 @@ public:
   vtkSetClampMacro(Analytic, vtkTypeBool, 0, 1);
   vtkGetMacro(Analytic, vtkTypeBool);
   vtkBooleanMacro(Analytic, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When 0.0 (the default) this produces a data set that is stationary.
    * When on the data set moves in the X/Y plane over a sin wave over time,
@@ -58,9 +58,9 @@ public:
   vtkGetMacro(XAmplitude, double);
   vtkSetMacro(YAmplitude, double);
   vtkGetMacro(YAmplitude, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When off (the default) this produces a single cell data set.
    * When on the number of cells (in the Y direction) grows
@@ -69,22 +69,17 @@ public:
   vtkSetClampMacro(Growing, vtkTypeBool, 0, 1);
   vtkGetMacro(Growing, vtkTypeBool);
   vtkBooleanMacro(Growing, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkTimeSourceExample();
   ~vtkTimeSourceExample() override;
 
-  int RequestInformation(vtkInformation*,
-                         vtkInformationVector**,
-                         vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int RequestData(vtkInformation*,
-                  vtkInformationVector**,
-                  vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-
-  void LookupTimeAndValue(double &time, double &value);
+  void LookupTimeAndValue(double& time, double& value);
   double ValueFunction(double time);
   double XFunction(double time);
   double YFunction(double time);
@@ -96,12 +91,12 @@ protected:
   vtkTypeBool Growing;
 
   int NumSteps;
-  double *Steps;
-  double *Values;
+  double* Steps;
+  double* Values;
+
 private:
   vtkTimeSourceExample(const vtkTimeSourceExample&) = delete;
   void operator=(const vtkTimeSourceExample&) = delete;
 };
 
 #endif
-

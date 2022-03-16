@@ -18,7 +18,7 @@
  *
  * vtkInformationInformationVectorKey is used to represent keys in
  * vtkInformation for vectors of other vtkInformation objects.
-*/
+ */
 
 #ifndef vtkInformationInformationVectorKey_h
 #define vtkInformationInformationVectorKey_h
@@ -33,20 +33,20 @@ class vtkInformationVector;
 class VTKCOMMONCORE_EXPORT vtkInformationInformationVectorKey : public vtkInformationKey
 {
 public:
-  vtkTypeMacro(vtkInformationInformationVectorKey,vtkInformationKey);
+  vtkTypeMacro(vtkInformationInformationVectorKey, vtkInformationKey);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkInformationInformationVectorKey(const char* name, const char* location);
   ~vtkInformationInformationVectorKey() override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the value associated with this key in the given
    * information object.
    */
   void Set(vtkInformation* info, vtkInformationVector*);
   vtkInformationVector* Get(vtkInformation* info);
-  //@}
+  ///@}
 
   /**
    * Copy the entry associated with this key from one information

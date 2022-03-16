@@ -28,7 +28,7 @@ vtkTreeIterator::~vtkTreeIterator()
 {
   if (this->Tree)
   {
-    this->Tree->Delete();
+    this->Tree->UnRegister(this);
     this->Tree = nullptr;
   }
 }
@@ -43,20 +43,12 @@ void vtkTreeIterator::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkTreeIterator::SetTree(vtkTree* tree)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this
-                << "): setting Tree to " << tree );
-  if (this->Tree != tree)
+  bool needs_init = this->Tree != tree;
+  vtkSetObjectBodyMacro(Tree, vtkTree, tree);
+  if (needs_init)
   {
-    vtkTree* temp = this->Tree;
-    this->Tree = tree;
-    if (this->Tree != nullptr) { this->Tree->Register(this); }
-    if (temp != nullptr)
-    {
-      temp->UnRegister(this);
-    }
     this->StartVertex = -1;
     this->Initialize();
-    this->Modified();
   }
 }
 
@@ -73,7 +65,7 @@ void vtkTreeIterator::SetStartVertex(vtkIdType vertex)
 vtkIdType vtkTreeIterator::Next()
 {
   vtkIdType last = this->NextId;
-  if(last != -1)
+  if (last != -1)
   {
     this->NextId = this->NextInternal();
   }

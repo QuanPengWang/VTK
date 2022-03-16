@@ -21,7 +21,7 @@
  *
  * @sa
  * vtkPNGReader
-*/
+ */
 
 #ifndef vtkPNGWriter_h
 #define vtkPNGWriter_h
@@ -35,8 +35,8 @@ class vtkUnsignedCharArray;
 class VTKIOIMAGE_EXPORT vtkPNGWriter : public vtkImageWriter
 {
 public:
-  static vtkPNGWriter *New();
-  vtkTypeMacro(vtkPNGWriter,vtkImageWriter);
+  static vtkPNGWriter* New();
+  vtkTypeMacro(vtkPNGWriter, vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -44,7 +44,7 @@ public:
    */
   void Write() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the zlib compression level.
    * The range is 0-9, with 0 meaning no compression
@@ -54,25 +54,25 @@ public:
    */
   vtkSetClampMacro(CompressionLevel, int, 0, 9);
   vtkGetMacro(CompressionLevel, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Write the image to memory (a vtkUnsignedCharArray)
    */
   vtkSetMacro(WriteToMemory, vtkTypeUBool);
   vtkGetMacro(WriteToMemory, vtkTypeUBool);
   vtkBooleanMacro(WriteToMemory, vtkTypeUBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * When writing to memory this is the result, it will be nullptr until the
    * data is written the first time
    */
   virtual void SetResult(vtkUnsignedCharArray*);
   vtkGetObjectMacro(Result, vtkUnsignedCharArray);
-  //@}
+  ///@}
 
   /**
    * Adds a text chunk to the PNG. More than one text chunk with the same key is permissible.
@@ -82,7 +82,13 @@ public:
    * for more information.
    */
   void AddText(const char* key, const char* value);
-  //@{
+
+  /**
+   * Clear out any key/value pairs added through the AddText() member function.
+   */
+  void ClearText();
+
+  ///@{
   /**
    * Standard keys
    */
@@ -96,19 +102,18 @@ public:
   static const char* WARNING;
   static const char* SOURCE;
   static const char* COMMENT;
-  //@}
+  ///@}
 
 protected:
   vtkPNGWriter();
   ~vtkPNGWriter() override;
 
-  void WriteSlice(vtkImageData *data, int* uExtent);
+  void WriteSlice(vtkImageData* data, int* uExtent);
   int CompressionLevel;
-  vtkUnsignedCharArray *Result;
-  FILE *TempFP;
+  vtkUnsignedCharArray* Result;
+  FILE* TempFP;
   class vtkInternals;
   vtkInternals* Internals;
-
 
 private:
   vtkPNGWriter(const vtkPNGWriter&) = delete;

@@ -63,10 +63,6 @@
  * also populate a double array of specified size with a random sequence. It
  * will do so using one or more threads depending on the number of values
  * requested to generate.
- *
- * @warning
- * This class has been threaded with vtkMultiThreader. The amount of work
- * each thread performs is controlled by the #define VTK_MERSENNE_CHUNK.
  */
 
 #ifndef vtkMersenneTwister_h
@@ -82,30 +78,29 @@ class VTKCOMMONCORE_EXPORT vtkMersenneTwister : public vtkRandomSequence
 public:
   typedef vtkTypeUInt32 SequenceId;
 
-  //@{
+  ///@{
   /**
    * Standard methods for instantiation, type information, and printing.
    */
   static vtkMersenneTwister* New();
-  vtkTypeMacro(vtkMersenneTwister,vtkRandomSequence);
+  vtkTypeMacro(vtkMersenneTwister, vtkRandomSequence);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Satisfy general API of vtkRandomSequence superclass. Initialize the
    * sequence with a seed.
    */
-  void Initialize(vtkTypeUInt32 seed) override
-  {this->InitializeSequence(0,seed);}
+  void Initialize(vtkTypeUInt32 seed) override { this->InitializeSequence(0, seed); }
 
   /**
-   * Initialize a new Mersenne Twister sequence, given a) a <seed> and b) a
-   * Mersenne exponent (p s.t. 2^p-1 is a Mersenne prime). If <p> is not a
+   * Initialize a new Mersenne Twister sequence, given a) a \c seed and b) a
+   * Mersenne exponent (p s.t. 2^p-1 is a Mersenne prime). If \c p is not a
    * usable Mersenne exponent, its value is used to pick one from a list.
    * The return value is the id for the generated sequence, which is used as a
    * key to access values of the sequence.
    */
-  SequenceId InitializeNewSequence(vtkTypeUInt32 seed, int p=521);
+  SequenceId InitializeNewSequence(vtkTypeUInt32 seed, int p = 521);
 
   /**
    * Initialize a sequence as in InitializeNewSequence(), but additionally pass
@@ -113,7 +108,7 @@ public:
    * associated with this id, a warning is given and the sequence is reset using
    * the given parameters.
    */
-  void InitializeSequence(SequenceId id, vtkTypeUInt32 seed, int p=521);
+  void InitializeSequence(SequenceId id, vtkTypeUInt32 seed, int p = 521);
 
   /**
    * Current value
@@ -128,7 +123,7 @@ public:
   double GetValue() override { return this->GetValue(0); }
 
   /**
-   * Move to the next number in random sequence <id>. If no sequence is
+   * Move to the next number in random sequence \c id. If no sequence is
    * associated with this id, a warning is given and a sequence is generated
    * with default values.
    */

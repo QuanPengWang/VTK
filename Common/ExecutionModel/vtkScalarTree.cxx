@@ -14,16 +14,15 @@
 =========================================================================*/
 #include "vtkScalarTree.h"
 
-#include "vtkDataSet.h"
 #include "vtkDataArray.h"
+#include "vtkDataSet.h"
 #include "vtkGarbageCollector.h"
 #include "vtkObjectFactory.h"
 
+vtkCxxSetObjectMacro(vtkScalarTree, DataSet, vtkDataSet);
+vtkCxxSetObjectMacro(vtkScalarTree, Scalars, vtkDataArray);
 
-vtkCxxSetObjectMacro(vtkScalarTree,DataSet,vtkDataSet);
-vtkCxxSetObjectMacro(vtkScalarTree,Scalars,vtkDataArray);
-
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Instantiate scalar tree.
 vtkScalarTree::vtkScalarTree()
 {
@@ -32,28 +31,28 @@ vtkScalarTree::vtkScalarTree()
   this->ScalarValue = 0.0;
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkScalarTree::~vtkScalarTree()
 {
   this->SetDataSet(nullptr);
   this->SetScalars(nullptr);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Shallow copy enough information for a clone to produce the same result on
 // the same data.
-void vtkScalarTree::ShallowCopy(vtkScalarTree *stree)
+void vtkScalarTree::ShallowCopy(vtkScalarTree* stree)
 {
   this->SetDataSet(stree->GetDataSet());
   this->SetScalars(stree->GetScalars());
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkScalarTree::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
-  if ( this->DataSet )
+  if (this->DataSet)
   {
     os << indent << "DataSet: " << this->DataSet << "\n";
   }
@@ -62,7 +61,7 @@ void vtkScalarTree::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "DataSet: (none)\n";
   }
 
-  if ( this->Scalars )
+  if (this->Scalars)
   {
     os << indent << "Scalars: " << this->Scalars << "\n";
   }

@@ -25,7 +25,7 @@
  * Neurosciences, Foothills Medical Centre, Calgary, for providing this class.
  * @sa
  * vtkImageReslice vtkImageInterpolator vtkImageSincInterpolator
-*/
+ */
 
 #ifndef vtkAbstractImageInterpolator_h
 #define vtkAbstractImageInterpolator_h
@@ -52,7 +52,7 @@ public:
   /**
    * Initialize the interpolator with the data that you wish to interpolate.
    */
-  virtual void Initialize(vtkDataObject *data);
+  virtual void Initialize(vtkDataObject* data);
 
   /**
    * Release any data stored by the interpolator.
@@ -63,14 +63,14 @@ public:
    * Copy the interpolator.  It is possible to duplicate an interpolator
    * by calling NewInstance() followed by DeepCopy().
    */
-  void DeepCopy(vtkAbstractImageInterpolator *obj);
+  void DeepCopy(vtkAbstractImageInterpolator* obj);
 
   /**
    * Update the interpolator.  If the interpolator has been modified by
    * a Set method since Initialize() was called, you must call this method
    * to update the interpolator before you can use it.
    */
-  void Update();
+  virtual void Update();
 
   /**
    * Get the result of interpolating the specified component of the input
@@ -88,7 +88,7 @@ public:
    * then the return value is false, and each component will be set to
    * the OutValue.
    */
-  bool Interpolate(const double point[3], double *value);
+  bool Interpolate(const double point[3], double* value);
 
   /**
    * The value to return when the point is out of bounds.
@@ -135,17 +135,17 @@ public:
    */
   int GetNumberOfComponents();
 
-  //@{
+  ///@{
   /**
    * A version of Interpolate that takes structured coords instead of data
    * coords.  Structured coords are the data coords after subtracting the
    * Origin and dividing by the Spacing.
    */
-  void InterpolateIJK(const double point[3], double *value);
-  void InterpolateIJK(const float point[3], float *value);
-  //@}
+  void InterpolateIJK(const double point[3], double* value);
+  void InterpolateIJK(const float point[3], float* value);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Check an x,y,z point to see if it is within the bounds for the
    * structured coords of the image.  This is meant to be called prior
@@ -154,9 +154,9 @@ public:
    */
   bool CheckBoundsIJK(const double x[3]);
   bool CheckBoundsIJK(const float x[3]);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The border mode (default: clamp).  This controls how out-of-bounds
    * lookups are handled, i.e. how data will be extrapolated beyond the
@@ -165,15 +165,12 @@ public:
    * mirror the image at the boundary.
    */
   void SetBorderMode(int mode);
-  void SetBorderModeToClamp() {
-    this->SetBorderMode(VTK_IMAGE_BORDER_CLAMP); }
-  void SetBorderModeToRepeat() {
-    this->SetBorderMode(VTK_IMAGE_BORDER_REPEAT); }
-  void SetBorderModeToMirror() {
-    this->SetBorderMode(VTK_IMAGE_BORDER_MIRROR); }
+  void SetBorderModeToClamp() { this->SetBorderMode(VTK_IMAGE_BORDER_CLAMP); }
+  void SetBorderModeToRepeat() { this->SetBorderMode(VTK_IMAGE_BORDER_REPEAT); }
+  void SetBorderModeToMirror() { this->SetBorderMode(VTK_IMAGE_BORDER_MIRROR); }
   int GetBorderMode() { return this->BorderMode; }
-  const char *GetBorderModeAsString();
-  //@}
+  const char* GetBorderModeAsString();
+  ///@}
 
   /**
    * Enable sliding window for separable kernels.
@@ -203,7 +200,7 @@ public:
    */
   virtual bool IsSeparable() = 0;
 
-  //@{
+  ///@{
   /**
    * If the data is going to be sampled on a regular grid, then the
    * interpolation weights can be precomputed.  A matrix must be supplied
@@ -214,20 +211,18 @@ public:
    * be used to check which indices in the extent map to out-of-bounds
    * coordinates in the input data.
    */
-  virtual void PrecomputeWeightsForExtent(
-    const double matrix[16], const int extent[6], int checkExtent[6],
-    vtkInterpolationWeights *&weights);
-  virtual void PrecomputeWeightsForExtent(
-    const float matrix[16], const int extent[6], int checkExtent[6],
-    vtkInterpolationWeights *&weights);
-  //@}
+  virtual void PrecomputeWeightsForExtent(const double matrix[16], const int extent[6],
+    int checkExtent[6], vtkInterpolationWeights*& weights);
+  virtual void PrecomputeWeightsForExtent(const float matrix[16], const int extent[6],
+    int checkExtent[6], vtkInterpolationWeights*& weights);
+  ///@}
 
   /**
    * Free the weights that were provided by PrecomputeWeightsForExtent.
    */
-  virtual void FreePrecomputedWeights(vtkInterpolationWeights *&weights);
+  virtual void FreePrecomputedWeights(vtkInterpolationWeights*& weights);
 
-  //@{
+  ///@{
   /**
    * Get a row of samples, using the weights that were precomputed
    * by PrecomputeWeightsForExtent.  Note that each sample may have
@@ -235,42 +230,31 @@ public:
    * will be returned by setting the ComponentOffset and ComponentCount.
    */
   void InterpolateRow(
-    vtkInterpolationWeights *&weights, int xIdx, int yIdx, int zIdx,
-    double *value, int n);
+    vtkInterpolationWeights*& weights, int xIdx, int yIdx, int zIdx, double* value, int n);
   void InterpolateRow(
-    vtkInterpolationWeights *&weights, int xIdx, int yIdx, int zIdx,
-    float *value, int n);
-  //@}
+    vtkInterpolationWeights*& weights, int xIdx, int yIdx, int zIdx, float* value, int n);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the spacing of the data being interpolated.
    */
   vtkGetVector3Macro(Spacing, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the origin of the data being interpolated.
    */
   vtkGetVector3Macro(Origin, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the extent of the data being interpolated.
    */
   vtkGetVector6Macro(Extent, int);
-  //@}
-
-  //@{
-  /**
-   * Get the whole extent of the data being interpolated, including
-   * parts of the data that are not currently in memory.
-   */
-  VTK_LEGACY(int *GetWholeExtent());
-  VTK_LEGACY(void GetWholeExtent(int extent[6]));
-  //@}
+  ///@}
 
 protected:
   vtkAbstractImageInterpolator();
@@ -284,45 +268,39 @@ protected:
   /**
    * Subclass-specific copy.
    */
-  virtual void InternalDeepCopy(vtkAbstractImageInterpolator *obj) = 0;
+  virtual void InternalDeepCopy(vtkAbstractImageInterpolator* obj) = 0;
 
-  //@{
+  ///@{
   /**
    * Get the interpolation functions.
    */
   virtual void GetInterpolationFunc(
-    void (**doublefunc)(
-      vtkInterpolationInfo *, const double [3], double *));
+    void (**doublefunc)(vtkInterpolationInfo*, const double[3], double*));
   virtual void GetInterpolationFunc(
-    void (**floatfunc)(
-      vtkInterpolationInfo *, const float [3], float *));
-  //@}
+    void (**floatfunc)(vtkInterpolationInfo*, const float[3], float*));
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the row interpolation functions.
    */
   virtual void GetRowInterpolationFunc(
-    void (**doublefunc)(
-      vtkInterpolationWeights *, int, int, int, double *, int));
+    void (**doublefunc)(vtkInterpolationWeights*, int, int, int, double*, int));
   virtual void GetRowInterpolationFunc(
-    void (**floatfunc)(
-      vtkInterpolationWeights *, int, int, int, float *, int));
-  //@}
+    void (**floatfunc)(vtkInterpolationWeights*, int, int, int, float*, int));
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the sliding window interpolation functions.
    */
   virtual void GetSlidingWindowFunc(
-    void (**doublefunc)(
-      vtkInterpolationWeights *, int, int, int, double *, int));
+    void (**doublefunc)(vtkInterpolationWeights*, int, int, int, double*, int));
   virtual void GetSlidingWindowFunc(
-    void (**floatfunc)(
-      vtkInterpolationWeights *, int, int, int, float *, int));
-  //@}
+    void (**floatfunc)(vtkInterpolationWeights*, int, int, int, float*, int));
+  ///@}
 
-  vtkDataArray *Scalars;
+  vtkDataArray* Scalars;
   double StructuredBoundsDouble[6];
   float StructuredBoundsFloat[6];
   int Extent[6];
@@ -336,64 +314,54 @@ protected:
   bool SlidingWindow;
 
   // information needed by the interpolator funcs
-  vtkInterpolationInfo *InterpolationInfo;
+  vtkInterpolationInfo* InterpolationInfo;
 
   void (*InterpolationFuncDouble)(
-    vtkInterpolationInfo *info, const double point[3], double *outPtr);
-  void (*InterpolationFuncFloat)(
-    vtkInterpolationInfo *info, const float point[3], float *outPtr);
+    vtkInterpolationInfo* info, const double point[3], double* outPtr);
+  void (*InterpolationFuncFloat)(vtkInterpolationInfo* info, const float point[3], float* outPtr);
 
   void (*RowInterpolationFuncDouble)(
-    vtkInterpolationWeights *weights, int idX, int idY, int idZ,
-    double *outPtr, int n);
+    vtkInterpolationWeights* weights, int idX, int idY, int idZ, double* outPtr, int n);
   void (*RowInterpolationFuncFloat)(
-    vtkInterpolationWeights *weights, int idX, int idY, int idZ,
-    float *outPtr, int n);
+    vtkInterpolationWeights* weights, int idX, int idY, int idZ, float* outPtr, int n);
 
 private:
-
   vtkAbstractImageInterpolator(const vtkAbstractImageInterpolator&) = delete;
   void operator=(const vtkAbstractImageInterpolator&) = delete;
 };
 
-inline void vtkAbstractImageInterpolator::InterpolateIJK(
-  const double point[3], double *value)
+inline void vtkAbstractImageInterpolator::InterpolateIJK(const double point[3], double* value)
 {
   this->InterpolationFuncDouble(this->InterpolationInfo, point, value);
 }
 
-inline void vtkAbstractImageInterpolator::InterpolateIJK(
-  const float point[3], float *value)
+inline void vtkAbstractImageInterpolator::InterpolateIJK(const float point[3], float* value)
 {
   this->InterpolationFuncFloat(this->InterpolationInfo, point, value);
 }
 
 inline bool vtkAbstractImageInterpolator::CheckBoundsIJK(const double x[3])
 {
-  const double *bounds = this->StructuredBoundsDouble;
-  return !((x[0] < bounds[0]) || (x[0] > bounds[1]) ||
-           (x[1] < bounds[2]) || (x[1] > bounds[3]) ||
-           (x[2] < bounds[4]) || (x[2] > bounds[5]));
+  const double* bounds = this->StructuredBoundsDouble;
+  return !((x[0] < bounds[0]) || (x[0] > bounds[1]) || (x[1] < bounds[2]) || (x[1] > bounds[3]) ||
+    (x[2] < bounds[4]) || (x[2] > bounds[5]));
 }
 
 inline bool vtkAbstractImageInterpolator::CheckBoundsIJK(const float x[3])
 {
-  const float *bounds = this->StructuredBoundsFloat;
-  return !((x[0] < bounds[0]) || (x[0] > bounds[1]) ||
-           (x[1] < bounds[2]) || (x[1] > bounds[3]) ||
-           (x[2] < bounds[4]) || (x[2] > bounds[5]));
+  const float* bounds = this->StructuredBoundsFloat;
+  return !((x[0] < bounds[0]) || (x[0] > bounds[1]) || (x[1] < bounds[2]) || (x[1] > bounds[3]) ||
+    (x[2] < bounds[4]) || (x[2] > bounds[5]));
 }
 
 inline void vtkAbstractImageInterpolator::InterpolateRow(
-  vtkInterpolationWeights *&weights, int xIdx, int yIdx, int zIdx,
-  double *value, int n)
+  vtkInterpolationWeights*& weights, int xIdx, int yIdx, int zIdx, double* value, int n)
 {
   this->RowInterpolationFuncDouble(weights, xIdx, yIdx, zIdx, value, n);
 }
 
 inline void vtkAbstractImageInterpolator::InterpolateRow(
-  vtkInterpolationWeights *&weights, int xIdx, int yIdx, int zIdx,
-  float *value, int n)
+  vtkInterpolationWeights*& weights, int xIdx, int yIdx, int zIdx, float* value, int n)
 {
   this->RowInterpolationFuncFloat(weights, xIdx, yIdx, zIdx, value, n);
 }

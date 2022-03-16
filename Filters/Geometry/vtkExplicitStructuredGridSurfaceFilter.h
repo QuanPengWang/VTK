@@ -15,7 +15,7 @@
 /**
  * @class   vtkExplicitStructuredGridSurfaceFilter
  * @brief   Filter which creates a surface (polydata) from an explicit structured grid.
-*/
+ */
 
 #ifndef vtkExplicitStructuredGridSurfaceFilter_h
 #define vtkExplicitStructuredGridSurfaceFilter_h
@@ -27,15 +27,14 @@ class vtkExplicitStructuredGrid;
 class vtkIdTypeArray;
 class vtkMultiProcessController;
 
-class VTKFILTERSGEOMETRY_EXPORT vtkExplicitStructuredGridSurfaceFilter :
-  public vtkPolyDataAlgorithm
+class VTKFILTERSGEOMETRY_EXPORT vtkExplicitStructuredGridSurfaceFilter : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkExplicitStructuredGridSurfaceFilter *New();
+  static vtkExplicitStructuredGridSurfaceFilter* New();
   vtkTypeMacro(vtkExplicitStructuredGridSurfaceFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * If on, the output polygonal dataset will have a celldata array that
    * holds the cell index of the original 3D cell that produced each output
@@ -49,10 +48,10 @@ public:
   vtkBooleanMacro(PassThroughCellIds, int);
   vtkSetMacro(PassThroughPointIds, int);
   vtkGetMacro(PassThroughPointIds, int);
-  vtkBooleanMacro(PassThroughPointIds ,int);
-  //@}
+  vtkBooleanMacro(PassThroughPointIds, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * If PassThroughCellIds or PassThroughPointIds is on, then these ivars
    * control the name given to the field in which the ids are written into.  If
@@ -60,29 +59,24 @@ public:
    * is used, respectively.
    */
   vtkSetStringMacro(OriginalCellIdsName);
-  virtual const char *GetOriginalCellIdsName()
+  virtual const char* GetOriginalCellIdsName()
   {
-    return (this->OriginalCellIdsName ?
-           this->OriginalCellIdsName : "vtkOriginalCellIds");
+    return (this->OriginalCellIdsName ? this->OriginalCellIdsName : "vtkOriginalCellIds");
   }
   vtkSetStringMacro(OriginalPointIdsName);
-  virtual const char *GetOriginalPointIdsName()
+  virtual const char* GetOriginalPointIdsName()
   {
-    return (this->OriginalPointIdsName ?
-           this->OriginalPointIdsName : "vtkOriginalPointIds");
+    return (this->OriginalPointIdsName ? this->OriginalPointIdsName : "vtkOriginalPointIds");
   }
-  //@}
+  ///@}
 
 protected:
   vtkExplicitStructuredGridSurfaceFilter();
   ~vtkExplicitStructuredGridSurfaceFilter() override;
 
-  int RequestInformation(vtkInformation *,
-    vtkInformationVector**, vtkInformationVector*) override;
-  int RequestUpdateExtent(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*) override;
-  int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int, vtkInformation*) override;
 
   int ExtractSurface(vtkExplicitStructuredGrid*, vtkPolyData*);
@@ -92,10 +86,10 @@ protected:
   int PieceInvariant;
 
   int PassThroughCellIds;
-  char *OriginalCellIdsName;
+  char* OriginalCellIdsName;
 
   int PassThroughPointIds;
-  char *OriginalPointIdsName;
+  char* OriginalPointIdsName;
 
   int WholeExtent[6];
 

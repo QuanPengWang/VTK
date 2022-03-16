@@ -1,3 +1,10 @@
+#[==[
+@ingroup module-impl
+@brief Output a node in the graph
+
+Queries the properties for modules and generates the node for it in the graph
+and its outgoing dependency edges.
+#]==]
 function (_vtk_module_graphviz_module_node var module)
   get_property(_vtk_graphviz_file GLOBAL
     PROPERTY "_vtk_module_${module}_file")
@@ -98,20 +105,21 @@ function (_vtk_module_graphviz_module_node var module)
   set("${var}" "${_vtk_graphviz_node_block}" PARENT_SCOPE)
 endfunction ()
 
-#[==[.md
-## Graphviz output
+#[==[
+@ingroup module-support
+@brief Generate graphviz output for a module dependency graph
 
 Information about the modules built and/or available may be dumped to a
 Graphviz `.dot` file.
 
-```
+~~~
 vtk_module_graphviz(
   MODULES   <module>...
   OUTPUT    <path>
 
   [PRIVATE_DEPENDENCIES <ON|OFF>]
   [KIT_CLUSTERS <ON|OFF>])
-```
+~~~
 
   * `MODULES`: (Required) The modules to output information for.
   * `OUTPUT`: (Required) A Graphviz file describing the modules built will
@@ -122,11 +130,10 @@ vtk_module_graphviz(
     a cluster or not.
 #]==]
 function (vtk_module_graphviz)
-  cmake_parse_arguments(_vtk_graphviz
+  cmake_parse_arguments(PARSE_ARGV 0 _vtk_graphviz
     ""
     "PRIVATE_DEPENDENCIES;KIT_CLUSTERS;OUTPUT"
-    "MODULES"
-    ${ARGN})
+    "MODULES")
 
   if (_vtk_graphviz_UNPARSED_ARGUMENTS)
     message(FATAL_ERROR
@@ -152,7 +159,7 @@ function (vtk_module_graphviz)
   endif ()
 
   if (NOT IS_ABSOLUTE "${_vtk_graphviz_OUTPUT}")
-    set(_vtk_graphviz_OUTPUT "${CMAKE_BINARY_DIR}/${_vtk_graphviz_OUTPUT}")
+    string(PREPEND _vtk_graphviz_OUTPUT "${CMAKE_BINARY_DIR}/")
   endif ()
 
   set(_vtk_graphviz_kits)

@@ -14,9 +14,13 @@
 =========================================================================*/
 /**
  * @class vtkBlockSelector
- * @brief Selects cells or points contained in a block as defined in the
+ * @brief selector for blocks
+ *
+ * Selects cells or points contained in a block as defined in the
  * vtkSelectionNode used to initialize this operator.
  *
+ * This selector supports vtkSelectionNode::BLOCKS and
+ * vtkSelectionNode::BLOCK_SELECTORS.
  */
 
 #ifndef vtkBlockSelector_h
@@ -33,13 +37,21 @@ public:
 
   void Initialize(vtkSelectionNode* node) override;
 
+  /**
+   * Overridden to handle `BLOCK_SELECTORS`. We need the data to convert
+   * selector expressions to composite indices for quick check if block is
+   * selected. We do that here.
+   */
+  void Execute(vtkDataObject* input, vtkDataObject* output) override;
+
 protected:
   vtkBlockSelector();
   ~vtkBlockSelector() override;
 
   bool ComputeSelectedElements(vtkDataObject* input, vtkSignedCharArray* insidednessArray) override;
   SelectionMode GetAMRBlockSelection(unsigned int level, unsigned int index) override;
-  SelectionMode GetBlockSelection(unsigned int compositeIndex) override;
+  SelectionMode GetBlockSelection(
+    unsigned int compositeIndex, bool isDataObjectTree = true) override;
 
 private:
   vtkBlockSelector(const vtkBlockSelector&) = delete;

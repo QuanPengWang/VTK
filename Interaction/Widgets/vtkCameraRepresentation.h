@@ -25,13 +25,13 @@
  *
  * @sa
  * vtkCameraWidget vtkCameraInterpolator
-*/
+ */
 
 #ifndef vtkCameraRepresentation_h
 #define vtkCameraRepresentation_h
 
-#include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkBorderRepresentation.h"
+#include "vtkInteractionWidgetsModule.h" // For export macro
 
 class vtkRenderer;
 class vtkRenderWindowInteractor;
@@ -50,26 +50,26 @@ public:
   /**
    * Instantiate this class.
    */
-  static vtkCameraRepresentation *New();
+  static vtkCameraRepresentation* New();
 
-  //@{
+  ///@{
   /**
    * Standard VTK class methods.
    */
-  vtkTypeMacro(vtkCameraRepresentation,vtkBorderRepresentation);
+  vtkTypeMacro(vtkCameraRepresentation, vtkBorderRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify the camera to interpolate. This must be specified by
    * the user.
    */
-  void SetCamera(vtkCamera *camera);
-  vtkGetObjectMacro(Camera,vtkCamera);
-  //@}
+  void SetCamera(vtkCamera* camera);
+  vtkGetObjectMacro(Camera, vtkCamera);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the vtkCameraInterpolator used to interpolate and save the
    * sequence of camera views. If not defined, one is created
@@ -77,27 +77,27 @@ public:
    * the interpolation type (linear, spline) and other instance
    * variables.
    */
-  void SetInterpolator(vtkCameraInterpolator *camInt);
-  vtkGetObjectMacro(Interpolator,vtkCameraInterpolator);
-  //@}
+  void SetInterpolator(vtkCameraInterpolator* camInt);
+  vtkGetObjectMacro(Interpolator, vtkCameraInterpolator);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the number of frames to generate when playback is initiated.
    */
-  vtkSetClampMacro(NumberOfFrames,int,1,VTK_INT_MAX);
-  vtkGetMacro(NumberOfFrames,int);
-  //@}
+  vtkSetClampMacro(NumberOfFrames, int, 1, VTK_INT_MAX);
+  vtkGetMacro(NumberOfFrames, int);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * By obtaining this property you can specify the properties of the
    * representation.
    */
-  vtkGetObjectMacro(Property,vtkProperty2D);
-  //@}
+  vtkGetObjectMacro(Property, vtkProperty2D);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are used to create interpolated camera paths.  The
    * AddCameraToPath() method adds the view defined by the current camera
@@ -106,18 +106,21 @@ public:
    * resets the interpolated path to its initial, empty configuration.
    */
   void AddCameraToPath();
-  void AnimatePath(vtkRenderWindowInteractor *rwi);
+  void AnimatePath(vtkRenderWindowInteractor* rwi);
   void InitializePath();
-  //@}
+  ///@}
 
   /**
    * Satisfy the superclasses' API.
    */
   void BuildRepresentation() override;
   void GetSize(double size[2]) override
-    {size[0]=6.0; size[1]=2.0;}
+  {
+    size[0] = 6.0;
+    size[1] = 2.0;
+  }
 
-  //@{
+  ///@{
   /**
    * These methods are necessary to make this representation behave as
    * a vtkProp.
@@ -128,25 +131,25 @@ public:
   int RenderOpaqueGeometry(vtkViewport*) override;
   int RenderTranslucentPolygonalGeometry(vtkViewport*) override;
   vtkTypeBool HasTranslucentPolygonalGeometry() override;
-  //@}
+  ///@}
 
 protected:
   vtkCameraRepresentation();
   ~vtkCameraRepresentation() override;
 
   // the camera and the interpolator
-  vtkCamera             *Camera;
-  vtkCameraInterpolator *Interpolator;
-  int                   NumberOfFrames;
-  double                CurrentTime;
+  vtkCamera* Camera;
+  vtkCameraInterpolator* Interpolator;
+  int NumberOfFrames;
+  double CurrentTime;
 
   // representation of the camera
-  vtkPoints                  *Points;
-  vtkPolyData                *PolyData;
-  vtkTransformPolyDataFilter *TransformFilter;
-  vtkPolyDataMapper2D        *Mapper;
-  vtkProperty2D              *Property;
-  vtkActor2D                 *Actor;
+  vtkPoints* Points;
+  vtkPolyData* PolyData;
+  vtkTransformPolyDataFilter* TransformFilter;
+  vtkPolyDataMapper2D* Mapper;
+  vtkProperty2D* Property;
+  vtkActor2D* Actor;
 
 private:
   vtkCameraRepresentation(const vtkCameraRepresentation&) = delete;

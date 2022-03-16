@@ -20,17 +20,16 @@
 
 #include "vtkQtTableView.h"
 
-#include "vtkSphereSource.h"
 #include "vtkDataObjectToTable.h"
-#include "vtkTable.h"
 #include "vtkSmartPointer.h"
+#include "vtkSphereSource.h"
+#include "vtkTable.h"
 
-#include <QWidget>
 #include <QApplication>
 #include <QTimer>
+#include <QWidget>
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 int TestVtkQtTableView(int argc, char* argv[])
 {
@@ -53,6 +52,5 @@ int TestVtkQtTableView(int argc, char* argv[])
 
   // Start the Qt event loop to run the application
   QTimer::singleShot(500, &app, SLOT(quit()));
-  return app.exec();
+  return QApplication::exec();
 }
-

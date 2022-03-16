@@ -45,34 +45,34 @@
 #ifndef vtkSVGExporter_h
 #define vtkSVGExporter_h
 
-#include "vtkIOExportModule.h" // For export macro
 #include "vtkExporter.h"
+#include "vtkIOExportModule.h" // For export macro
 
 class vtkContextActor;
 class vtkRenderer;
 class vtkSVGContextDevice2D;
 class vtkXMLDataElement;
 
-class VTKIOEXPORT_EXPORT vtkSVGExporter: public vtkExporter
+class VTKIOEXPORT_EXPORT vtkSVGExporter : public vtkExporter
 {
 public:
   static vtkSVGExporter* New();
-  vtkTypeMacro(vtkSVGExporter, vtkExporter)
-  void PrintSelf(ostream &os, vtkIndent indent) override;
+  vtkTypeMacro(vtkSVGExporter, vtkExporter);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /** The title of the exported document. @{ */
-  vtkSetStringMacro(Title)
-  vtkGetStringMacro(Title)
+  vtkSetStringMacro(Title);
+  vtkGetStringMacro(Title);
   /** @} */
 
   /** A description of the exported document. @{ */
-  vtkSetStringMacro(Description)
-  vtkGetStringMacro(Description)
+  vtkSetStringMacro(Description);
+  vtkGetStringMacro(Description);
   /** @} */
 
   /** The name of the exported file. @{ */
-  vtkSetStringMacro(FileName)
-  vtkGetStringMacro(FileName)
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
   /** @} */
 
   /**
@@ -90,9 +90,9 @@ public:
    *
    * @{
    */
-  vtkSetMacro(TextAsPath, bool)
-  vtkGetMacro(TextAsPath, bool)
-  vtkBooleanMacro(TextAsPath, bool)
+  vtkSetMacro(TextAsPath, bool);
+  vtkGetMacro(TextAsPath, bool);
+  vtkBooleanMacro(TextAsPath, bool);
   /**@}*/
 
   /**
@@ -100,9 +100,9 @@ public:
    * is true.
    * @{
    */
-  vtkSetMacro(DrawBackground, bool)
-  vtkGetMacro(DrawBackground, bool)
-  vtkBooleanMacro(DrawBackground, bool)
+  vtkSetMacro(DrawBackground, bool);
+  vtkGetMacro(DrawBackground, bool);
+  vtkBooleanMacro(DrawBackground, bool);
   /**@}*/
 
   /**
@@ -120,8 +120,8 @@ public:
    *
    * @{
    */
-  vtkSetMacro(SubdivisionThreshold, float)
-  vtkGetMacro(SubdivisionThreshold, float)
+  vtkSetMacro(SubdivisionThreshold, float);
+  vtkGetMacro(SubdivisionThreshold, float);
   /**@}*/
 
 protected:
@@ -133,18 +133,17 @@ protected:
   void WriteSVG();
   void PrepareDocument();
   void RenderContextActors();
-  void RenderBackground(vtkRenderer *ren);
-  void RenderContextActor(vtkContextActor *actor,
-                          vtkRenderer *renderer);
+  void RenderBackground(vtkRenderer* ren);
+  void RenderContextActor(vtkContextActor* actor, vtkRenderer* renderer);
 
-  char *Title;
-  char *Description;
-  char *FileName;
+  char* Title;
+  char* Description;
+  char* FileName;
 
-  vtkSVGContextDevice2D *Device;
-  vtkXMLDataElement *RootNode;
-  vtkXMLDataElement *PageNode;
-  vtkXMLDataElement *DefinitionNode;
+  vtkSVGContextDevice2D* Device;
+  vtkXMLDataElement* RootNode;
+  vtkXMLDataElement* PageNode;
+  vtkXMLDataElement* DefinitionNode;
 
   float SubdivisionThreshold;
   bool DrawBackground;

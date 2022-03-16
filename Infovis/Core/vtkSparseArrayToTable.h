@@ -36,7 +36,7 @@
  *
  * @par Thanks:
  * Developed by Timothy M. Shead (tshead@sandia.gov) at Sandia National Laboratories.
-*/
+ */
 
 #ifndef vtkSparseArrayToTable_h
 #define vtkSparseArrayToTable_h
@@ -51,14 +51,14 @@ public:
   vtkTypeMacro(vtkSparseArrayToTable, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Specify the name of the output table column that contains array values.
    * Default: "value"
    */
   vtkGetStringMacro(ValueColumn);
   vtkSetStringMacro(ValueColumn);
-  //@}
+  ///@}
 
 protected:
   vtkSparseArrayToTable();
@@ -66,10 +66,7 @@ protected:
 
   int FillInputPortInformation(int, vtkInformation*) override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   char* ValueColumn;
 
@@ -79,4 +76,3 @@ private:
 };
 
 #endif
-

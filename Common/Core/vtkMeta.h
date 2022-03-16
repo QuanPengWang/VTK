@@ -20,15 +20,18 @@
 #include <utility>
 
 /**
- * @file vtkMeta
+ * @file vtkMeta.h
  * This file contains a variety of metaprogramming constructs for working
  * with vtk types.
  */
 
 // Forward decs for StripPointers:
-template <typename ArrayType> class vtkNew;
-template <typename ArrayType> class vtkSmartPointer;
-template <typename ArrayType> class vtkWeakPointer;
+template <typename ArrayType>
+class vtkNew;
+template <typename ArrayType>
+class vtkSmartPointer;
+template <typename ArrayType>
+class vtkWeakPointer;
 
 namespace vtk
 {

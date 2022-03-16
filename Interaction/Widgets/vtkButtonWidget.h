@@ -50,16 +50,16 @@
  *   vtkCommand::StateChangedEvent (on vtkWidgetEvent::EndSelect)
  * </pre>
  *
-*/
+ */
 
 #ifndef vtkButtonWidget_h
 #define vtkButtonWidget_h
 
-#include "vtkInteractionWidgetsModule.h" // For export macro
 #include "vtkAbstractWidget.h"
+#include "vtkDeprecation.h"              // For VTK_DEPRECATED_IN_9_2_0
+#include "vtkInteractionWidgetsModule.h" // For export macro
 
 class vtkButtonRepresentation;
-
 
 class VTKINTERACTIONWIDGETS_EXPORT vtkButtonWidget : public vtkAbstractWidget
 {
@@ -67,29 +67,33 @@ public:
   /**
    * Instantiate the class.
    */
-  static vtkButtonWidget *New();
+  static vtkButtonWidget* New();
 
-  //@{
+  ///@{
   /**
    * Standard macros.
    */
-  vtkTypeMacro(vtkButtonWidget,vtkAbstractWidget);
+  vtkTypeMacro(vtkButtonWidget, vtkAbstractWidget);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
   /**
    * Specify an instance of vtkWidgetRepresentation used to represent this
    * widget in the scene. Note that the representation is a subclass of vtkProp
    * so it can be added to the renderer independent of the widget.
    */
-  void SetRepresentation(vtkButtonRepresentation *r)
-    {this->Superclass::SetWidgetRepresentation(reinterpret_cast<vtkWidgetRepresentation*>(r));}
+  void SetRepresentation(vtkButtonRepresentation* r)
+  {
+    this->Superclass::SetWidgetRepresentation(reinterpret_cast<vtkWidgetRepresentation*>(r));
+  }
 
   /**
    * Return the representation as a vtkButtonRepresentation.
    */
-  vtkButtonRepresentation *GetSliderRepresentation()
-    {return reinterpret_cast<vtkButtonRepresentation*>(this->WidgetRep);}
+  vtkButtonRepresentation* GetSliderRepresentation()
+  {
+    return reinterpret_cast<vtkButtonRepresentation*>(this->WidgetRep);
+  }
 
   /**
    * Create the default widget representation if one is not set.
@@ -107,7 +111,7 @@ public:
 
 protected:
   vtkButtonWidget();
-  ~vtkButtonWidget() override {}
+  ~vtkButtonWidget() override = default;
 
   // These are the events that are handled
   static void SelectAction(vtkAbstractWidget*);
@@ -116,12 +120,16 @@ protected:
 
   // Manage the state of the widget
   int WidgetState;
-  enum _WidgetState
+  enum WidgetStateType
   {
-    Start=0,
+    Start = 0,
     Hovering,
     Selecting
   };
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_DEPRECATED_IN_9_2_0("because leading underscore is reserved")
+  typedef WidgetStateType _WidgetState;
+#endif
 
 private:
   vtkButtonWidget(const vtkButtonWidget&) = delete;

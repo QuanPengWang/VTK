@@ -25,16 +25,14 @@
 
 #include <cassert>
 
-#ifndef __VTK_WRAP__
-
 namespace vtk
 {
 
 // Pass these to vtk::Range(cds, options):
 enum class CompositeDataSetOptions : unsigned int
 {
-  None =           0,
-  SkipEmptyNodes = 1 << 1  // Skip null datasets.
+  None = 0,
+  SkipEmptyNodes = 1 << 1 // Skip null datasets.
 };
 
 } // end namespace vtk (for bitflag op definition)
@@ -51,24 +49,17 @@ struct CompositeDataSetRange;
 struct CompositeDataSetIterator;
 
 using CompositeDataSetIteratorReference =
-    vtk::CompositeDataSetNodeReference<vtkCompositeDataIterator,
-                                       CompositeDataSetIterator>;
+  vtk::CompositeDataSetNodeReference<vtkCompositeDataIterator, CompositeDataSetIterator>;
 
 //------------------------------------------------------------------------------
 // vtkCompositeDataSet iterator. Returns vtk::CompositeDataSetNodeReference.
-struct CompositeDataSetIterator :
-    public std::iterator<std::forward_iterator_tag,
-                         vtkDataObject*,
-                         int,
-                         CompositeDataSetIteratorReference,
-                         CompositeDataSetIteratorReference>
+struct CompositeDataSetIterator
+  : public std::iterator<std::forward_iterator_tag, vtkDataObject*, int,
+      CompositeDataSetIteratorReference, CompositeDataSetIteratorReference>
 {
 private:
-  using Superclass = std::iterator<std::forward_iterator_tag,
-                                   vtkDataObject*,
-                                   int,
-                                   CompositeDataSetIteratorReference,
-                                   CompositeDataSetIteratorReference>;
+  using Superclass = std::iterator<std::forward_iterator_tag, vtkDataObject*, int,
+    CompositeDataSetIteratorReference, CompositeDataSetIteratorReference>;
   using InternalIterator = vtkCompositeDataIterator;
   using SmartIterator = vtkSmartPointer<InternalIterator>;
 
@@ -80,8 +71,7 @@ public:
   using reference = typename Superclass::reference;
 
   CompositeDataSetIterator(const CompositeDataSetIterator& o)
-    : Iterator(o.Iterator ? SmartIterator::Take(o.Iterator->NewInstance())
-                          : nullptr)
+    : Iterator(o.Iterator ? SmartIterator::Take(o.Iterator->NewInstance()) : nullptr)
   {
     this->CopyState(o.Iterator);
   }
@@ -90,8 +80,7 @@ public:
 
   CompositeDataSetIterator& operator=(const CompositeDataSetIterator& o)
   {
-    this->Iterator = o.Iterator ? SmartIterator::Take(o.Iterator->NewInstance())
-                                : nullptr;
+    this->Iterator = o.Iterator ? SmartIterator::Take(o.Iterator->NewInstance()) : nullptr;
     this->CopyState(o.Iterator);
     return *this;
   }
@@ -109,22 +98,15 @@ public:
     return other;
   }
 
-  reference operator*() const
-  {
-    return this->GetData();
-  }
+  reference operator*() const { return this->GetData(); }
 
-  pointer operator->() const
-  {
-    return this->GetData();
-  }
+  pointer operator->() const { return this->GetData(); }
 
-  friend bool operator==(const CompositeDataSetIterator& lhs,
-                         const CompositeDataSetIterator& rhs)
+  friend bool operator==(const CompositeDataSetIterator& lhs, const CompositeDataSetIterator& rhs)
   {
     // A null internal iterator means it is an 'end' sentinal.
-    InternalIterator *l = lhs.Iterator;
-    InternalIterator *r = rhs.Iterator;
+    InternalIterator* l = lhs.Iterator;
+    InternalIterator* r = rhs.Iterator;
 
     if (!r && !l)
     { // end == end
@@ -144,14 +126,12 @@ public:
     }
   }
 
-  friend bool operator!=(const CompositeDataSetIterator& lhs,
-                         const CompositeDataSetIterator& rhs)
+  friend bool operator!=(const CompositeDataSetIterator& lhs, const CompositeDataSetIterator& rhs)
   {
     return !(lhs == rhs); // let the compiler handle this one =)
   }
 
-  friend void swap(CompositeDataSetIterator& lhs,
-                   CompositeDataSetIterator& rhs) noexcept
+  friend void swap(CompositeDataSetIterator& lhs, CompositeDataSetIterator& rhs) noexcept
   {
     using std::swap;
     swap(lhs.Iterator, rhs.Iterator);
@@ -162,17 +142,20 @@ public:
 protected:
   // Note: This takes ownership of iter and manages its lifetime.
   // Iter should not be used past this point by the caller.
-  CompositeDataSetIterator(SmartIterator &&iter) noexcept
+  CompositeDataSetIterator(SmartIterator&& iter) noexcept
     : Iterator(std::move(iter))
   {
   }
 
   // Note: Iterators constructed using this ctor will be considered
   // 'end' iterators via a sentinal pattern.
-  CompositeDataSetIterator() noexcept : Iterator(nullptr) {}
+  CompositeDataSetIterator() noexcept
+    : Iterator(nullptr)
+  {
+  }
 
 private:
-  void CopyState(InternalIterator *source)
+  void CopyState(InternalIterator* source)
   {
     if (source)
     {
@@ -180,6 +163,10 @@ private:
       this->Iterator->SetDataSet(source->GetDataSet());
       this->Iterator->SetSkipEmptyNodes(source->GetSkipEmptyNodes());
       this->Iterator->InitTraversal();
+      // XXX(empty iteration): This assert fires for some iterator
+      // implementations if iterating over an empty dataset (because in this
+      // case, `begin() == end()`. This assert needs work.
+      // assert(!source->IsDoneWithTraversal());
       this->AdvanceTo(source->GetCurrentFlatIndex());
     }
   }
@@ -205,7 +192,7 @@ private:
   {
     assert(this->Iterator != nullptr);
     assert(!this->Iterator->IsDoneWithTraversal());
-    return CompositeDataSetIteratorReference{this->Iterator};
+    return CompositeDataSetIteratorReference{ this->Iterator };
   }
 
   mutable SmartIterator Iterator;
@@ -229,23 +216,17 @@ public:
   using const_reference = const CompositeDataSetIteratorReference;
   using value_type = vtkDataObject*;
 
-  CompositeDataSetRange(vtkCompositeDataSet *cds,
-                        CompositeDataSetOptions opts = CompositeDataSetOptions::None)
+  CompositeDataSetRange(
+    vtkCompositeDataSet* cds, CompositeDataSetOptions opts = CompositeDataSetOptions::None)
     : CompositeDataSet(cds)
     , Options(opts)
   {
     assert(this->CompositeDataSet);
   }
 
-  vtkCompositeDataSet* GetCompositeDataSet() const noexcept
-  {
-    return this->CompositeDataSet;
-  }
+  vtkCompositeDataSet* GetCompositeDataSet() const noexcept { return this->CompositeDataSet; }
 
-  CompositeDataSetOptions GetOptions() const noexcept
-  {
-    return this->Options;
-  }
+  CompositeDataSetOptions GetOptions() const noexcept { return this->Options; }
 
   // This is O(N), since the size requires traversal due to various options.
   size_type size() const
@@ -261,27 +242,15 @@ public:
     return result;
   }
 
-  iterator begin() const
-  {
-    return CompositeDataSetIterator{this->NewIterator()};
-  }
+  iterator begin() const { return CompositeDataSetIterator{ this->NewIterator() }; }
 
-  iterator end() const
-  {
-    return CompositeDataSetIterator{};
-  }
+  iterator end() const { return CompositeDataSetIterator{}; }
 
   // Note: These return mutable objects because const vtkObject are unusable.
-  const_iterator cbegin() const
-  {
-    return CompositeDataSetIterator{this->NewIterator()};
-  }
+  const_iterator cbegin() const { return CompositeDataSetIterator{ this->NewIterator() }; }
 
   // Note: These return mutable objects because const vtkObjects are unusable.
-  const_iterator cend() const
-  {
-    return CompositeDataSetIterator{};
-  }
+  const_iterator cend() const { return CompositeDataSetIterator{}; }
 
 private:
   SmartIterator NewIterator() const
@@ -300,8 +269,6 @@ private:
 
 }
 } // end namespace vtk::detail
-
-#endif // __VTK_WRAP__
 
 #endif // vtkCompositeDataSetRange_h
 

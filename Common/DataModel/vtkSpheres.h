@@ -27,7 +27,7 @@
  *
  * @sa
  * vtkPlanes vtkImplicitBoolean
-*/
+ */
 
 #ifndef vtkSpheres_h
 #define vtkSpheres_h
@@ -42,23 +42,23 @@ class vtkDataArray;
 class VTKCOMMONDATAMODEL_EXPORT vtkSpheres : public vtkImplicitFunction
 {
 public:
-  //@{
+  ///@{
   /**
    * Standard methods for instantiation, type information, and printing.
    */
-  static vtkSpheres *New();
-  vtkTypeMacro(vtkSpheres,vtkImplicitFunction);
+  static vtkSpheres* New();
+  vtkTypeMacro(vtkSpheres, vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Evaluate spheres equations. Return largest value when evaluating all
    * sphere equations.
    */
   using vtkImplicitFunction::EvaluateFunction;
   double EvaluateFunction(double x[3]) override;
-  //@}
+  ///@}
 
   /**
    * Evaluate spheres gradient. Gradients point towards the outside of the
@@ -66,22 +66,22 @@ public:
    */
   void EvaluateGradient(double x[3], double n[3]) override;
 
-  //@{
+  ///@{
   /**
    * Specify a list of points defining sphere centers.
    */
   virtual void SetCenters(vtkPoints*);
-  vtkGetObjectMacro(Centers,vtkPoints);
-  //@}
+  vtkGetObjectMacro(Centers, vtkPoints);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify a list of radii for the spheres. There is a one-to-one
    * correspondence between sphere points and sphere radii.
    */
   void SetRadii(vtkDataArray* radii);
-  vtkGetObjectMacro(Radii,vtkDataArray);
-  //@}
+  vtkGetObjectMacro(Radii, vtkDataArray);
+  ///@}
 
   /**
    * Return the number of spheres in the set of spheres.
@@ -94,22 +94,22 @@ public:
    * nullptr.  This method always returns the same object.  Alternatively use
    * GetSphere(int i, vtkSphere *sphere) to update a user supplied sphere.
    */
-  vtkSphere *GetSphere(int i);
+  vtkSphere* GetSphere(int i);
 
   /**
    * If i is within the allowable range, mutates the given sphere's
    * Center and Radius to match the vtkSphere object at the ith
    * position. Does nothing if i is outside the allowable range.
    */
-  void GetSphere(int i, vtkSphere *sphere);
+  void GetSphere(int i, vtkSphere* sphere);
 
 protected:
   vtkSpheres();
   ~vtkSpheres() override;
 
-  vtkPoints *Centers;
-  vtkDataArray *Radii;
-  vtkSphere *Sphere;
+  vtkPoints* Centers;
+  vtkDataArray* Radii;
+  vtkSphere* Sphere;
 
 private:
   vtkSpheres(const vtkSpheres&) = delete;

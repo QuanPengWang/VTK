@@ -32,7 +32,7 @@
  *    'connect' the vertices in the selection set by computing the
  *    shortest path between the vertices (if such a path exists)
  * Note: IncludeShortestPaths is currently non-functional
-*/
+ */
 
 #ifndef vtkExpandSelectedGraph_h
 #define vtkExpandSelectedGraph_h
@@ -47,7 +47,7 @@ class VTKINFOVISCORE_EXPORT vtkExpandSelectedGraph : public vtkSelectionAlgorith
 {
 public:
   static vtkExpandSelectedGraph* New();
-  vtkTypeMacro(vtkExpandSelectedGraph,vtkSelectionAlgorithm);
+  vtkTypeMacro(vtkExpandSelectedGraph, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -60,16 +60,16 @@ public:
    */
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get BFSDistance which controls how many 'hops' the selection
    * is grown from each seed point in the selection set (defaults to 1)
    */
   vtkSetMacro(BFSDistance, int);
   vtkGetMacro(BFSDistance, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get IncludeShortestPaths controls whether this filter tries to
    * 'connect' the vertices in the selection set by computing the
@@ -79,17 +79,17 @@ public:
   vtkSetMacro(IncludeShortestPaths, bool);
   vtkGetMacro(IncludeShortestPaths, bool);
   vtkBooleanMacro(IncludeShortestPaths, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the vertex domain to use in the expansion.
    */
   vtkSetStringMacro(Domain);
   vtkGetStringMacro(Domain);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether or not to use the domain when deciding to add a vertex to the
    * expansion. Defaults to false.
@@ -97,18 +97,15 @@ public:
   vtkSetMacro(UseDomain, bool);
   vtkGetMacro(UseDomain, bool);
   vtkBooleanMacro(UseDomain, bool);
-  //@}
+  ///@}
 
 protected:
   vtkExpandSelectedGraph();
   ~vtkExpandSelectedGraph() override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  void Expand(vtkIdTypeArray*,vtkGraph*);
+  void Expand(vtkIdTypeArray*, vtkGraph*);
 
   int BFSDistance;
   bool IncludeShortestPaths;
@@ -119,9 +116,7 @@ private:
   vtkExpandSelectedGraph(const vtkExpandSelectedGraph&) = delete;
   void operator=(const vtkExpandSelectedGraph&) = delete;
 
-  void BFSExpandSelection(vtkIdTypeArray *selection,
-                          vtkGraph *graph);
+  void BFSExpandSelection(vtkIdTypeArray* selection, vtkGraph* graph);
 };
 
 #endif
-

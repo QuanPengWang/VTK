@@ -19,14 +19,13 @@
  * Writes debug/warning/error output to a log file instead of the console.
  * To use this class, instantiate it and then call SetInstance(this).
  *
-*/
+ */
 
 #ifndef vtkFileOutputWindow_h
 #define vtkFileOutputWindow_h
 
 #include "vtkCommonCoreModule.h" // For export macro
 #include "vtkOutputWindow.h"
-
 
 class VTKCOMMONCORE_EXPORT vtkFileOutputWindow : public vtkOutputWindow
 {
@@ -43,15 +42,15 @@ public:
    */
   void DisplayText(const char*) override;
 
-  //@{
+  ///@{
   /**
    * Sets the name for the log file.
    */
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
-  //@}
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Turns on buffer flushing for the output
    * to the log file.
@@ -59,9 +58,9 @@ public:
   vtkSetMacro(Flush, vtkTypeBool);
   vtkGetMacro(Flush, vtkTypeBool);
   vtkBooleanMacro(Flush, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Setting append will cause the log file to be
    * opened in append mode.  Otherwise, if the log file exists,
@@ -71,7 +70,7 @@ public:
   vtkSetMacro(Append, vtkTypeBool);
   vtkGetMacro(Append, vtkTypeBool);
   vtkBooleanMacro(Append, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkFileOutputWindow();
@@ -79,7 +78,7 @@ protected:
   void Initialize();
 
   char* FileName;
-  ofstream* OStream;
+  ostream* OStream;
   vtkTypeBool Flush;
   vtkTypeBool Append;
 
@@ -87,6 +86,5 @@ private:
   vtkFileOutputWindow(const vtkFileOutputWindow&) = delete;
   void operator=(const vtkFileOutputWindow&) = delete;
 };
-
 
 #endif

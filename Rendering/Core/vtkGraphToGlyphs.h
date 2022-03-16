@@ -28,14 +28,14 @@
  * The glyphs will automatically be scaled to be the same size in screen
  * coordinates. To do this the filter requires a pointer to the renderer
  * into which the glyphs will be rendered.
-*/
+ */
 
 #ifndef vtkGraphToGlyphs_h
 #define vtkGraphToGlyphs_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkSmartPointer.h" // for SP ivars
+#include "vtkRenderingCoreModule.h" // For export macro
+#include "vtkSmartPointer.h"        // for SP ivars
 
 class vtkDistanceToCamera;
 class vtkGraphToPoints;
@@ -47,7 +47,7 @@ class vtkSphereSource;
 class VTKRENDERINGCORE_EXPORT vtkGraphToGlyphs : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkGraphToGlyphs *New();
+  static vtkGraphToGlyphs* New();
   vtkTypeMacro(vtkGraphToGlyphs, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -64,7 +64,7 @@ public:
     SPHERE
   };
 
-  //@{
+  ///@{
   /**
    * The glyph type, specified as one of the enumerated values in this
    * class. VERTEX is a special glyph that cannot be scaled, but instead
@@ -73,18 +73,18 @@ public:
    */
   vtkSetMacro(GlyphType, int);
   vtkGetMacro(GlyphType, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether to fill the glyph, or to just render the outline.
    */
   vtkSetMacro(Filled, bool);
   vtkGetMacro(Filled, bool);
   vtkBooleanMacro(Filled, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the desired screen size of each glyph. If you are using scaling,
    * this will be the size of the glyph when rendering an object with
@@ -92,24 +92,24 @@ public:
    */
   vtkSetMacro(ScreenSize, double);
   vtkGetMacro(ScreenSize, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The renderer in which the glyphs will be placed.
    */
   virtual void SetRenderer(vtkRenderer* ren);
   virtual vtkRenderer* GetRenderer();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Whether to use the input array to process in order to scale the
    * vertices.
    */
   virtual void SetScaling(bool b);
   virtual bool GetScaling();
-  //@}
+  ///@}
 
   /**
    * The modified time of this filter.
@@ -123,7 +123,7 @@ protected:
   /**
    * Convert the vtkGraph into vtkPolyData.
    */
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Set the input type of the algorithm to vtkGraph.

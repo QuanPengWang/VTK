@@ -28,7 +28,7 @@
  *
  * @sa
  * vtkShrinkPolyData
-*/
+ */
 
 #ifndef vtkShrinkFilter_h
 #define vtkShrinkFilter_h
@@ -39,17 +39,17 @@
 class VTKFILTERSGENERAL_EXPORT vtkShrinkFilter : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkShrinkFilter *New();
-  vtkTypeMacro(vtkShrinkFilter,vtkUnstructuredGridAlgorithm);
+  static vtkShrinkFilter* New();
+  vtkTypeMacro(vtkShrinkFilter, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get/Set the fraction of shrink for each cell. The default is 0.5.
    */
   vtkSetClampMacro(ShrinkFactor, double, 0.0, 1.0);
   vtkGetMacro(ShrinkFactor, double);
-  //@}
+  ///@}
 
 protected:
   vtkShrinkFilter();
@@ -59,9 +59,7 @@ protected:
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
   // Main implementation.
-  int RequestData(vtkInformation*,
-                  vtkInformationVector**,
-                  vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   double ShrinkFactor;
 

@@ -31,7 +31,7 @@
  * vtkPythonInterpreter instance include vtkCommand::EnterEvent,
  * vtkCommand::ExitEvent, vtkCommand::UpdateEvent, vtkCommand::ErrorEvent and
  * vtkCommand::SetOutputEvent.
-*/
+ */
 
 #ifndef vtkPythonInteractiveInterpreter_h
 #define vtkPythonInteractiveInterpreter_h
@@ -74,7 +74,7 @@ public:
    */
   int RunStringWithConsoleLocals(const char* script);
 
-  //@{
+  ///@{
   /**
    * Provides access to the internal PyObject instances used for the
    * code.InteractiveConsole() as well as the dictionary for the locals of the
@@ -83,7 +83,7 @@ public:
    */
   void* GetInteractiveConsolePyObject();
   void* GetInteractiveConsoleLocalsPyObject();
-  //@}
+  ///@}
 
 protected:
   vtkPythonInteractiveInterpreter();

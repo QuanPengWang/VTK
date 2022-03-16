@@ -20,7 +20,7 @@
  * and the location of the maximum variable value.
  *  These computed values are available so that they can be used to set the camera
  * for the best view of the plane.
-*/
+ */
 
 #ifndef vtkCutMaterial_h
 #define vtkCutMaterial_h
@@ -34,43 +34,43 @@ class VTKFILTERSPARALLEL_EXPORT vtkCutMaterial : public vtkPolyDataAlgorithm
 {
 public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  vtkTypeMacro(vtkCutMaterial,vtkPolyDataAlgorithm);
-  static vtkCutMaterial *New();
+  vtkTypeMacro(vtkCutMaterial, vtkPolyDataAlgorithm);
+  static vtkCutMaterial* New();
 
-  //@{
+  ///@{
   /**
    * Cell array that contains the material values.
    */
   vtkSetStringMacro(MaterialArrayName);
   vtkGetStringMacro(MaterialArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Material to probe.
    */
   vtkSetMacro(Material, int);
   vtkGetMacro(Material, int);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * For now, we just use the cell values.
    * The array name to cut.
    */
   vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The last piece of information that specifies the plane.
    */
   vtkSetVector3Macro(UpVector, double);
   vtkGetVector3Macro(UpVector, double);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Accesses to the values computed during the execute method.  They
    * could be used to get a good camera view for the resulting plane.
@@ -78,26 +78,27 @@ public:
   vtkGetVector3Macro(MaximumPoint, double);
   vtkGetVector3Macro(CenterPoint, double);
   vtkGetVector3Macro(Normal, double);
-  //@}
+  ///@}
 
 protected:
   vtkCutMaterial();
   ~vtkCutMaterial() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override; //generate output data
-  int FillInputPortInformation(int port, vtkInformation *info) override;
-  void ComputeMaximumPoint(vtkDataSet *input);
+  int RequestData(vtkInformation*, vtkInformationVector**,
+    vtkInformationVector*) override; // generate output data
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  void ComputeMaximumPoint(vtkDataSet* input);
   void ComputeNormal();
 
-  char *MaterialArrayName;
+  char* MaterialArrayName;
   int Material;
-  char *ArrayName;
+  char* ArrayName;
   double UpVector[3];
   double MaximumPoint[3];
   double CenterPoint[3];
   double Normal[3];
 
-  vtkPlane *PlaneFunction;
+  vtkPlane* PlaneFunction;
 
 private:
   vtkCutMaterial(const vtkCutMaterial&) = delete;

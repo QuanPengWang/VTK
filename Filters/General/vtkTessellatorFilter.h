@@ -28,7 +28,7 @@ statement of authorship are reproduced on all copies.
  * tesselates each cell and uses the vtkStreamingTessellator and
  * vtkDataSetEdgeSubdivisionCriterion classes to generate simplices that
  * approximate the nonlinear mesh using some approximation metric (encoded
- * in the particular vtkDataSetEdgeSubdivisionCriterion::EvaluateEdge
+ * in the particular vtkDataSetEdgeSubdivisionCriterion::EvaluateLocationAndFields
  * implementation). The simplices are placed into the filter's output
  * vtkDataSet object by the callback routines AddATetrahedron,
  * AddATriangle, and AddALine, which are registered with the triangulator.
@@ -51,7 +51,7 @@ statement of authorship are reproduced on all copies.
  * @sa
  * vtkDataSetToUnstructuredGridFilter vtkDataSet vtkStreamingTessellator
  * vtkDataSetEdgeSubdivisionCriterion
-*/
+ */
 
 #include "vtkFiltersGeneralModule.h" // For export macro
 #include "vtkUnstructuredGridAlgorithm.h"
@@ -68,20 +68,20 @@ class vtkUnstructuredGrid;
 class VTKFILTERSGENERAL_EXPORT vtkTessellatorFilter : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeMacro(vtkTessellatorFilter,vtkUnstructuredGridAlgorithm);
-  void PrintSelf( ostream& os, vtkIndent indent ) override;
+  vtkTypeMacro(vtkTessellatorFilter, vtkUnstructuredGridAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkTessellatorFilter* New();
 
-  virtual void SetTessellator( vtkStreamingTessellator* );
+  virtual void SetTessellator(vtkStreamingTessellator*);
   vtkGetObjectMacro(Tessellator, vtkStreamingTessellator);
 
-  virtual void SetSubdivider( vtkDataSetEdgeSubdivisionCriterion* );
+  virtual void SetSubdivider(vtkDataSetEdgeSubdivisionCriterion*);
   vtkGetObjectMacro(Subdivider, vtkDataSetEdgeSubdivisionCriterion);
 
   vtkMTimeType GetMTime() override;
 
-  //@{
+  ///@{
   /**
    * Set the dimension of the output tessellation.
    * Cells in dimensions higher than the given value will have
@@ -90,43 +90,43 @@ public:
    * quadrilateral faces would be tessellated rather than its
    * interior.
    */
-  vtkSetClampMacro(OutputDimension,int,1,3);
-  vtkGetMacro(OutputDimension,int);
-  //@}
+  vtkSetClampMacro(OutputDimension, int, 1, 3);
+  vtkGetMacro(OutputDimension, int);
+  ///@}
 
   int GetOutputDimension() const;
 
-  //@{
+  ///@{
   /**
    * These are convenience routines for setting properties maintained by the
    * tessellator and subdivider. They are implemented here for ParaView's
    * sake.
    */
-  virtual void SetMaximumNumberOfSubdivisions( int num_subdiv_in );
+  virtual void SetMaximumNumberOfSubdivisions(int num_subdiv_in);
   int GetMaximumNumberOfSubdivisions();
-  virtual void SetChordError( double ce );
+  virtual void SetChordError(double ce);
   double GetChordError();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * These methods are for the ParaView client.
    */
   virtual void ResetFieldCriteria();
-  virtual void SetFieldCriterion( int field, double chord );
-  //@}
+  virtual void SetFieldCriterion(int field, double err);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The adaptive tessellation will output vertices that are not shared
    * among cells, even where they should be. This can be corrected to
    * some extents with a vtkMergeFilter.
    * By default, the filter is off and vertices will not be shared.
    */
-  vtkGetMacro(MergePoints,vtkTypeBool);
-  vtkSetMacro(MergePoints,vtkTypeBool);
-  vtkBooleanMacro(MergePoints,vtkTypeBool);
-  //@}
+  vtkGetMacro(MergePoints, vtkTypeBool);
+  vtkSetMacro(MergePoints, vtkTypeBool);
+  vtkBooleanMacro(MergePoints, vtkTypeBool);
+  ///@}
 
 protected:
   vtkTessellatorFilter();
@@ -139,12 +139,12 @@ protected:
    * the per-primitive output functions (OutputLine, OutputTriangle, and
    * maybe one day... OutputTetrahedron).
    */
-  void SetupOutput( vtkDataSet* input, vtkUnstructuredGrid* output );
+  void SetupOutput(vtkDataSet* input, vtkUnstructuredGrid* output);
 
   /**
    * Called by RequestData to merge output points.
    */
-  void MergeOutputPoints( vtkUnstructuredGrid* input, vtkUnstructuredGrid* output );
+  void MergeOutputPoints(vtkUnstructuredGrid* input, vtkUnstructuredGrid* output);
 
   /**
    * Reset the temporary variables used during the filter's RequestData() method.
@@ -154,9 +154,8 @@ protected:
   /**
    * Run the filter; produce a polygonal approximation to the grid.
    */
-  int RequestData(vtkInformation* request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   vtkStreamingTessellator* Tessellator;
   vtkDataSetEdgeSubdivisionCriterion* Subdivider;
@@ -164,7 +163,7 @@ protected:
   vtkTypeBool MergePoints;
   vtkPointLocator* Locator;
 
-  //@{
+  ///@{
   /**
    * These member variables are set by SetupOutput for use inside the
    * callback members OutputLine and OutputTriangle.
@@ -173,41 +172,23 @@ protected:
   vtkPoints* OutputPoints;
   vtkDataArray** OutputAttributes;
   int* OutputAttributeIndices;
-  //@}
+  ///@}
 
-  static void AddAPoint( const double*,
-                         vtkEdgeSubdivisionCriterion*,
-                         void*,
-                         const void* );
-  static void AddALine( const double*,
-                        const double*,
-                        vtkEdgeSubdivisionCriterion*,
-                        void*,
-                        const void* );
-  static void AddATriangle( const double*,
-                            const double*,
-                            const double*,
-                            vtkEdgeSubdivisionCriterion*,
-                            void*,
-                            const void* );
-  static void AddATetrahedron( const double*,
-                               const double*,
-                               const double*,
-                               const double*,
-                               vtkEdgeSubdivisionCriterion*,
-                               void*,
-                               const void* );
-  void OutputPoint( const double* );
-  void OutputLine( const double*, const double* );
-  void OutputTriangle( const double*, const double*, const double* );
-  void OutputTetrahedron( const double*,
-                          const double*,
-                          const double*,
-                          const double* );
+  static void AddAPoint(const double*, vtkEdgeSubdivisionCriterion*, void*, const void*);
+  static void AddALine(
+    const double*, const double*, vtkEdgeSubdivisionCriterion*, void*, const void*);
+  static void AddATriangle(
+    const double*, const double*, const double*, vtkEdgeSubdivisionCriterion*, void*, const void*);
+  static void AddATetrahedron(const double*, const double*, const double*, const double*,
+    vtkEdgeSubdivisionCriterion*, void*, const void*);
+  void OutputPoint(const double*);
+  void OutputLine(const double*, const double*);
+  void OutputTriangle(const double*, const double*, const double*);
+  void OutputTetrahedron(const double*, const double*, const double*, const double*);
 
 private:
-  vtkTessellatorFilter( const vtkTessellatorFilter& ) = delete;
-  void operator = ( const vtkTessellatorFilter& ) = delete;
+  vtkTessellatorFilter(const vtkTessellatorFilter&) = delete;
+  void operator=(const vtkTessellatorFilter&) = delete;
 };
 
 inline int vtkTessellatorFilter::GetOutputDimension() const

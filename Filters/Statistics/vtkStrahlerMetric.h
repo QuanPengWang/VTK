@@ -13,9 +13,9 @@
 
 =========================================================================*/
 //-------------------------------------------------------------------------
-//Copyright 2008 Sandia Corporation.
-//Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
-//the U.S. Government retains certain rights in this software.
+// Copyright 2008 Sandia Corporation.
+// Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+// the U.S. Government retains certain rights in this software.
 //-------------------------------------------------------------------------
 //
 /**
@@ -39,7 +39,7 @@
  * @par Thanks:
  * Thanks to David Duke from the University of Leeds for providing this
  * implementation.
-*/
+ */
 
 #ifndef vtkStrahlerMetric_h
 #define vtkStrahlerMetric_h
@@ -52,20 +52,20 @@ class vtkFloatArray;
 class VTKFILTERSSTATISTICS_EXPORT vtkStrahlerMetric : public vtkTreeAlgorithm
 {
 public:
-  static vtkStrahlerMetric *New();
-  vtkTypeMacro(vtkStrahlerMetric,vtkTreeAlgorithm);
+  static vtkStrahlerMetric* New();
+  vtkTypeMacro(vtkStrahlerMetric, vtkTreeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set the name of the array in which the Strahler values will
    * be stored within the output vertex data.
    * Default is "Strahler"
    */
   vtkSetStringMacro(MetricArrayName);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/get setting of normalize flag.  If this is set, the
    * Strahler values are scaled into the range [0..1].
@@ -74,26 +74,26 @@ public:
   vtkSetMacro(Normalize, vtkTypeBool);
   vtkGetMacro(Normalize, vtkTypeBool);
   vtkBooleanMacro(Normalize, vtkTypeBool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Get the maximum strahler value for the tree.
    */
-  vtkGetMacro(MaxStrahler,float);
-  //@}
+  vtkGetMacro(MaxStrahler, float);
+  ///@}
 
 protected:
   vtkStrahlerMetric();
   ~vtkStrahlerMetric() override;
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkTypeBool Normalize;
   float MaxStrahler;
-  char *MetricArrayName;
+  char* MetricArrayName;
 
-  float CalculateStrahler(vtkIdType root, vtkFloatArray *metric, vtkTree *graph);
+  float CalculateStrahler(vtkIdType root, vtkFloatArray* metric, vtkTree* tree);
 
 private:
   vtkStrahlerMetric(const vtkStrahlerMetric&) = delete;
@@ -101,4 +101,3 @@ private:
 };
 
 #endif
-

@@ -15,7 +15,7 @@
 /**
  * @class   vtkClientSocket
  * @brief   Encapsulates a client socket.
-*/
+ */
 
 #ifndef vtkClientSocket_h
 #define vtkClientSocket_h
@@ -36,7 +36,7 @@ public:
    */
   int ConnectToServer(const char* hostname, int port);
 
-  //@{
+  ///@{
   /**
    * Returns if the socket is on the connecting side (the side that requests a
    * ConnectToServer() or on the connected side (the side that was waiting for
@@ -44,7 +44,7 @@ public:
    * connection.
    */
   vtkGetMacro(ConnectingSide, bool);
-  //@}
+  ///@}
 
 protected:
   vtkClientSocket();
@@ -53,12 +53,10 @@ protected:
   vtkSetMacro(ConnectingSide, bool);
   bool ConnectingSide;
   friend class vtkServerSocket;
+
 private:
   vtkClientSocket(const vtkClientSocket&) = delete;
   void operator=(const vtkClientSocket&) = delete;
-
 };
 
-
 #endif
-

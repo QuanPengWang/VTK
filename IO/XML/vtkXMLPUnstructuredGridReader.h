@@ -24,7 +24,7 @@
  *
  * @sa
  * vtkXMLUnstructuredGridReader
-*/
+ */
 
 #ifndef vtkXMLPUnstructuredGridReader_h
 #define vtkXMLPUnstructuredGridReader_h
@@ -32,22 +32,23 @@
 #include "vtkIOXMLModule.h" // For export macro
 #include "vtkXMLPUnstructuredDataReader.h"
 
+class vtkAbstractArray;
 class vtkUnstructuredGrid;
 
 class VTKIOXML_EXPORT vtkXMLPUnstructuredGridReader : public vtkXMLPUnstructuredDataReader
 {
 public:
-  vtkTypeMacro(vtkXMLPUnstructuredGridReader,vtkXMLPUnstructuredDataReader);
+  vtkTypeMacro(vtkXMLPUnstructuredGridReader, vtkXMLPUnstructuredDataReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  static vtkXMLPUnstructuredGridReader *New();
+  static vtkXMLPUnstructuredGridReader* New();
 
-  //@{
+  ///@{
   /**
    * Get the reader's output.
    */
-  vtkUnstructuredGrid *GetOutput();
-  vtkUnstructuredGrid *GetOutput(int idx);
-  //@}
+  vtkUnstructuredGrid* GetOutput();
+  vtkUnstructuredGrid* GetOutput(int idx);
+  ///@}
 
 protected:
   vtkXMLPUnstructuredGridReader();
@@ -61,7 +62,7 @@ protected:
   void SetupNextPiece() override;
   int ReadPieceData() override;
 
-  void CopyArrayForCells(vtkDataArray* inArray, vtkDataArray* outArray) override;
+  void CopyArrayForCells(vtkAbstractArray* inArray, vtkAbstractArray* outArray) override;
   vtkXMLDataReader* CreatePieceReader() override;
   int FillOutputPortInformation(int, vtkInformation*) override;
 

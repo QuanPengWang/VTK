@@ -4,6 +4,7 @@ set(classes
   vtkDEMReader
   vtkDICOMImageReader
   vtkGESignaReader
+  vtkHDRReader
   vtkImageExport
   vtkImageImport
   vtkImageImportExecutive
@@ -24,6 +25,7 @@ set(classes
   vtkNIFTIImageReader
   vtkNIFTIImageWriter
   vtkNrrdReader
+  vtkOMETIFFReader
   vtkPNGReader
   vtkPNGWriter
   vtkPNMReader
@@ -31,10 +33,16 @@ set(classes
   vtkPostScriptWriter
   vtkSEPReader
   vtkSLCReader
+  vtkTGAReader
   vtkTIFFReader
   vtkTIFFWriter
   vtkVolume16Reader
   vtkVolumeReader)
 
+set(private_headers
+  vtkNIFTIImagePrivate.h
+  vtkTIFFReaderInternal.h)
+
 vtk_module_add_module(VTK::IOImage
+  PRIVATE_HEADERS ${private_headers}
   CLASSES ${classes})

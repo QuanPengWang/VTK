@@ -16,53 +16,52 @@
 
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkXMLDataElement.h"
-#include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformationVector.h"
+#include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLImageDataReader);
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkXMLImageDataReader::vtkXMLImageDataReader() = default;
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkXMLImageDataReader::~vtkXMLImageDataReader() = default;
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkXMLImageDataReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkImageData* vtkXMLImageDataReader::GetOutput()
 {
   return this->GetOutput(0);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 vtkImageData* vtkXMLImageDataReader::GetOutput(int idx)
 {
   return vtkImageData::SafeDownCast(this->GetOutputDataObject(idx));
 }
 
-
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 const char* vtkXMLImageDataReader::GetDataSetName()
 {
   return "ImageData";
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkXMLImageDataReader::SetOutputExtent(int* extent)
 {
   vtkImageData::SafeDownCast(this->GetCurrentOutput())->SetExtent(extent);
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkXMLImageDataReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
 {
   if (!this->Superclass::ReadPrimaryElement(ePrimary))
@@ -103,10 +102,10 @@ int vtkXMLImageDataReader::ReadPrimaryElement(vtkXMLDataElement* ePrimary)
   return 1;
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Note that any changes (add or removing information) made to this method
 // should be replicated in CopyOutputInformation
-void vtkXMLImageDataReader::SetupOutputInformation(vtkInformation *outInfo)
+void vtkXMLImageDataReader::SetupOutputInformation(vtkInformation* outInfo)
 {
   this->Superclass::SetupOutputInformation(outInfo);
 
@@ -115,13 +114,11 @@ void vtkXMLImageDataReader::SetupOutputInformation(vtkInformation *outInfo)
   outInfo->Set(vtkDataObject::DIRECTION(), this->Direction, 9);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkXMLImageDataReader::CopyOutputInformation(vtkInformation *outInfo, int port)
+//------------------------------------------------------------------------------
+void vtkXMLImageDataReader::CopyOutputInformation(vtkInformation* outInfo, int port)
 {
   this->Superclass::CopyOutputInformation(outInfo, port);
-  vtkInformation *localInfo =
-    this->GetExecutive()->GetOutputInformation(port);
+  vtkInformation* localInfo = this->GetExecutive()->GetOutputInformation(port);
   if (localInfo->Has(vtkDataObject::ORIGIN()))
   {
     outInfo->CopyEntry(localInfo, vtkDataObject::ORIGIN());
@@ -136,8 +133,7 @@ void vtkXMLImageDataReader::CopyOutputInformation(vtkInformation *outInfo, int p
   }
 }
 
-
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 int vtkXMLImageDataReader::FillOutputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");

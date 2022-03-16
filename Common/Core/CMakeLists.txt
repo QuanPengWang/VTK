@@ -1,20 +1,20 @@
-# Core configuration options.
-if(CMAKE_SIZEOF_VOID_P GREATER 4)
- set(VTK_USE_64BIT_IDS_DEFAULT ON)
-else()
- set(VTK_USE_64BIT_IDS_DEFAULT OFF)
- set(VTK_USE_64BIT_TIMESTAMPS_DEFAULT OFF)
- option(VTK_USE_64BIT_TIMESTAMPS "Build VTK with 64 bit timestamps"
-  ${VTK_USE_64BIT_TIMESTAMPS_DEFAULT})
-endif()
+include(CMakeDependentOption)
+cmake_dependent_option(VTK_USE_64BIT_TIMESTAMPS "Build VTK with 64 bit timestamps" OFF
+  "NOT CMAKE_SIZEOF_VOID_P GREATER 4" ON)
+mark_as_advanced(VTK_USE_64BIT_TIMESTAMPS)
 
-option(VTK_USE_64BIT_IDS "Build VTK with 64 bit ids"
-  ${VTK_USE_64BIT_IDS_DEFAULT})
+if (CMAKE_SIZEOF_VOID_P GREATER 4)
+ set(vtk_use_64bit_ids_default ON)
+else ()
+ set(vtk_use_64bit_ids_default OFF)
+endif ()
+
+option(VTK_USE_64BIT_IDS "Build VTK with 64 bit ids" "${vtk_use_64bit_ids_default}")
 mark_as_advanced(VTK_USE_64BIT_IDS)
 
 option(VTK_DEBUG_LEAKS "Build leak checking support into VTK." OFF)
 mark_as_advanced(VTK_DEBUG_LEAKS)
-include(CMakeDependentOption)
+
 # See vtkDataArrayRange.h docs for more info on these:
 cmake_dependent_option(VTK_DEBUG_RANGE_ITERATORS
   "Detect usage errors with the for-range iterators (SLOW)." OFF
@@ -36,9 +36,29 @@ mark_as_advanced(VTK_ALL_NEW_OBJECT_FACTORY)
 
 set(vtk_smp_sources)
 set(vtk_smp_headers)
+set(vtk_smp_nowrap_headers)
+set(vtk_smp_templates)
 set(vtk_smp_defines)
 set(vtk_smp_libraries)
+set(vtk_smp_enable_sequential 0)
+set(vtk_smp_enable_stdthread 0)
+set(vtk_smp_enable_tbb 0)
+set(vtk_smp_enable_openmp 0)
+set(VTK_SMP_IMPLEMENTATION_TYPE)
 include("${CMAKE_CURRENT_SOURCE_DIR}/vtkSMPSelection.cmake")
+
+set(vtk_object_base_defines)
+
+# An optional dependency on memkind
+set(vtk_memkind_libraries)
+if (VTK_USE_MEMKIND)
+  vtk_module_find_package(
+    PACKAGE MEMKIND)
+  list(APPEND vtk_memkind_libraries
+    MEMKIND::MEMKIND)
+  get_target_property(memkind_version_minor MEMKIND::MEMKIND MEMKIND_VERSION_MINOR)
+  list(APPEND vtk_object_base_defines "MEMKIND_VERSION_MINOR=${memkind_version_minor}")
+endif()
 
 # Generate the vtkTypeList_Create macros:
 include("${CMAKE_CURRENT_SOURCE_DIR}/vtkCreateTypeListMacros.cmake")
@@ -71,9 +91,42 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/vtkArrayDispatchArrayList.h"
   @ONLY)
 
+# create a list of source files for explicit array type instantiations
+set(instantiation_sources)
+
+# steal the list of array types from vtkCreateArrayDispatchArrayList.cmake
+foreach (INSTANTIATION_VALUE_TYPE IN LISTS vtkArrayDispatch_all_types)
+  # only instantiate fundamental types, not typedefs
+  if (INSTANTIATION_VALUE_TYPE STREQUAL "vtkIdType")
+    continue()
+  endif ()
+  # create a file suffix from the type
+  string(REPLACE " " "_" _suffix "${INSTANTIATION_VALUE_TYPE}")
+
+  set(_list "vtkSOADataArrayTemplateInstantiate")
+  if (VTK_BUILD_SCALED_SOA_ARRAYS)
+    list(APPEND _list "vtkScaledSOADataArrayTemplateInstantiate")
+  endif ()
+  # see comments in vtkGenericDataArray.h for explanation
+  if (INSTANTIATION_VALUE_TYPE MATCHES "(^| )long( |$)")
+    list(APPEND _list "vtkGenericDataArrayValueRangeInstantiate")
+  endif ()
+
+  # generate cxx file to instantiate template with this type
+  foreach (_prefix IN LISTS _list)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/${_prefix}.cxx.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/${_prefix}_${_suffix}.cxx"
+      @ONLY)
+    list(APPEND instantiation_sources
+      "${CMAKE_CURRENT_BINARY_DIR}/${_prefix}_${_suffix}.cxx")
+  endforeach ()
+endforeach ()
+
 set(classes
   vtkAbstractArray
   vtkAnimationCue
+  vtkArchiver
   vtkArray
   vtkArrayCoordinates
   vtkArrayExtents
@@ -93,8 +146,6 @@ set(classes
   vtkCollectionIterator
   vtkCommand
   vtkCommonInformationKeyManager
-  vtkConditionVariable
-  vtkCriticalSection
   vtkDataArray
   vtkDataArrayCollection
   vtkDataArrayCollectionIterator
@@ -147,7 +198,6 @@ set(classes
   vtkMersenneTwister
   vtkMinimalStandardRandomSequence
   vtkMultiThreader
-  vtkMutexLock
   vtkOStrStreamWrapper
   vtkOStreamWrapper
   vtkObject
@@ -167,7 +217,6 @@ set(classes
   vtkScalarsToColors
   vtkShortArray
   vtkSignedCharArray
-  vtkSimpleCriticalSection
   vtkSmartPointerBase
   vtkSortDataArray
   vtkStdString
@@ -189,7 +238,13 @@ set(classes
   vtkWeakPointerBase
   vtkWeakReference
   vtkWindow
-  vtkXMLFileOutputWindow)
+  vtkXMLFileOutputWindow
+
+  # These classes are deprecated.
+  vtkConditionVariable
+  vtkCriticalSection
+  vtkSimpleCriticalSection
+  vtkMutexLock)
 
 set(template_classes
   vtkAOSDataArrayTemplate
@@ -203,52 +258,23 @@ set(template_classes
   vtkSOADataArrayTemplate
   vtkSparseArray
   vtkTypedArray
-  vtkTypedDataArray
+  vtkTypedDataArray)
+
+set(nowrap_template_classes
   vtkTypeList)
 
 set(sources
   vtkArrayIteratorTemplateInstantiate.cxx
-  vtkSOADataArrayTemplateInstantiate.cxx
-  vtkScalarsToColors.cxx
-  vtkShortArray.cxx
-  vtkSignedCharArray.cxx
-  vtkSimpleCriticalSection.cxx
-  vtkSmartPointerBase.cxx
-  vtkSortDataArray.cxx
-  vtkSparseArray.txx
-  vtkStdString.cxx
-  vtkStringArray.cxx
-  vtkStringOutputWindow.cxx
-  vtkSystemIncludes.h
-  vtkTimePointUtility.cxx
-  vtkTimeStamp.cxx
-  vtkType.h
-  vtkTypedArray.txx
-  vtkTypedDataArray.txx
-  vtkUnicodeString.cxx
-  vtkUnicodeStringArray.cxx
-  vtkUnsignedCharArray.cxx
-  vtkUnsignedIntArray.cxx
-  vtkUnsignedLongArray.cxx
-  vtkUnsignedLongLongArray.cxx
-  vtkUnsignedShortArray.cxx
-  vtkVariant.cxx
-  vtkVariantArray.cxx
-  vtkVersion.cxx
-  vtkVoidArray.cxx
-  vtkWeakPointerBase.cxx
-  vtkWeakReference.cxx
-  vtkWindow.cxx
-  vtkXMLFileOutputWindow.cxx
-  ${vtk_smp_sources}
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkConfigure.h"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkMathConfigure.h"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkVersionMacros.h"
-  )
+  vtkGenericDataArray.cxx
+  # A separate file that hides some deprecated usages from headers to avoid
+  # spamming users of `vtkVariant*.h` headers with noisy warnings. Remove with
+  # `VTK_DEPRECATED_IN_9_1_0()`.
+  vtkVariantCast.cxx
+  ${instantiation_sources}
+  ${vtk_smp_sources})
 
 if (VTK_BUILD_SCALED_SOA_ARRAYS)
   list (APPEND template_classes vtkScaledSOADataArrayTemplate)
-  list (APPEND sources  vtkScaledSOADataArrayTemplateInstantiate.cxx)
   set(VTK_USE_SCALED_SOA_ARRAYS 1)
 endif ()
 configure_file(
@@ -259,30 +285,24 @@ set(headers
   vtkABI.h
   vtkArrayIteratorIncludes.h
   vtkAssume.h
-  vtkAtomicTypeConcepts.h
-  vtkAtomicTypes.h
   vtkAutoInit.h
   vtkBuffer.h
-  vtkCollectionRange.h
-  vtkDataArrayAccessor.h
+  vtkCompiler.h
   vtkDataArrayIteratorMacro.h
   vtkDataArrayMeta.h
   vtkDataArrayRange.h
-  vtkDataArrayTupleRange_AOS.h
-  vtkDataArrayTupleRange_Generic.h
-  vtkDataArrayValueRange_AOS.h
-  vtkDataArrayValueRange_Generic.h
-  vtkDataArrayTemplate.h
+  vtkDeprecation.h
   vtkEventData.h
   vtkGenericDataArrayLookupHelper.h
   vtkIOStream.h
   vtkIOStreamFwd.h
   vtkInformationInternals.h
-  vtkMappedDataArray.h
   vtkMathUtilities.h
-  vtkMersenneTwister.h
+  vtkMatrixUtilities.h
   vtkMeta.h
   vtkNew.h
+  vtkRange.h
+  vtkRangeIterableTraits.h
   vtkSetGet.h
   vtkSmartPointer.h
   vtkSystemIncludes.h
@@ -290,30 +310,28 @@ set(headers
   vtkTestDataArray.h
   vtkType.h
   vtkTypeTraits.h
-  vtkTypedDataArray.h
   vtkTypedDataArrayIterator.h
   vtkVariantCast.h
   vtkVariantCreate.h
   vtkVariantExtract.h
   vtkVariantInlineOperators.h
   vtkWeakPointer.h
-  vtkWeakReference.h
   vtkWin32Header.h
   vtkWindows.h
   vtkWrappingHints.h
-  ${vtk_smp_headers}
   "${CMAKE_CURRENT_BINARY_DIR}/vtkArrayDispatchArrayList.h"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkConfigure.h"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkMathConfigure.h"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkToolkits.h"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkTypeListMacros.h"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkVersionMacros.h"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkVTK_USE_SCALED_SOA_ARRAYS.h")
 
-set(templates
-  vtkArrayIteratorTemplateImplicit.txx)
-
 set(private_headers
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkFloatingPointExceptionsConfigure.h")
+
+set(templates
+  vtkArrayIteratorTemplateImplicit.txx
+  ${vtk_smp_templates})
+
+set(private_templates
   vtkDataArrayPrivate.txx)
 
 set(vtk_include_dirs)
@@ -384,25 +402,64 @@ endif()
 include(TestBigEndian)
 test_big_endian(VTK_WORDS_BIGENDIAN)
 
-# Provide version macros through vtkConfigure.h for compatibility.
-if(VTK_LEGACY_REMOVE)
-  set(VTK_CONFIG_LEGACY_VERSION "")
-else()
-  set(VTK_CONFIG_LEGACY_VERSION "#include \"vtkVersionMacros.h\" // removed by VTK_LEGACY_REMOVE")
-endif()
+# vtkSMP header information.
+set(smp_backends
+  OpenMP
+  Sequential
+  STDThread
+  TBB)
+foreach (smp_backend IN LISTS smp_backends)
+  string(TOLOWER "${smp_backend}" smp_backend_lower)
+  string(TOUPPER "${smp_backend}" smp_backend_upper)
+  set("VTK_SMP_ENABLE_${smp_backend_upper}" "${vtk_smp_enable_${smp_backend_lower}}")
+  if (VTK_SMP_IMPLEMENTATION_TYPE STREQUAL smp_backend)
+    set("VTK_SMP_DEFAULT_IMPLEMENTATION_${smp_backend_upper}" 1)
+  else ()
+    set("VTK_SMP_DEFAULT_IMPLEMENTATION_${smp_backend_upper}" 0)
+  endif ()
+endforeach ()
 
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkVersionMacros.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkVersionMacros.h"
-  @ONLY)
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkConfigure.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkConfigure.h"
-  @ONLY)
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkToolkits.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkToolkits.h"
-  @ONLY)
+set(nowrap_headers
+  vtkCollectionRange.h
+  vtkDataArrayAccessor.h
+  vtkDataArrayTupleRange_AOS.h
+  vtkDataArrayTupleRange_Generic.h
+  vtkDataArrayValueRange_AOS.h
+  vtkDataArrayValueRange_Generic.h
+  vtkMathPrivate.hxx
+  ${vtk_smp_nowrap_headers}
+  ${vtk_smp_headers})
+set(generated_headers
+  vtkBuild.h
+  vtkDebug.h
+  vtkDebugRangeIterators.h
+  vtkEndian.h
+  vtkFeatures.h
+  vtkLegacy.h
+  vtkOptions.h
+  vtkPlatform.h
+  vtkSMP.h
+  vtkThreads.h
+  vtkVersionFull.h
+  vtkVersionMacros.h)
+if (NOT VTK_LEGACY_REMOVE)
+  list(APPEND generated_headers
+    vtkConfigureDeprecated.h)
+endif ()
+foreach (generated_header IN LISTS generated_headers)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/${generated_header}.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${generated_header}"
+    @ONLY)
+  list(APPEND headers
+    "${CMAKE_CURRENT_BINARY_DIR}/${generated_header}")
+endforeach ()
+
+if (NOT VTK_LEGACY_REMOVE)
+  list(APPEND nowrap_headers
+    vtkConfigure.h
+    vtkToolkits.h)
+endif ()
 
 add_custom_command(
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/CaseFolding.txt"
@@ -476,6 +533,15 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtkFloatingPointExceptionsConfigure.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkFloatingPointExceptionsConfigure.h")
 
+# Allow work arounds for lack of thread_local on odd compilers
+if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0) )
+  list(APPEND vtk_object_base_defines "VTK_HAS_THREADLOCAL")
+endif ()
+
+set_property(SOURCE vtkObjectBase.cxx
+  PROPERTY
+     COMPILE_DEFINITIONS ${vtk_object_base_defines})
+
 if(MSVC)
   set_source_files_properties(
     vtkDataArray.cxx
@@ -484,11 +550,16 @@ if(MSVC)
 endif()
 
 vtk_module_add_module(VTK::CommonCore
+  HEADER_DIRECTORIES
   CLASSES           ${classes}
   TEMPLATE_CLASSES  ${template_classes}
+  NOWRAP_TEMPLATE_CLASSES ${nowrap_template_classes}
   SOURCES           ${sources}
   TEMPLATES         ${templates}
-  HEADERS           ${headers})
+  HEADERS           ${headers}
+  NOWRAP_HEADERS    ${nowrap_headers}
+  PRIVATE_HEADERS   ${private_headers}
+  PRIVATE_TEMPLATES ${private_templates})
 if (vtk_include_dirs)
   vtk_module_include(VTK::CommonCore
     PRIVATE
@@ -499,11 +570,13 @@ vtk_module_link(VTK::CommonCore
   PUBLIC
     Threads::Threads
     ${vtk_smp_libraries}
+    ${vtk_memkind_libraries}
   PRIVATE
     # Need nsl to resolve gethostbyname on SunOS-5.8 and socket also
     $<$<PLATFORM_ID:SunOS>:socket>
     $<$<PLATFORM_ID:SunOS>:nsl>
-    $<$<PLATFORM_ID:Android>:log>)
+    $<$<PLATFORM_ID:Android>:log>
+    )
 vtk_module_compile_features(VTK::CommonCore
   PUBLIC
     cxx_std_11)

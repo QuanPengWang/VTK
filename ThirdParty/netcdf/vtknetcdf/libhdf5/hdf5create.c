@@ -9,6 +9,9 @@
  */
 
 #include "config.h"
+#include "netcdf.h"
+#include "ncpathmgr.h"
+#include "ncpathmgr.h"
 #include "hdf5internal.h"
 
 /* From hdf5file.c. */
@@ -27,9 +30,10 @@ extern int NC4_create_image_file(NC_FILE_INFO_T* h5, size_t);
  *
  * @param path The file name of the new file.
  * @param cmode The creation mode flag.
- * @param initialsz The proposed initial file size (advisory)
- * @param parameters extra parameter info (like  MPI communicator)
- * @param nc Pointer to an instance of NC.
+ * @param initialsz The proposed initial file size (advisory, for
+ * in-memory netCDF-4/HDF5 files only).
+ * @param parameters extra parameter info (like MPI communicator).
+ * @param ncid The already-assigned ncid for this file (aka ext_ncid).
  *
  * @return ::NC_NOERR No error.
  * @return ::NC_EINVAL Invalid input (check cmode).
@@ -40,13 +44,13 @@ extern int NC4_create_image_file(NC_FILE_INFO_T* h5, size_t);
  */
 static int
 nc4_create_file(const char *path, int cmode, size_t initialsz,
-                void* parameters, NC *nc)
+                void* parameters, int ncid)
 {
     hid_t fcpl_id, fapl_id = -1;
     unsigned flags;
     FILE *fp;
     int retval = NC_NOERR;
-    NC_FILE_INFO_T* nc4_info = NULL;
+    NC_FILE_INFO_T *nc4_info;
     NC_HDF5_FILE_INFO_T *hdf5_info;
     NC_HDF5_GRP_INFO_T *hdf5_grp;
 
@@ -58,13 +62,13 @@ nc4_create_file(const char *path, int cmode, size_t initialsz,
     int info_duped = 0; /* Whether the MPI Info object was duplicated */
 #endif /* !USE_PARALLEL4 */
 
-    assert(nc && path);
+    assert(path);
     LOG((3, "%s: path %s mode 0x%x", __func__, path, cmode));
 
     /* Add necessary structs to hold netcdf-4 file data. */
-    if ((retval = nc4_nc4f_list_add(nc, path, (NC_WRITE | cmode))))
+    if ((retval = nc4_file_list_add(ncid, path, NC_WRITE | cmode,
+                                    (void **)&nc4_info)))
         BAIL(retval);
-    nc4_info = NC4_DATA(nc);
     assert(nc4_info && nc4_info->root_grp);
     nc4_info->root_grp->atts_read = 1;
 
@@ -107,18 +111,19 @@ nc4_create_file(const char *path, int cmode, size_t initialsz,
     /* If this file already exists, and NC_NOCLOBBER is specified,
        return an error (unless diskless|inmemory) */
     if (!nc4_info->mem.diskless && !nc4_info->mem.inmemory) {
-        if ((cmode & NC_NOCLOBBER) && (fp = fopen(path, "r"))) {
+        if ((cmode & NC_NOCLOBBER) && (fp = NCfopen(path, "r"))) {
             fclose(fp);
             BAIL(NC_EEXIST);
         }
     }
 
     /* Need this access plist to control how HDF5 handles open objects
-     * on file close. Setting H5F_CLOSE_SEMI will cause H5Fclose to
-     * fail if there are any open objects in the file. */
+     * on file close. (Setting H5F_CLOSE_WEAK will cause H5Fclose not to
+     * fail if there are any open objects in the file. This may happen when virtual
+     * datasets are opened). */
     if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
         BAIL(NC_EHDFERR);
-    if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_SEMI))
+    if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_WEAK))
         BAIL(NC_EHDFERR);
 
 #ifdef USE_PARALLEL4
@@ -146,24 +151,32 @@ nc4_create_file(const char *path, int cmode, size_t initialsz,
             nc4_info->info = info;
         }
     }
-#else /* only set cache for non-parallel... */
-    if (H5Pset_cache(fapl_id, 0, nc4_chunk_cache_nelems, nc4_chunk_cache_size,
-                     nc4_chunk_cache_preemption) < 0)
-        BAIL(NC_EHDFERR);
-    LOG((4, "%s: set HDF raw chunk cache to size %d nelems %d preemption %f",
-         __func__, nc4_chunk_cache_size, nc4_chunk_cache_nelems,
-         nc4_chunk_cache_preemption));
 #endif /* USE_PARALLEL4 */
 
-#ifdef HDF5_HAS_LIBVER_BOUNDS
+    /* Only set cache for non-parallel creates. */
+    if (!nc4_info->parallel)
+    {
+	if (H5Pset_cache(fapl_id, 0, nc4_chunk_cache_nelems, nc4_chunk_cache_size,
+			 nc4_chunk_cache_preemption) < 0)
+	    BAIL(NC_EHDFERR);
+	LOG((4, "%s: set HDF raw chunk cache to size %d nelems %d preemption %f",
+	     __func__, nc4_chunk_cache_size, nc4_chunk_cache_nelems,
+	     nc4_chunk_cache_preemption));
+    }
+
 #if H5_VERSION_GE(1,10,2)
-    if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_EARLIEST, H5F_LIBVER_V18) < 0)
+    /* lib versions 1.10.2 and higher */
+    if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_V18, H5F_LIBVER_LATEST) < 0)
 #else
-        if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_EARLIEST,
-                                 H5F_LIBVER_LATEST) < 0)
+#if H5_VERSION_GE(1,10,0)
+    /* lib versions 1.10.0, 1.10.1 */
+    if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_EARLIEST, H5F_LIBVER_LATEST) < 0)
+#else
+    /* all HDF5 1.8 lib versions */
+    if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
 #endif
-            BAIL(NC_EHDFERR);
 #endif
+        BAIL(NC_EHDFERR);
 
     /* Create the property list. */
     if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0)
@@ -212,13 +225,13 @@ nc4_create_file(const char *path, int cmode, size_t initialsz,
             /* Configure FAPL to use the core file driver */
             if (H5Pset_fapl_core(fapl_id, alloc_incr, (nc4_info->mem.persist?1:0)) < 0)
                 BAIL(NC_EHDFERR);
-            if ((hdf5_info->hdfid = H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
+            if ((hdf5_info->hdfid = nc4_H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
                 BAIL(EACCES);
         }
         else /* Normal file */
         {
             /* Create the HDF5 file. */
-            if ((hdf5_info->hdfid = H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
+            if ((hdf5_info->hdfid = nc4_H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
                 BAIL(EACCES);
         }
 
@@ -261,7 +274,8 @@ exit: /*failure exit*/
  * @param parameters pointer to struct holding extra data (e.g. for
  * parallel I/O) layer. Ignored if NULL.
  * @param dispatch Pointer to the dispatch table for this file.
- * @param nc_file Pointer to an instance of NC.
+ * @param ncid The ncid that has been assigned by the dispatch layer
+ * (aka ext_ncid).
  *
  * @return ::NC_NOERR No error.
  * @return ::NC_EINVAL Invalid input (check cmode).
@@ -271,11 +285,11 @@ exit: /*failure exit*/
 int
 NC4_create(const char* path, int cmode, size_t initialsz, int basepe,
            size_t *chunksizehintp, void *parameters,
-           NC_Dispatch *dispatch, NC *nc_file)
+           const NC_Dispatch *dispatch, int ncid)
 {
     int res;
 
-    assert(nc_file && path);
+    assert(path);
 
     LOG((1, "%s: path %s cmode 0x%x parameters %p",
          __func__, path, cmode, parameters));
@@ -290,16 +304,45 @@ NC4_create(const char* path, int cmode, size_t initialsz, int basepe,
     hdf5_set_log_level();
 #endif /* LOGGING */
 
-    /* Check the cmode for validity. */
-    if((cmode & ILLEGAL_CREATE_FLAGS) != 0)
-    {res = NC_EINVAL; goto done;}
+    /* Check the cmode for validity. Checking parallel against
+     * NC_DISKLESS already done in NC_create(). */
+    if (cmode & ILLEGAL_CREATE_FLAGS)
+        return NC_EINVAL;
 
-    /* check parallel against NC_DISKLESS already done in NC_create() */
+    /* Create the netCDF-4/HDF5 file. */
+    res = nc4_create_file(path, cmode, initialsz, parameters, ncid);
 
-    nc_file->int_ncid = nc_file->ext_ncid;
-
-    res = nc4_create_file(path, cmode, initialsz, parameters, nc_file);
-
-done:
     return res;
+}
+
+/**
+ * Wrapper function for H5Fcreate.
+ * Converts the filename from ANSI to UTF-8 as needed before calling H5Fcreate.
+ *
+ * @param filename The filename encoded ANSI to access.
+ * @param flags File access flags.
+ * @param fcpl_id File creation property list identifier.
+ * @param fapl_id File access property list identifier.
+ * @return A file identifier if succeeded. A negative value if failed.
+ */
+hid_t
+nc4_H5Fcreate(const char *filename0, unsigned flags, hid_t fcpl_id, hid_t fapl_id)
+{
+    hid_t hid;
+    char* localname = NULL;
+    char* filename = NULL;
+
+#ifdef HDF5_UTF8_PATHS
+    NCpath2utf8(filename0,&filename);
+#else    
+    filename = strdup(filename0);
+#endif
+    /* Canonicalize it since we are not opening the file ourselves */
+    if((localname = NCpathcvt(filename))==NULL)
+	{hid = H5I_INVALID_HID; goto done;}
+    hid = H5Fcreate(localname, flags, fcpl_id, fapl_id);
+done:
+    nullfree(filename);
+    nullfree(localname);
+    return hid;
 }

@@ -29,13 +29,13 @@
  * RequestDataObject RequestData and RequestInformation. The default
  * implementation of RequestDataObject will create an output data of the
  * same type as the input.
-*/
+ */
 
 #ifndef vtkDataSetAlgorithm_h
 #define vtkDataSetAlgorithm_h
 
-#include "vtkCommonExecutionModelModule.h" // For export macro
 #include "vtkAlgorithm.h"
+#include "vtkCommonExecutionModelModule.h" // For export macro
 
 class vtkDataSet;
 class vtkImageData;
@@ -48,17 +48,17 @@ class vtkRectilinearGrid;
 class VTKCOMMONEXECUTIONMODEL_EXPORT vtkDataSetAlgorithm : public vtkAlgorithm
 {
 public:
-  static vtkDataSetAlgorithm *New();
-  vtkTypeMacro(vtkDataSetAlgorithm,vtkAlgorithm);
+  static vtkDataSetAlgorithm* New();
+  vtkTypeMacro(vtkDataSetAlgorithm, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Get the output data object for a port on this algorithm.
    */
   vtkDataSet* GetOutput();
   vtkDataSet* GetOutput(int);
-  //@}
+  ///@}
 
   /**
    * Get the input data object. This method is not recommended for use, but
@@ -69,34 +69,34 @@ public:
   /**
    * Get the output as vtkPolyData.
    */
-  vtkPolyData *GetPolyDataOutput();
+  vtkPolyData* GetPolyDataOutput();
 
   /**
    * Get the output as vtkStructuredPoints.
    */
-  vtkStructuredPoints *GetStructuredPointsOutput();
+  vtkStructuredPoints* GetStructuredPointsOutput();
 
   /**
    * Get the output as vtkStructuredPoints.
    */
-  vtkImageData *GetImageDataOutput();
+  vtkImageData* GetImageDataOutput();
 
   /**
    * Get the output as vtkStructuredGrid.
    */
-  vtkStructuredGrid *GetStructuredGridOutput();
+  vtkStructuredGrid* GetStructuredGridOutput();
 
   /**
    * Get the output as vtkUnstructuredGrid.
    */
-  vtkUnstructuredGrid *GetUnstructuredGridOutput();
+  vtkUnstructuredGrid* GetUnstructuredGridOutput();
 
   /**
    * Get the output as vtkRectilinearGrid.
    */
-  vtkRectilinearGrid *GetRectilinearGridOutput();
+  vtkRectilinearGrid* GetRectilinearGridOutput();
 
-  //@{
+  ///@{
   /**
    * Assign a data object as input. Note that this method does not
    * establish a pipeline connection. Use SetInputConnection() to
@@ -106,87 +106,81 @@ public:
   void SetInputData(int, vtkDataObject*);
   void SetInputData(vtkDataSet*);
   void SetInputData(int, vtkDataSet*);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Assign a data object as input. Note that this method does not
    * establish a pipeline connection. Use AddInputConnection() to
    * setup a pipeline connection.
    */
-  void AddInputData(vtkDataObject *);
+  void AddInputData(vtkDataObject*);
   void AddInputData(vtkDataSet*);
   void AddInputData(int, vtkDataSet*);
   void AddInputData(int, vtkDataObject*);
-  //@}
+  ///@}
 
   /**
    * see vtkAlgorithm for details
    */
-  int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inputVector,
-                             vtkInformationVector* outputVector) override;
+  vtkTypeBool ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
 protected:
   vtkDataSetAlgorithm();
-  ~vtkDataSetAlgorithm() override {}
+  ~vtkDataSetAlgorithm() override = default;
+
+  /**
+   * This is called within ProcessRequest when a request asks the
+   * algorithm to create empty output data objects. This typically happens
+   * early on in the execution of the pipeline. The default behavior is to
+   * create an output DataSet of the same type as the input for each
+   * output port. This method can be overridden to change the output
+   * data type of an algorithm. This happens in the first pass of the pipeline
+   * execution process.
+   */
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   /**
    * This is called within ProcessRequest when a request asks for
    * Information. Typically an algorithm provides whatever lightweight
    * information about its output that it can here without doing any
-   * lengthy computations. This happens in the first pass of the pipeline
-   * execution.
+   * lengthy computations. This happens after the RequestDataObject pass of
+   * the pipeline execution process.
    */
-  virtual int RequestInformation(vtkInformation*,
-                                 vtkInformationVector**,
-                                 vtkInformationVector*) {return 1;};
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  {
+    return 1;
+  }
 
-  //@{
   /**
    * This is called within ProcessRequest when each filter in the pipeline
    * decides what portion of its input is needed to create the portion of its
-   * output that the downstream filter asks for. This happens during the
-   * second pass in the pipeline execution process.
+   * output that the downstream filter asks for. This happens after the
+   * RequestInformation pass of the pipeline execution process.
    */
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*)
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
   {
-      return 1;
-  };
-  //@}
-
-
-  /**
-   * This is called within ProcessRequest to when a request asks the
-   * algorithm to create empty output data objects. This typically happens
-   * early on in the execution of the pipeline. The default behavior is to
-   * create an output DataSet of the same type as the input for each
-   * output port. This method can be overridden to change the output
-   * data type of an algorithm. This happens in the third pass of the
-   * pipeline execution.
-   */
-  virtual int RequestDataObject(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector);
+    return 1;
+  }
 
   /**
    * This is called within ProcessRequest when a request asks the algorithm
    * to do its work. This is the method you should override to do whatever the
-   * algorithm is designed to do. This happens during the fourth pass in the
+   * algorithm is designed to do. This happens during the final pass in the
    * pipeline execution process.
    */
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*) {return 1;};
-
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  {
+    return 1;
+  }
 
   // see algorithm for more info
   int FillOutputPortInformation(int port, vtkInformation* info) override;
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  vtkDataObject *GetInput(int port);
+  vtkDataObject* GetInput(int port);
 
 private:
   vtkDataSetAlgorithm(const vtkDataSetAlgorithm&) = delete;
@@ -194,5 +188,3 @@ private:
 };
 
 #endif
-
-

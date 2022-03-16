@@ -71,14 +71,14 @@
 #ifndef vtkPassArrays_h
 #define vtkPassArrays_h
 
-#include "vtkFiltersGeneralModule.h" // For export macro
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkFiltersGeneralModule.h" // For export macro
 
 class VTKFILTERSGENERAL_EXPORT vtkPassArrays : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPassArrays* New();
-  vtkTypeMacro(vtkPassArrays,vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkPassArrays, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -99,7 +99,7 @@ public:
   virtual void RemoveCellDataArray(const char* name);
   virtual void RemoveFieldDataArray(const char* name);
 
-  //@{
+  ///@{
   /**
    * Clear all arrays to pass through.
    */
@@ -107,9 +107,9 @@ public:
   virtual void ClearPointDataArrays();
   virtual void ClearCellDataArrays();
   virtual void ClearFieldDataArrays();
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Instead of passing only the specified arrays, remove the specified arrays
    * and keep all other arrays. Default is off.
@@ -117,9 +117,9 @@ public:
   vtkSetMacro(RemoveArrays, bool);
   vtkGetMacro(RemoveArrays, bool);
   vtkBooleanMacro(RemoveArrays, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Process only those field types explicitly specified with AddFieldType.
    * Otherwise, processes field types associated with at least one specified
@@ -128,7 +128,7 @@ public:
   vtkSetMacro(UseFieldTypes, bool);
   vtkGetMacro(UseFieldTypes, bool);
   vtkBooleanMacro(UseFieldTypes, bool);
-  //@}
+  ///@}
 
   /**
    * Add a field type to process.
@@ -147,9 +147,8 @@ public:
   /**
    * This is required to capture REQUEST_DATA_OBJECT requests.
    */
-  int ProcessRequest(vtkInformation* request,
-                     vtkInformationVector** inputVector,
-                     vtkInformationVector* outputVector) override;
+  vtkTypeBool ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
 protected:
   vtkPassArrays();
@@ -164,14 +163,10 @@ protected:
   /**
    * Creates the same output type as the input type.
    */
-  int RequestDataObject(vtkInformation* request,
-                        vtkInformationVector** inputVector,
-                        vtkInformationVector* outputVector) override;
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
-  int RequestData(
-    vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   bool RemoveArrays;
   bool UseFieldTypes;
@@ -185,4 +180,3 @@ private:
 };
 
 #endif
-

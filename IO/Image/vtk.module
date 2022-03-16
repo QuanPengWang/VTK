@@ -10,6 +10,7 @@ GROUPS
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
+  VTK::ImagingCore
 PRIVATE_DEPENDS
   VTK::CommonDataModel
   VTK::CommonMath
@@ -20,12 +21,12 @@ PRIVATE_DEPENDS
   VTK::jpeg
   VTK::metaio
   VTK::png
+  VTK::pugixml
   VTK::tiff
   VTK::vtksys
   VTK::zlib
 TEST_DEPENDS
   VTK::FiltersGeometry
-  VTK::ImagingCore
   VTK::ImagingMath
   VTK::ImagingSources
   VTK::InteractionImage

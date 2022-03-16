@@ -3,6 +3,8 @@ NAME
 LIBRARY_NAME
   vtkFiltersParallel
 IMPLEMENTABLE
+IMPLEMENTS
+  VTK::FiltersCore
 KIT
   VTK::Parallel
 GROUPS
@@ -15,21 +17,25 @@ DEPENDS
   VTK::FiltersExtraction
   VTK::FiltersGeneral
   VTK::FiltersGeometry
+  VTK::FiltersHybrid
   VTK::FiltersModeling
   VTK::FiltersSources
+  VTK::FiltersTexture
 PRIVATE_DEPENDS
   VTK::CommonSystem
   VTK::CommonTransforms
   VTK::IOLegacy
   VTK::ParallelCore
-  VTK::RenderingCore
 TEST_DEPENDS
   VTK::FiltersFlowPaths
   VTK::FiltersParallelImaging
+  VTK::IOExodus
+  VTK::IOImage
   VTK::IOLegacy
   VTK::IOParallelExodus
   VTK::IOXML
   VTK::InteractionStyle
+  VTK::ParallelCore
   VTK::RenderingOpenGL2
   VTK::RenderingParallel
   VTK::TestingCore

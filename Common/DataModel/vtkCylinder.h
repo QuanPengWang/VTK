@@ -30,7 +30,10 @@
  * The cylinder is infinite in extent. To truncate the cylinder in
  * modeling operations use the vtkImplicitBoolean in combination with
  * clipping planes.
-*/
+ *
+ * @sa
+ * vtkCylinderSource
+ */
 
 #ifndef vtkCylinder_h
 #define vtkCylinder_h
@@ -41,45 +44,45 @@
 class VTKCOMMONDATAMODEL_EXPORT vtkCylinder : public vtkImplicitFunction
 {
 public:
-  vtkTypeMacro(vtkCylinder,vtkImplicitFunction);
+  vtkTypeMacro(vtkCylinder, vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Construct cylinder radius of 0.5; centered at origin with axis
    * along y coordinate axis.
    */
-  static vtkCylinder *New();
+  static vtkCylinder* New();
 
-  //@{
+  ///@{
   /**
    * Evaluate cylinder equation F(r) = r^2 - Radius^2.
    */
   using vtkImplicitFunction::EvaluateFunction;
   double EvaluateFunction(double x[3]) override;
-  //@}
+  ///@}
 
   /**
    * Evaluate cylinder function gradient.
    */
   void EvaluateGradient(double x[3], double g[3]) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the cylinder radius.
    */
-  vtkSetMacro(Radius,double);
-  vtkGetMacro(Radius,double);
-  //@}
+  vtkSetMacro(Radius, double);
+  vtkGetMacro(Radius, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the cylinder center.
    */
-  vtkSetVector3Macro(Center,double);
-  vtkGetVector3Macro(Center,double);
-  //@}
+  vtkSetVector3Macro(Center, double);
+  vtkGetVector3Macro(Center, double);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the axis of the cylinder. If the axis is not specified as
    * a unit vector, it will be normalized. If zero-length axis vector
@@ -87,12 +90,12 @@ public:
    */
   void SetAxis(double ax, double ay, double az);
   void SetAxis(double a[3]);
-  vtkGetVector3Macro(Axis,double);
-  //@}
+  vtkGetVector3Macro(Axis, double);
+  ///@}
 
 protected:
   vtkCylinder();
-  ~vtkCylinder() override {}
+  ~vtkCylinder() override = default;
 
   double Radius;
   double Center[3];

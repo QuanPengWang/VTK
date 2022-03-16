@@ -14,28 +14,39 @@
 =========================================================================*/
 /**
  * @class   vtkPointSet
- * @brief   abstract class for specifying dataset behavior
+ * @brief   concrete class for storing a set of points
  *
- * vtkPointSet is an abstract class that specifies the interface for
+ * vtkPointSet is an concrete class representing a set of points
+ * that specifies the interface for
  * datasets that explicitly use "point" arrays to represent geometry.
- * For example, vtkPolyData and vtkUnstructuredGrid require point arrays
- * to specify point position, while vtkStructuredGrid generates point
- * positions implicitly.
+ * For example, vtkPolyData, vtkUnstructuredGrid, and vtkStructuredGrid
+ * require point arrays to specify point positions, while vtkImageData
+ * represents point positions implicitly (and hence is not a subclass
+ * of vtkImageData).
  *
  * Note: The vtkPolyData and vtkUnstructuredGrid datasets (derived classes of
  * vtkPointSet) are often used in geometric computation (e.g.,
- * vtkDeluanay2D). In most cases the underlying geometry and/or topology is
- * not modified; however in some few cases the underlying geometry/topology
- * may be incrementally modified. This has implications on the use of
- * supporting classes like locators and cell links topological
- * structures. Consequently, there is a flag, Editable, that controls whether
- * the dataset can be incrementally edited. By default, and for performance
- * reasons, vtkPointSet derived classes are created as non-editable. The few
- * methods that require editing capabilities are documented in derived
- * classes.
+ * vtkDelaunay2D).  In most cases during filter execution the output geometry
+ * and/or topology is created once and provided as output; however in a very
+ * few cases the underlying geometry/topology may be created and then
+ * incrementally modified. This has implications on the use of supporting
+ * classes like locators and cell links topological structures which may be
+ * required to support incremental editing operations. Consequently, there is
+ * a flag, Editable, that controls whether the dataset can be incrementally
+ * edited after it is initially created. By default, and for performance
+ * reasons, vtkPointSet derived classes are created as non-editable.  The few
+ * methods that require incremental editing capabilities are documented in
+ * derived classes.
+ *
+ * Another important feature of vtkPointSet classes is the use of an internal
+ * locator to speed up certain operations like FindCell(). Depending on the
+ * application and desired performance, different locators (either a cell or
+ * point locator) of different locator types may be used, along with different
+ * strategies for using the locators to perform various operations. See
+ * the class vtkFindCellStrategy for more information
  *
  * @sa
- * vtkPolyData vtkStructuredGrid vtkUnstructuredGrid
+ * vtkPolyData vtkStructuredGrid vtkUnstructuredGrid vtkFindCellStrategy
  */
 
 #ifndef vtkPointSet_h
@@ -44,21 +55,32 @@
 #include "vtkCommonDataModelModule.h" // For export macro
 #include "vtkDataSet.h"
 
-#include "vtkPoints.h" // Needed for inline methods
+#include "vtkCellTypes.h"   // For GetCellType
+#include "vtkEmptyCell.h"   // For GetCell
+#include "vtkGenericCell.h" // For GetCell
+#include "vtkPoints.h"      // Needed for inline methods
 
 class vtkAbstractPointLocator;
+class vtkAbstractCellLocator;
 
 class VTKCOMMONDATAMODEL_EXPORT vtkPointSet : public vtkDataSet
 {
 public:
-  //@{
+  /**
+   * Standard instantiation method.
+   */
+  static vtkPointSet* New();
+  static vtkPointSet* ExtendedNew();
+
+  ///@{
   /**
    * Standard methdos for type information and printing.
    */
-  vtkTypeMacro(vtkPointSet,vtkDataSet);
+  vtkTypeMacro(vtkPointSet, vtkDataSet);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Specify whether this dataset is editable after creation. Meaning, once
    * the points and cells are defined, can the dataset be incrementally
@@ -68,10 +90,10 @@ public:
    * the data is static (see vtkStaticCellLinks, vtkStaticPointLocator,
    * vtkStaticCellLocator).
    */
-  vtkSetMacro(Editable,bool);
-  vtkGetMacro(Editable,bool);
-  vtkBooleanMacro(Editable,bool);
-  //@}
+  vtkSetMacro(Editable, bool);
+  vtkGetMacro(Editable, bool);
+  vtkBooleanMacro(Editable, bool);
+  ///@}
 
   /**
    * Reset to an empty state and free any memory.
@@ -81,26 +103,61 @@ public:
   /**
    * Copy the geometric structure of an input point set object.
    */
-  void CopyStructure(vtkDataSet *pd) override;
+  void CopyStructure(vtkDataSet* pd) override;
 
-  //@{
+  ///@{
   /**
    * See vtkDataSet for additional information.
    */
   vtkIdType GetNumberOfPoints() override;
-  void GetPoint(vtkIdType ptId, double x[3]) override
-    {this->Points->GetPoint(ptId,x);};
+  void GetPoint(vtkIdType ptId, double x[3]) override { this->Points->GetPoint(ptId, x); }
   vtkIdType FindPoint(double x[3]) override;
-  vtkIdType FindPoint(double x, double y, double z) {
-    return this->vtkDataSet::FindPoint(x, y, z);};
-  vtkIdType FindCell(double x[3], vtkCell *cell, vtkIdType cellId,
-                             double tol2, int& subId, double pcoords[3],
-                             double *weights) override;
-  vtkIdType FindCell(double x[3], vtkCell *cell,
-                             vtkGenericCell *gencell, vtkIdType cellId,
-                             double tol2, int& subId, double pcoords[3],
-                             double *weights) override;
-  //@}
+  vtkIdType FindPoint(double x, double y, double z) { return this->vtkDataSet::FindPoint(x, y, z); }
+  vtkIdType FindCell(double x[3], vtkCell* cell, vtkIdType cellId, double tol2, int& subId,
+    double pcoords[3], double* weights) override;
+  vtkIdType FindCell(double x[3], vtkCell* cell, vtkGenericCell* gencell, vtkIdType cellId,
+    double tol2, int& subId, double pcoords[3], double* weights) override;
+  ///@}
+
+  ///@{
+  /**
+   * This method always returns 0, as there are no cells in a `vtkPointSet`.
+   */
+  vtkIdType GetNumberOfCells() override { return 0; }
+  int GetMaxCellSize() override { return 0; }
+  ///@}
+
+  using Superclass::GetCell;
+  /**
+   * This method always return a `vtkEmptyCell`, as there is no cell in a
+   * `vtkPointSet`.
+   */
+  vtkCell* GetCell(vtkIdType) override { return this->EmptyCell; }
+
+  ///@{
+  /**
+   * This method resets parameter idList, as there is no cell in a `vtkPointSet`.
+   */
+  void GetCellPoints(vtkIdType, vtkIdList* idList) override { idList->Reset(); }
+  void GetPointCells(vtkIdType, vtkIdList* idList) override { idList->Reset(); }
+  ///@}
+
+  /**
+   * This method sets cell to be an empty cell.
+   */
+  void GetCell(vtkIdType, vtkGenericCell* cell) override { cell->SetCellTypeToEmptyCell(); }
+
+  /**
+   * This method always returns `VTK_EMPTY_CELL`, as there is no cell in a
+   * `vtkPointSet`.
+   */
+  int GetCellType(vtkIdType) override { return VTK_EMPTY_CELL; }
+
+  /**
+   * This method always returns 1, as all cells are point in a pure
+   * `vtkPointSet`.
+   */
+  vtkIdType GetCellSize(vtkIdType) override { return 1; }
 
   /**
    * See vtkDataSet for additional information.
@@ -108,19 +165,47 @@ public:
    * and its values are only valid as long as another method invocation is not
    * performed. Prefer GetPoint() with the return value in argument.
    */
-  double *GetPoint(vtkIdType ptId) VTK_SIZEHINT(3) override
-    {return this->Points->GetPoint(ptId);};
+  double* GetPoint(vtkIdType ptId) VTK_SIZEHINT(3) override { return this->Points->GetPoint(ptId); }
 
   /**
    * Return an iterator that traverses the cells in this data set.
    */
   vtkCellIterator* NewCellIterator() override;
 
+  ///@{
   /**
-   * Build the internal point locator. In a multi-threaded environment,
-   * call this method in a single thread before using FindCell or FindPoint.
+   * Build the internal point locator . In a multi-threaded environment, call
+   * this method in a single thread before using FindCell() or FindPoint().
    */
-  void BuildLocator();
+  void BuildPointLocator();
+  void BuildLocator() { this->BuildPointLocator(); }
+  ///@}
+
+  /**
+   * Build the cell locator. In a multi-threaded environment,
+   * call this method in a single thread before using FindCell().
+   */
+  void BuildCellLocator();
+
+  ///@{
+  /**
+   * Set / get an instance of vtkAbstractPointLocator which is used to
+   * support the FindPoint() and FindCell() methods. By default a
+   * vtkStaticPointLocator is used, unless the class is set as Editable, in
+   * which case a vtkPointLocator is used.
+   */
+  virtual void SetPointLocator(vtkAbstractPointLocator*);
+  vtkGetObjectMacro(PointLocator, vtkAbstractPointLocator);
+  ///@}
+
+  ///@{
+  /**
+   * Set / get an instance of vtkAbstractCellLocator which may be used
+   * when a vtkCellLocatorStrategy is used during a FindCell() operation.
+   */
+  virtual void SetCellLocator(vtkAbstractCellLocator*);
+  vtkGetObjectMacro(CellLocator, vtkAbstractCellLocator);
+  ///@}
 
   /**
    * Get MTime which also considers its vtkPoints MTime.
@@ -137,13 +222,13 @@ public:
    */
   void Squeeze() override;
 
-  //@{
+  ///@{
   /**
    * Specify point array to define point coordinates.
    */
   virtual void SetPoints(vtkPoints*);
-  vtkGetObjectMacro(Points,vtkPoints);
-  //@}
+  vtkGetObjectMacro(Points, vtkPoints);
+  ///@}
 
   /**
    * Return the actual size of the data in kibibytes (1024 bytes). This number
@@ -155,42 +240,43 @@ public:
    */
   unsigned long GetActualMemorySize() override;
 
-  //@{
+  ///@{
   /**
    * Shallow and Deep copy.
    */
-  void ShallowCopy(vtkDataObject *src) override;
-  void DeepCopy(vtkDataObject *src) override;
-  //@}
+  void ShallowCopy(vtkDataObject* src) override;
+  void DeepCopy(vtkDataObject* src) override;
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Overwritten to handle the data/locator loop
    */
-  void Register(vtkObjectBase* o) override;
-  void UnRegister(vtkObjectBase* o) override;
-  //@}
+  bool UsesGarbageCollector() const override { return true; }
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Retrieve an instance of this class from an information object.
    */
   static vtkPointSet* GetData(vtkInformation* info);
-  static vtkPointSet* GetData(vtkInformationVector* v, int i=0);
-  //@}
+  static vtkPointSet* GetData(vtkInformationVector* v, int i = 0);
+  ///@}
 
 protected:
   vtkPointSet();
   ~vtkPointSet() override;
 
   bool Editable;
-  vtkPoints *Points;
-  vtkAbstractPointLocator *Locator;
+  vtkPoints* Points;
+  vtkAbstractPointLocator* PointLocator;
+  vtkAbstractCellLocator* CellLocator;
 
   void ReportReferences(vtkGarbageCollector*) override;
-private:
 
+private:
   void Cleanup();
+  vtkEmptyCell* EmptyCell;
 
   vtkPointSet(const vtkPointSet&) = delete;
   void operator=(const vtkPointSet&) = delete;

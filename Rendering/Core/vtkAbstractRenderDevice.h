@@ -14,16 +14,16 @@
 #ifndef vtkAbstractRenderDevice_h
 #define vtkAbstractRenderDevice_h
 
-#include "vtkRenderingCoreModule.h" // For export macro
 #include "vtkObject.h"
-#include <string> // For std::string
+#include "vtkRenderingCoreModule.h" // For export macro
+#include <string>                   // For std::string
 
 class vtkRecti;
 
 class VTKRENDERINGCORE_EXPORT vtkAbstractRenderDevice : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkAbstractRenderDevice, vtkObject)
+  vtkTypeMacro(vtkAbstractRenderDevice, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -44,10 +44,10 @@ public:
   /**
    * @brief Create a window with the desired geometry.
    * @param geometry The geometry in screen coordinates for the window.
+   * @param name The name of the window.
    * @return True on success, false on failure.
    */
-  virtual bool CreateNewWindow(const vtkRecti &geometry,
-                               const std::string &name) = 0;
+  virtual bool CreateNewWindow(const vtkRecti& geometry, const std::string& name) = 0;
 
   /**
    * @brief Make the context current so that it can be used by OpenGL. This is

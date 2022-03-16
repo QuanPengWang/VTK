@@ -19,7 +19,7 @@ See COPYRIGHT for license information.
 #include "ncuri.h"
 #include "ncauth.h"
 #include "nclog.h"
-#include "ncwinpath.h"
+#include "ncpathmgr.h"
 
 #ifdef _MSC_VER
 #include <windows.h>
@@ -30,7 +30,10 @@ See COPYRIGHT for license information.
 
 /* Define the curl flag defaults in envv style */
 static const char* AUTHDEFAULTS[] = {
+"HTTP.SSL.VERIFYPEER","-1", /* Use default */
+"HTTP.SSL.VERIFYHOST","-1", /* Use default */
 "HTTP.TIMEOUT","1800", /*seconds */ /* Long but not infinite */
+"HTTP.CONNECTTIMEOUT","50", /*seconds */ /* Long but not infinite */
 NULL
 };
 
@@ -48,7 +51,7 @@ NC_parseproxy(NCauth* auth, const char* surl)
     NCURI* uri = NULL;
     if(surl == NULL || strlen(surl) == 0)
 	return (NC_NOERR); /* nothing there*/
-    if(ncuriparse(surl,&uri) != NCU_OK)
+    if(ncuriparse(surl,&uri))
 	return (NC_EURL);
     auth->proxy.user = uri->user;
     auth->proxy.pwd = uri->password;
@@ -76,28 +79,32 @@ NC_combinehostport(NCURI* uri)
     if(port != NULL) len += (1+strlen(port));
     hp = (char*)malloc(len+1);
     if(hp == NULL) return NULL;
-    strncpy(hp,host,len);
+    strcpy(hp,host);
     if(port != NULL) {
-	strncat(hp,":",len);
-	strncat(hp,port,len);
+	strlcat(hp,":",len+1);
+	strlcat(hp,port,len+1);
     }
     return hp;
 }
 
 int
-NC_authsetup(NCauth* auth, NCURI* uri)
+NC_authsetup(NCauth** authp, NCURI* uri)
 {
     int ret = NC_NOERR;
     char* uri_hostport = NULL;
+    NCauth* auth = NULL;
 
     if(uri != NULL)
       uri_hostport = NC_combinehostport(uri);
     else
       return NC_EDAP; /* Generic EDAP error. */
+    if((auth=calloc(1,sizeof(NCauth)))==NULL)
+        return NC_ENOMEM;
+
     setdefaults(auth);
 
     /* Note, we still must do this function even if
-       ncrc_globalstate.rc.ignore is set in order
+       ncrc_getglobalstate()->rc.ignore is set in order
        to getinfo e.g. host+port  from url
     */
 
@@ -107,6 +114,8 @@ NC_authsetup(NCauth* auth, NCURI* uri)
 			NC_rclookup("HTTP.VERBOSE",uri_hostport));
     setauthfield(auth,"HTTP.TIMEOUT",
 			NC_rclookup("HTTP.TIMEOUT",uri_hostport));
+    setauthfield(auth,"HTTP.CONNECTTIMEOUT",
+			NC_rclookup("HTTP.CONNECTTIMEOUT",uri_hostport));
     setauthfield(auth,"HTTP.USERAGENT",
 			NC_rclookup("HTTP.USERAGENT",uri_hostport));
     setauthfield(auth,"HTTP.COOKIEFILE",
@@ -121,8 +130,6 @@ NC_authsetup(NCauth* auth, NCURI* uri)
 			NC_rclookup("HTTP.PROXY.SERVER",uri_hostport));
     setauthfield(auth,"HTTP.PROXY_SERVER",
 			NC_rclookup("HTTP.PROXY_SERVER",uri_hostport));
-    setauthfield(auth,"HTTP.SSL.VALIDATE",
-			NC_rclookup("HTTP.SSL.VALIDATE",uri_hostport));
     setauthfield(auth,"HTTP.SSL.CERTIFICATE",
 			NC_rclookup("HTTP.SSL.CERTIFICATE",uri_hostport));
     setauthfield(auth,"HTTP.SSL.KEY",
@@ -135,8 +142,17 @@ NC_authsetup(NCauth* auth, NCURI* uri)
 			NC_rclookup("HTTP.SSL.CAPATH",uri_hostport));
     setauthfield(auth,"HTTP.SSL.VERIFYPEER",
 			NC_rclookup("HTTP.SSL.VERIFYPEER",uri_hostport));
+    setauthfield(auth,"HTTP.SSL.VERIFYHOST",
+			NC_rclookup("HTTP.SSL.VERIFYHOST",uri_hostport));
+    /* Alias for VERIFYHOST + VERIFYPEER */
+    setauthfield(auth,"HTTP.SSL.VALIDATE",
+			NC_rclookup("HTTP.SSL.VALIDATE",uri_hostport));
     setauthfield(auth,"HTTP.NETRC",
 			NC_rclookup("HTTP.NETRC",uri_hostport));
+    setauthfield(auth,"HTTP.S3.ACCESSID",
+			NC_rclookup("HTTP.S3.ACCESSID",uri_hostport));
+    setauthfield(auth,"HTTP.S3.SECRETKEY",
+			NC_rclookup("HTTP.S3.SECRETKEY",uri_hostport));
 
     { /* Handle various cases for user + password */
       /* First, see if the user+pwd was in the original url */
@@ -166,12 +182,14 @@ NC_authsetup(NCauth* auth, NCURI* uri)
       nullfree(pwd);
       nullfree(uri_hostport);
     }
+    if(authp) {*authp = auth; auth = NULL;}
     return (ret);
 }
 
 void
-NC_authclear(NCauth* auth)
+NC_authfree(NCauth* auth)
 {
+    if(auth == NULL) return;
     if(auth->curlflags.cookiejarcreated) {
 #ifdef _MSC_VER
         DeleteFile(auth->curlflags.cookiejar);
@@ -192,6 +210,9 @@ NC_authclear(NCauth* auth)
     nullfree(auth->proxy.pwd);
     nullfree(auth->creds.user);
     nullfree(auth->creds.pwd);
+    nullfree(auth->s3creds.accessid);
+    nullfree(auth->s3creds.secretkey);
+    nullfree(auth);
 }
 
 /**************************************************/
@@ -217,6 +238,12 @@ setauthfield(NCauth* auth, const char* flag, const char* value)
         if(atoi(value)) auth->curlflags.timeout = atoi(value);
 #ifdef D4DEBUG
             nclog(NCLOGNOTE,"HTTP.TIMEOUT: %ld", auth->curlflags.timeout);
+#endif
+    }
+    if(strcmp(flag,"HTTP.CONNECTTIMEOUT")==0) {
+        if(atoi(value)) auth->curlflags.connecttimeout = atoi(value);
+#ifdef D4DEBUG
+            nclog(NCLOGNOTE,"HTTP.CONNECTTIMEOUT: %ld", auth->curlflags.connecttimeout);
 #endif
     }
     if(strcmp(flag,"HTTP.USERAGENT")==0) {
@@ -246,13 +273,28 @@ setauthfield(NCauth* auth, const char* flag, const char* value)
             nclog(NCLOGNOTE,"HTTP.PROXY.SERVER: %s", value);
 #endif
     }
+    if(strcmp(flag,"HTTP.SSL.VERIFYPEER")==0) {
+	int v;
+        if((v = atol(value))) {
+	    auth->ssl.verifypeer = v;
+#ifdef D4DEBUG
+                nclog(NCLOGNOTE,"HTTP.SSL.VERIFYPEER: %d", v);
+#endif
+	}
+    }
+    if(strcmp(flag,"HTTP.SSL.VERIFYHOST")==0) {
+	int v;
+        if((v = atol(value))) {
+	    auth->ssl.verifyhost = v;
+#ifdef D4DEBUG
+                nclog(NCLOGNOTE,"HTTP.SSL.VERIFYHOST: %d", v);
+#endif
+	}
+    }
     if(strcmp(flag,"HTTP.SSL.VALIDATE")==0) {
         if(atoi(value)) {
 	    auth->ssl.verifypeer = 1;
-	    auth->ssl.verifyhost = 1;
-#ifdef D4DEBUG
-                nclog(NCLOGNOTE,"HTTP.SSL.VALIDATE: %ld", 1);
-#endif
+	    auth->ssl.verifyhost = 2;
 	}
     }
 
@@ -300,22 +342,6 @@ setauthfield(NCauth* auth, const char* flag, const char* value)
             nclog(NCLOGNOTE,"HTTP.SSL.CAPATH: %s", auth->ssl.capath);
 #endif
     }
-
-    if(strcmp(flag,"HTTP.SSL.VERIFYPEER")==0) {
-        const char* s = value;
-        int tf = 0;
-        if(s == NULL || strcmp(s,"0")==0 || strcasecmp(s,"false")==0)
-            tf = 0;
-        else if(strcmp(s,"1")==0 || strcasecmp(s,"true")==0)
-            tf = 1;
-        else
-            tf = 1; /* default if not null */
-        auth->ssl.verifypeer = tf;
-#ifdef D4DEBUG
-            nclog(NCLOGNOTE,"HTTP.SSL.VERIFYPEER: %d", auth->ssl.verifypeer);
-#endif
-    }
-
     if(strcmp(flag,"HTTP.NETRC")==0) {
         nullfree(auth->curlflags.netrc);
         auth->curlflags.netrc = strdup(value);
@@ -334,6 +360,17 @@ setauthfield(NCauth* auth, const char* flag, const char* value)
         nullfree(auth->creds.pwd);
         auth->creds.pwd = strdup(value);
         MEMCHECK(auth->creds.pwd);
+    }
+
+    if(strcmp(flag,"HTTP.S3.ACCESSID")==0) {
+        nullfree(auth->s3creds.accessid);
+        auth->s3creds.accessid = strdup(value);
+        MEMCHECK(auth->s3creds.accessid);
+    }
+    if(strcmp(flag,"HTTP.S3.SECRETKEY")==0) {
+        nullfree(auth->s3creds.secretkey);
+        auth->s3creds.secretkey = strdup(value);
+        MEMCHECK(auth->s3creds.secretkey);
     }
 
 done:

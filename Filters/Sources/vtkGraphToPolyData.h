@@ -30,7 +30,7 @@
  *
  * Only the owned graph edges (i.e. edges with ghost level 0) are copied
  * into the vtkPolyData.
-*/
+ */
 
 #ifndef vtkGraphToPolyData_h
 #define vtkGraphToPolyData_h
@@ -41,11 +41,11 @@
 class VTKFILTERSSOURCES_EXPORT vtkGraphToPolyData : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkGraphToPolyData *New();
-  vtkTypeMacro(vtkGraphToPolyData,vtkPolyDataAlgorithm);
+  static vtkGraphToPolyData* New();
+  vtkTypeMacro(vtkGraphToPolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Create a second output containing points and orientation vectors
    * for drawing arrows or other glyphs on edges.  This output should be
@@ -57,9 +57,9 @@ public:
   vtkSetMacro(EdgeGlyphOutput, bool);
   vtkGetMacro(EdgeGlyphOutput, bool);
   vtkBooleanMacro(EdgeGlyphOutput, bool);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * The position of the glyph point along the edge.
    * 0 puts a glyph point at the source of each edge.
@@ -69,11 +69,11 @@ public:
    */
   vtkSetMacro(EdgeGlyphPosition, double);
   vtkGetMacro(EdgeGlyphPosition, double);
-  //@}
+  ///@}
 
 protected:
   vtkGraphToPolyData();
-  ~vtkGraphToPolyData() override {}
+  ~vtkGraphToPolyData() override = default;
 
   bool EdgeGlyphOutput;
   double EdgeGlyphPosition;
@@ -83,7 +83,7 @@ protected:
   /**
    * Convert the vtkGraph into vtkPolyData.
    */
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Set the input type of the algorithm to vtkGraph.

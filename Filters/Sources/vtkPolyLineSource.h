@@ -18,7 +18,7 @@
  *
  * vtkPolyLineSource is a source object that creates a poly line from
  * user-specified points. The output is a vtkPolyLine.
-*/
+ */
 
 #ifndef vtkPolyLineSource_h
 #define vtkPolyLineSource_h
@@ -35,20 +35,20 @@ public:
   vtkTypeMacro(vtkPolyLineSource, vtkPolyPointSource);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set whether to close the poly line by connecting the last and first points.
    */
   vtkSetMacro(Closed, vtkTypeBool);
   vtkGetMacro(Closed, vtkTypeBool);
   vtkBooleanMacro(Closed, vtkTypeBool);
-  //@}
+  ///@}
 
 protected:
   vtkPolyLineSource();
   ~vtkPolyLineSource() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector *) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkTypeBool Closed;
 

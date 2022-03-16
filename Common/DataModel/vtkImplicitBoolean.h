@@ -30,7 +30,7 @@
  * subtracts the 2nd through last implicit functions from the first. The
  * VTK_UNION_OF_MAGNITUDES takes the minimum absolute value of the
  * implicit functions.
-*/
+ */
 
 #ifndef vtkImplicitBoolean_h
 #define vtkImplicitBoolean_h
@@ -43,12 +43,12 @@ class vtkImplicitFunctionCollection;
 class VTKCOMMONDATAMODEL_EXPORT vtkImplicitBoolean : public vtkImplicitFunction
 {
 public:
-  vtkTypeMacro(vtkImplicitBoolean,vtkImplicitFunction);
+  vtkTypeMacro(vtkImplicitBoolean, vtkImplicitFunction);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum OperationType
   {
-    VTK_UNION=0,
+    VTK_UNION = 0,
     VTK_INTERSECTION,
     VTK_DIFFERENCE,
     VTK_UNION_OF_MAGNITUDES
@@ -57,15 +57,15 @@ public:
   /**
    * Default boolean method is union.
    */
-  static vtkImplicitBoolean *New();
+  static vtkImplicitBoolean* New();
 
-  //@{
+  ///@{
   /**
    * Evaluate boolean combinations of implicit function using current operator.
    */
   using vtkImplicitFunction::EvaluateFunction;
   double EvaluateFunction(double x[3]) override;
-  //@}
+  ///@}
 
   /**
    * Evaluate gradient of boolean combination.
@@ -80,40 +80,36 @@ public:
   /**
    * Add another implicit function to the list of functions.
    */
-  void AddFunction(vtkImplicitFunction *in);
+  void AddFunction(vtkImplicitFunction* in);
 
   /**
    * Remove a function from the list of implicit functions to boolean.
    */
-  void RemoveFunction(vtkImplicitFunction *in);
+  void RemoveFunction(vtkImplicitFunction* in);
 
   /**
    * Return the collection of implicit functions.
    */
-  vtkImplicitFunctionCollection *GetFunction() {return this->FunctionList;};
+  vtkImplicitFunctionCollection* GetFunction() { return this->FunctionList; }
 
-  //@{
+  ///@{
   /**
    * Specify the type of boolean operation.
    */
-  vtkSetClampMacro(OperationType,int,VTK_UNION,VTK_UNION_OF_MAGNITUDES);
-  vtkGetMacro(OperationType,int);
-  void SetOperationTypeToUnion()
-    {this->SetOperationType(VTK_UNION);};
-  void SetOperationTypeToIntersection()
-    {this->SetOperationType(VTK_INTERSECTION);};
-  void SetOperationTypeToDifference()
-    {this->SetOperationType(VTK_DIFFERENCE);};
-  void SetOperationTypeToUnionOfMagnitudes()
-    {this->SetOperationType(VTK_UNION_OF_MAGNITUDES);};
-  const char *GetOperationTypeAsString();
-  //@}
+  vtkSetClampMacro(OperationType, int, VTK_UNION, VTK_UNION_OF_MAGNITUDES);
+  vtkGetMacro(OperationType, int);
+  void SetOperationTypeToUnion() { this->SetOperationType(VTK_UNION); }
+  void SetOperationTypeToIntersection() { this->SetOperationType(VTK_INTERSECTION); }
+  void SetOperationTypeToDifference() { this->SetOperationType(VTK_DIFFERENCE); }
+  void SetOperationTypeToUnionOfMagnitudes() { this->SetOperationType(VTK_UNION_OF_MAGNITUDES); }
+  const char* GetOperationTypeAsString();
+  ///@}
 
 protected:
   vtkImplicitBoolean();
   ~vtkImplicitBoolean() override;
 
-  vtkImplicitFunctionCollection *FunctionList;
+  vtkImplicitFunctionCollection* FunctionList;
 
   int OperationType;
 
@@ -122,21 +118,20 @@ private:
   void operator=(const vtkImplicitBoolean&) = delete;
 };
 
-//@{
 /**
  * Return the boolean operation type as a descriptive character string.
  */
-inline const char *vtkImplicitBoolean::GetOperationTypeAsString(void)
+inline const char* vtkImplicitBoolean::GetOperationTypeAsString()
 {
-  if ( this->OperationType == VTK_UNION )
+  if (this->OperationType == VTK_UNION)
   {
     return "Union";
   }
-  else if ( this->OperationType == VTK_INTERSECTION )
+  else if (this->OperationType == VTK_INTERSECTION)
   {
     return "Intersection";
   }
-  else if ( this->OperationType == VTK_DIFFERENCE )
+  else if (this->OperationType == VTK_DIFFERENCE)
   {
     return "Difference";
   }
@@ -145,8 +140,5 @@ inline const char *vtkImplicitBoolean::GetOperationTypeAsString(void)
     return "UnionOfMagnitudes";
   }
 }
-//@}
 
 #endif
-
-

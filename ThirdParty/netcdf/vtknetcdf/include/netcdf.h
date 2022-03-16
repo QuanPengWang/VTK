@@ -4,7 +4,7 @@ Main header file for the C API.
 
 Copyright 2018, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
-2015, 2016, 2017, 2018
+2015, 2016, 2017, 2018, 2019
 University Corporation for Atmospheric Research/Unidata.
 
 See \ref copyright file for more info.
@@ -120,6 +120,8 @@ extern "C" {
    currently unused:
         0x0002
    and the whole upper 16 bits
+   Note: nc4internal also defines flags in this space even tho it should not.
+   so check there around #define NC_CREAT.
 */
 
 #define NC_NOWRITE       0x0000 /**< Set read-only access for nc_open(). */
@@ -127,7 +129,6 @@ extern "C" {
 
 #define NC_CLOBBER       0x0000 /**< Destroy existing file. Mode flag for nc_create(). */
 #define NC_NOCLOBBER     0x0004 /**< Don't destroy existing file. Mode flag for nc_create(). */
-
 #define NC_DISKLESS      0x0008  /**< Use diskless file. Mode flag for nc_open() or nc_create(). */
 #define NC_MMAP          0x0010  /**< \deprecated Use diskless file with mmap. Mode flag for nc_open() or nc_create()*/
 
@@ -218,7 +219,7 @@ Use this in mode flags for both nc_create() and nc_open(). */
 #define NC_FORMATX_DAP4      (6)
 #define NC_FORMATX_UDF0      (8)
 #define NC_FORMATX_UDF1      (9)
-#define NC_FORMATX_ZARR      (10)
+#define NC_FORMATX_NCZARR    (10)
 #define NC_FORMATX_UNDEFINED (0)
 
   /* To avoid breaking compatibility (such as in the python library),
@@ -278,8 +279,11 @@ NOTE: The NC_MAX_DIMS, NC_MAX_ATTRS, and NC_MAX_VARS limits
 #define NC_MAX_VAR_DIMS 1024 /**< max per variable dimensions */
 /**@}*/
 
-/** This is the max size of an SD dataset name in HDF4 (from HDF4 documentation).*/
-#define NC_MAX_HDF4_NAME 64
+/** The max size of an SD dataset name in HDF4 (from HDF4
+ * documentation) is 64. But in in the wild we have encountered longer
+ * names. As long as the HDF4 name is not greater than NC_MAX_NAME,
+ * our code will be OK. */
+#define NC_MAX_HDF4_NAME NC_MAX_NAME
 
 /** In HDF5 files you can set the endianness of variables with
     nc_def_var_endian(). This define is used there. */
@@ -291,10 +295,14 @@ NOTE: The NC_MAX_DIMS, NC_MAX_ATTRS, and NC_MAX_VARS limits
 
 /** In HDF5 files you can set storage for each variable to be either
  * contiguous or chunked, with nc_def_var_chunking().  This define is
- * used there. */
+ * used there. Unknown storage is used for further extensions of HDF5
+ * storage models, which should be handled transparently by netcdf */
 /**@{*/
-#define NC_CHUNKED    0
-#define NC_CONTIGUOUS 1
+#define NC_CHUNKED         0
+#define NC_CONTIGUOUS      1
+#define NC_COMPACT         2
+#define NC_UNKNOWN_STORAGE 3
+#define NC_VIRTUAL         4
 /**@}*/
 
 /** In HDF5 files you can set check-summing for each variable.
@@ -473,7 +481,19 @@ by the desired type. */
 #define NC_ERCFILE       (-133)    /**< RC file failure */
 #define NC_ENULLPAD      (-134)    /**< Header Bytes not Null-Byte padded */
 #define NC_EINMEMORY     (-135)    /**< In-memory file error */
-#define NC4_LAST_ERROR   (-136)    /**< @internal All netCDF errors > this. */
+#define NC_ENOFILTER     (-136)    /**< Filter not defined on variable. */
+#define NC_ENCZARR       (-137)    /**< Error at NCZarr layer. */
+#define NC_ES3           (-138)    /**< Generic S3 error */
+#define NC_EEMPTY        (-139)    /**< Attempt to read empty NCZarr map key */
+#define NC_EOBJECT       (-140)    /**< Some object exists when it should not */
+#define NC_ENOOBJECT     (-141)    /**< Some object not found */
+#define NC_EPLUGIN       (-142)    /**< Unclassified failure in accessing a dynamically loaded plugin> */
+
+#define NC4_LAST_ERROR   (-142)    /**< @internal All netCDF errors > this. */
+
+/* Errors for all remote access methods(e.g. DAP and CDMREMOTE)*/
+#define NC_EURL         (NC_EDAPURL)   /**< Malformed URL */
+#define NC_ECONSTRAINT  (NC_EDAPCONSTRAINT)   /**< Malformed Constraint*/
 
 /** @internal This is used in netCDF-4 files for dimensions without
  * coordinate vars. */
@@ -483,10 +503,6 @@ by the desired type. */
  * our mistake of having chunksizes be first ints, then
  * size_t. Doh! */
 #define NC_HAVE_NEW_CHUNKING_API 1
-
-/* Errors for all remote access methods(e.g. DAP and CDMREMOTE)*/
-#define NC_EURL         (NC_EDAPURL)   /**< Malformed URL */
-#define NC_ECONSTRAINT  (NC_EDAPCONSTRAINT)   /**< Malformed Constraint*/
 
 /*
  * The Interface
@@ -626,7 +642,7 @@ nc_insert_array_compound(int ncid, nc_type xtype, const char *name,
 EXTERNL int
 nc_inq_type(int ncid, nc_type xtype, char *name, size_t *size);
 
-/* Get the id of a type from the name. */
+/* Get the id of a type from the name, which might be a fully qualified name */
 EXTERNL int
 nc_inq_typeid(int ncid, const char *name, nc_type *typeidp);
 
@@ -851,6 +867,10 @@ EXTERNL int
 nc_inq_var_deflate(int ncid, int varid, int *shufflep,
                    int *deflatep, int *deflate_levelp);
 
+/* Set szip compression for a variable. */
+EXTERNL int nc_def_var_szip(int ncid, int varid, int options_mask,
+                            int pixels_per_block);
+
 /* Find out szip settings of a var. */
 EXTERNL int
 nc_inq_var_szip(int ncid, int varid, int *options_maskp, int *pixels_per_blockp);
@@ -894,7 +914,7 @@ nc_inq_var_endian(int ncid, int varid, int *endianp);
 EXTERNL int
 nc_def_var_filter(int ncid, int varid, unsigned int id, size_t nparams, const unsigned int* parms);
 
-/* Learn about the filter on a variable */
+/* Learn about the first filter on a variable */
 EXTERNL int
 nc_inq_var_filter(int ncid, int varid, unsigned int* idp, size_t* nparams, unsigned int* params);
 
@@ -1762,19 +1782,17 @@ nc_show_metadata(int ncid);
 
 /* End {put,get}_var */
 
-/* #ifdef _CRAYMPP */
+/* Delete a file. */
+EXTERNL int
+nc_delete(const char *path);
+
 /*
- * Public interfaces to better support
- * CRAY multi-processor systems like T3E.
- * A tip of the hat to NERSC.
- */
-/*
- * It turns out we need to declare and define
- * these public interfaces on all platforms
- * or things get ugly working out the
- * FORTRAN interface. On !_CRAYMPP platforms,
- * these functions work as advertised, but you
- * can only use "processor element" 0.
+ * The following functions were written to accommodate the old Cray
+ * systems. Modern HPC systems do not use these functions any more,
+ * but use the nc_open_par()/nc_create_par() functions instead. These
+ * functions are retained for backward compatibibility. These
+ * functions work as advertised, but you can only use "processor
+ * element" 0.
  */
 
 EXTERNL int
@@ -1786,9 +1804,6 @@ nc__open_mp(const char *path, int mode, int basepe,
         size_t *chunksizehintp, int *ncidp);
 
 EXTERNL int
-nc_delete(const char *path);
-
-EXTERNL int
 nc_delete_mp(const char *path, int basepe);
 
 EXTERNL int
@@ -1796,8 +1811,6 @@ nc_set_base_pe(int ncid, int pe);
 
 EXTERNL int
 nc_inq_base_pe(int ncid, int *pe);
-
-/* #endif _CRAYMPP */
 
 /* This v2 function is used in the nc_test program. */
 EXTERNL int

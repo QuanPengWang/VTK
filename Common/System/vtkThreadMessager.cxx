@@ -12,12 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// Hide VTK_DEPRECATED_IN_9_1_0() warnings for this class.
+#define VTK_DEPRECATION_LEVEL 0
+
 #include "vtkThreadMessager.h"
 
 #include "vtkObjectFactory.h"
 
 #ifdef VTK_USE_WIN32_THREADS
-# include "vtkWindows.h"
+#include "vtkWindows.h"
 #endif
 
 vtkStandardNewMacro(vtkThreadMessager);
@@ -47,17 +51,17 @@ vtkThreadMessager::~vtkThreadMessager()
 void vtkThreadMessager::WaitForMessage()
 {
 #ifdef VTK_USE_WIN32_THREADS
-  WaitForSingleObject( this->WSignal, INFINITE );
+  WaitForSingleObject(this->WSignal, INFINITE);
 #elif defined(VTK_USE_PTHREADS)
   pthread_cond_wait(&this->PSignal, &this->Mutex);
 #endif
 }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkThreadMessager::SendWakeMessage()
 {
 #ifdef VTK_USE_WIN32_THREADS
-  SetEvent( this->WSignal );
+  SetEvent(this->WSignal);
 #elif defined(VTK_USE_PTHREADS)
   pthread_cond_broadcast(&this->PSignal);
 #endif
@@ -86,5 +90,5 @@ void vtkThreadMessager::DisableWaitForReceiver()
 
 void vtkThreadMessager::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
